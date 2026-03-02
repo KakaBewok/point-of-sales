@@ -18,6 +18,11 @@ class VoucherManager extends Component
     public $showModal = false;
     public $editingId = null;
 
+    public $showDeleteModal = false;
+    public $itemToDeleteId = null;
+    public $itemToDeleteName = null;
+    public $deleteType = 'single';
+
     public $code = '';
     public $discount_type = 'percentage';
     public $discount_value = '';
@@ -99,8 +104,27 @@ class VoucherManager extends Component
         $this->showModal = false;
     }
 
-    public function delete(Voucher $voucher)
+    public function confirmDelete($id, $name = '')
     {
+        $this->itemToDeleteId = $id;
+        $this->itemToDeleteName = $name;
+        $this->deleteType = 'single';
+        $this->showDeleteModal = true;
+    }
+
+    public function processDelete()
+    {
+        if ($this->deleteType === 'single' && $this->itemToDeleteId) {
+            $this->delete($this->itemToDeleteId);
+        }
+        
+        $this->showDeleteModal = false;
+        $this->reset(['itemToDeleteId', 'itemToDeleteName', 'deleteType']);
+    }
+
+    public function delete($id)
+    {
+        $voucher = Voucher::findOrFail($id);
         if ($voucher->used_count > 0) {
             session()->flash('error', 'Voucher tidak bisa dihapus karena sudah pernah digunakan.');
             return;

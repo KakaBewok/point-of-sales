@@ -39,7 +39,7 @@
                         <tr class="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
                             <td class="px-6 py-4 text-zinc-600 dark:text-zinc-400 whitespace-nowrap">{{ $log->created_at->format('d/m/Y H:i') }}</td>
                             <td class="px-6 py-4">
-                                <span class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold ring-1 ring-inset {{ $log->getBadgeColor() }} {{ str_contains($log->getBadgeColor(), 'emerald') ? 'ring-emerald-600/20' : (str_contains($log->getBadgeColor(), 'red') ? 'ring-red-600/20' : (str_contains($log->getBadgeColor(), 'indigo') ? 'ring-indigo-600/20' : (str_contains($log->getBadgeColor(), 'blue') ? 'ring-blue-600/20' : 'ring-zinc-600/20'))) }}">
+                                <span class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold ring-1 ring-inset {{ $log->getBadgeColor() }} {{ str_contains($log->getBadgeColor(), 'emerald') ? 'ring-emerald-600/20 dark:ring-emerald-900/50' : (str_contains($log->getBadgeColor(), 'red') ? 'ring-red-600/20 dark:ring-red-900/50' : (str_contains($log->getBadgeColor(), 'amber') ? 'ring-amber-600/20 dark:ring-amber-900/50' : 'ring-zinc-500/20 dark:ring-zinc-700')) }}">
                                     {{ $log->getTypeLabel() }}
                                 </span>
                             </td>

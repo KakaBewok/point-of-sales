@@ -22,6 +22,11 @@ class ProductManager extends Component
     public $showModal = false;
     public $editingId = null;
 
+    public $showDeleteModal = false;
+    public $itemToDeleteId = null;
+    public $itemToDeleteName = null;
+    public $deleteType = 'single';
+
     // Bulk Delete
     public $selected = [];
     public $selectAll = false;
@@ -147,8 +152,36 @@ class ProductManager extends Component
         }
     }
 
-    public function delete(Product $product)
+    public function confirmDelete($id, $name = '')
     {
+        $this->itemToDeleteId = $id;
+        $this->itemToDeleteName = $name;
+        $this->deleteType = 'single';
+        $this->showDeleteModal = true;
+    }
+
+    public function confirmDeleteSelected()
+    {
+        $this->itemToDeleteName = count($this->selected) . ' produk terpilih';
+        $this->deleteType = 'multiple';
+        $this->showDeleteModal = true;
+    }
+
+    public function processDelete()
+    {
+        if ($this->deleteType === 'single' && $this->itemToDeleteId) {
+            $this->delete($this->itemToDeleteId);
+        } elseif ($this->deleteType === 'multiple') {
+            $this->deleteSelected();
+        }
+        
+        $this->showDeleteModal = false;
+        $this->reset(['itemToDeleteId', 'itemToDeleteName', 'deleteType']);
+    }
+
+    public function delete($id)
+    {
+        $product = Product::findOrFail($id);
         // Image NOT deleted on soft delete - File lifecycle logic
         $product->delete();
         session()->flash('message', 'Produk berhasil dihapus.');

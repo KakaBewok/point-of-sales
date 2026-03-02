@@ -61,7 +61,7 @@
                         <th class="px-6 py-4 text-right font-semibold text-red-600 dark:text-red-400">Pajak</th>
                         <th class="px-6 py-4 text-right font-semibold text-zinc-900 dark:text-white">Total</th>
                         <th class="px-6 py-4 text-center font-semibold text-zinc-600 dark:text-zinc-400">Metode</th>
-                        <th class="px-6 py-4 text-right font-semibold text-zinc-600 dark:text-zinc-400">Aksi</th>
+                        <th class="px-6 py-4 text-center font-semibold text-zinc-600 dark:text-zinc-400">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800/60">
@@ -86,8 +86,11 @@
                                     {{ strtoupper($trx->payment?->method ?? '-') }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-right">
-                                <flux:button size="sm" variant="ghost" class="h-8 w-8 px-0" icon="printer" as="a" href="{{ route('receipt.print', $trx->id) }}" target="_blank" />
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex items-center justify-center gap-2">
+                                    <flux:button size="sm" variant="primary" class="h-9 px-3 bg-blue-600 hover:bg-blue-700 text-white border-blue-600 shadow-sm" as="a" href="{{ route('reports.detail', $trx->id) }}" wire:navigate>Lihat</flux:button>
+                                    <flux:button size="sm" variant="ghost" class="h-9 w-9 px-0 text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800" icon="printer" as="a" href="{{ route('receipt.print', $trx->id) }}" target="_blank" />
+                                </div>
                             </td>
                         </tr>
                     @empty

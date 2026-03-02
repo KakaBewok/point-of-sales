@@ -68,13 +68,13 @@ class StockLog extends Model
         };
     }
 
-    public function getTypeBadgeColor(): string
+    public function getBadgeColor(): string
     {
         return match ($this->type) {
-            'in', 'return' => 'green',
-            'out', 'sale' => 'red',
-            'adjustment' => 'yellow',
-            default => 'gray',
+            'in', 'return' => 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+            'out', 'sale' => 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+            'adjustment' => 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+            default => 'bg-zinc-50 text-zinc-600 dark:bg-zinc-800/50 dark:text-zinc-400',
         };
     }
 }

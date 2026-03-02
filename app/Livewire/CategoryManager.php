@@ -16,6 +16,11 @@ class CategoryManager extends Component
     public $showModal = false;
     public $editingId = null;
 
+    public $showDeleteModal = false;
+    public $itemToDeleteId = null;
+    public $itemToDeleteName = null;
+    public $deleteType = 'single';
+
     public $selected = [];
     public $selectAll = false;
 
@@ -102,8 +107,36 @@ class CategoryManager extends Component
         }
     }
 
-    public function delete(Category $category)
+    public function confirmDelete($id, $name = '')
     {
+        $this->itemToDeleteId = $id;
+        $this->itemToDeleteName = $name;
+        $this->deleteType = 'single';
+        $this->showDeleteModal = true;
+    }
+
+    public function confirmDeleteSelected()
+    {
+        $this->itemToDeleteName = count($this->selected) . ' kategori terpilih';
+        $this->deleteType = 'multiple';
+        $this->showDeleteModal = true;
+    }
+
+    public function processDelete()
+    {
+        if ($this->deleteType === 'single' && $this->itemToDeleteId) {
+            $this->delete($this->itemToDeleteId);
+        } elseif ($this->deleteType === 'multiple') {
+            $this->deleteSelected();
+        }
+        
+        $this->showDeleteModal = false;
+        $this->reset(['itemToDeleteId', 'itemToDeleteName', 'deleteType']);
+    }
+
+    public function delete($id)
+    {
+        $category = Category::findOrFail($id);
         if ($category->products()->count() > 0) {
             session()->flash('error', 'Kategori tidak bisa dihapus karena masih memiliki produk.');
             return;

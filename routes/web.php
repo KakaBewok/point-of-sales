@@ -27,6 +27,7 @@ Route::middleware(['auth', 'verified', 'role:admin,cashier'])->group(function ()
     Route::get('/stock/logs', StockLogViewer::class)->name('stock.logs')->middleware('permission:stock');
     Route::get('/vouchers', VoucherManager::class)->name('vouchers.index')->middleware('permission:vouchers');
     Route::get('/reports', ReportManager::class)->name('reports.index')->middleware('permission:reports');
+    Route::get('/reports/{id}', \App\Livewire\ReportDetail::class)->name('reports.detail')->middleware('permission:reports');
     
     // Print Receipt
     Route::get('/print/receipt/{transaction}', function (\App\Models\Transaction $transaction) {
