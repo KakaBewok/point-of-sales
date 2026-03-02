@@ -44,11 +44,11 @@ class TransactionService
                 $product = Product::lockForUpdate()->findOrFail($item['product_id']);
 
                 if (!$product->is_active) {
-                    throw new \Exception("Produk '{$product->name}' sudah tidak aktif.");
+                    throw new \Exception("Product {$product->name} is not active.");
                 }
 
                 if (!$product->hasEnoughStock($item['quantity'])) {
-                    throw new \Exception("Stok tidak cukup untuk '{$product->name}'. Tersedia: {$product->stock}");
+                    throw new \Exception("Stock {$product->name} is not enough. Available: {$product->stock}, requested: {$item['quantity']}");
                 }
 
                 $itemSubtotal = $product->price * $item['quantity'];
@@ -103,13 +103,13 @@ class TransactionService
             // 6. Create transaction
             $transaction = Transaction::create([
                 'user_id' => Auth::id(),
-                'subtotal' => $subtotal,
-                'discount_type' => $discountType,
+                'subtotal' => $subtotal, // before discount and tax
+                'discount_type' => $discountType, // percentage or fixed
                 'discount_value' => $discountValue,
                 'discount_amount' => $totalDiscount,
                 'tax_rate' => $taxRate,
                 'tax_amount' => $taxAmount,
-                'grand_total' => $grandTotal,
+                'grand_total' => $grandTotal, // total after discount and tax
                 'voucher_id' => $voucher?->id,
                 'status' => 'pending',
                 'notes' => $notes,
@@ -198,7 +198,7 @@ class TransactionService
     public function processCashPayment(Transaction $transaction, float $cashReceived): Payment
     {
         if ($cashReceived < $transaction->grand_total) {
-            throw new \Exception('Jumlah uang yang diterima kurang dari total transaksi.');
+            throw new \Exception('The amount of money received is less than the total transaction.');
         }
 
         return DB::transaction(function () use ($transaction, $cashReceived) {

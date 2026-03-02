@@ -16,23 +16,23 @@ class VoucherService
         $voucher = Voucher::where('code', strtoupper(trim($code)))->first();
 
         if (!$voucher) {
-            throw new \Exception('Kode voucher tidak ditemukan.');
+            throw new \Exception('Voucher code not found.');
         }
 
         if (!$voucher->is_active) {
-            throw new \Exception('Voucher sudah tidak aktif.');
+            throw new \Exception('Voucher is not active.');
         }
 
         if (!$voucher->isValid()) {
             if (!$voucher->hasRemainingUsage()) {
-                throw new \Exception('Voucher sudah mencapai batas penggunaan.');
+                throw new \Exception('Voucher has reached its usage limit.');
             }
-            throw new \Exception('Voucher sudah kadaluarsa.');
+            throw new \Exception('Voucher has expired.');
         }
 
         if ($subtotal < $voucher->min_transaction) {
             $minFormatted = 'Rp ' . number_format($voucher->min_transaction, 0, ',', '.');
-            throw new \Exception("Minimum transaksi untuk voucher ini adalah {$minFormatted}.");
+            throw new \Exception("Minimum transaction for this voucher is {$minFormatted}.");
         }
 
         return $voucher;

@@ -22,7 +22,7 @@ class StockService
             $stockAfter = $stockBefore - $quantity;
 
             if ($stockAfter < 0) {
-                throw new \Exception("Stok tidak cukup untuk produk: {$product->name}. Tersedia: {$stockBefore}, diminta: {$quantity}");
+                throw new \Exception("Stock {$product->name} is not enough. Available: {$stockBefore}, requested: {$quantity}");
             }
 
             $product->update(['stock' => $stockAfter]);

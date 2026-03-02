@@ -62,47 +62,47 @@ class MidtransService
             ]);
         } catch (\Exception $e) {
             Log::error('Midtrans QRIS Error: ' . $e->getMessage());
-            throw new \Exception('Gagal membuat pembayaran QRIS. Silakan coba lagi.');
+            throw new \Exception('Failed to create QRIS payment. Please try again.');
         }
     }
 
     /**
      * Create a Virtual Account payment via Midtrans.
      */
-    public function createVaPayment(Transaction $transaction, string $bank = 'bca'): Payment
-    {
-        $orderId = 'POS-VA-' . $transaction->id . '-' . time();
+    // public function createVaPayment(Transaction $transaction, string $bank = 'bca'): Payment
+    // {
+    //     $orderId = 'POS-VA-' . $transaction->id . '-' . time();
 
-        $params = [
-            'payment_type' => 'bank_transfer',
-            'transaction_details' => [
-                'order_id' => $orderId,
-                'gross_amount' => (int) $transaction->grand_total,
-            ],
-            'bank_transfer' => [
-                'bank' => $bank,
-            ],
-        ];
+    //     $params = [
+    //         'payment_type' => 'bank_transfer',
+    //         'transaction_details' => [
+    //             'order_id' => $orderId,
+    //             'gross_amount' => (int) $transaction->grand_total,
+    //         ],
+    //         'bank_transfer' => [
+    //             'bank' => $bank,
+    //         ],
+    //     ];
 
-        try {
-            $response = CoreApi::charge($params);
+    //     try {
+    //         $response = CoreApi::charge($params);
 
-            return Payment::create([
-                'transaction_id' => $transaction->id,
-                'method' => 'va',
-                'amount' => $transaction->grand_total,
-                'status' => 'pending',
-                'midtrans_transaction_id' => $response->transaction_id ?? null,
-                'midtrans_order_id' => $orderId,
-                'midtrans_response' => json_decode(json_encode($response), true),
-                'va_number' => $this->extractVaNumber($response, $bank),
-                'expires_at' => now()->addHours(24),
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Midtrans VA Error: ' . $e->getMessage());
-            throw new \Exception('Gagal membuat pembayaran VA. Silakan coba lagi.');
-        }
-    }
+    //         return Payment::create([
+    //             'transaction_id' => $transaction->id,
+    //             'method' => 'va',
+    //             'amount' => $transaction->grand_total,
+    //             'status' => 'pending',
+    //             'midtrans_transaction_id' => $response->transaction_id ?? null,
+    //             'midtrans_order_id' => $orderId,
+    //             'midtrans_response' => json_decode(json_encode($response), true),
+    //             'va_number' => $this->extractVaNumber($response, $bank),
+    //             'expires_at' => now()->addHours(24),
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         Log::error('Midtrans VA Error: ' . $e->getMessage());
+    //         throw new \Exception('Gagal membuat pembayaran VA. Silakan coba lagi.');
+    //     }
+    // }
 
     /**
      * Handle Midtrans webhook notification.
@@ -207,21 +207,21 @@ class MidtransService
     /**
      * Extract VA number from Midtrans response.
      */
-    private function extractVaNumber(object $response, string $bank): ?string
-    {
-        if (isset($response->va_numbers) && is_array($response->va_numbers)) {
-            foreach ($response->va_numbers as $va) {
-                if ($va->bank === $bank) {
-                    return $va->va_number;
-                }
-            }
-        }
+    // private function extractVaNumber(object $response, string $bank): ?string
+    // {
+    //     if (isset($response->va_numbers) && is_array($response->va_numbers)) {
+    //         foreach ($response->va_numbers as $va) {
+    //             if ($va->bank === $bank) {
+    //                 return $va->va_number;
+    //             }
+    //         }
+    //     }
 
-        // Permata bank uses a different structure
-        if (isset($response->permata_va_number)) {
-            return $response->permata_va_number;
-        }
+    //     // Permata bank uses a different structure
+    //     if (isset($response->permata_va_number)) {
+    //         return $response->permata_va_number;
+    //     }
 
-        return null;
-    }
+    //     return null;
+    // }
 }
