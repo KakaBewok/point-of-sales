@@ -32,6 +32,7 @@ class ProductManager extends Component
     public $selectAll = false;
 
     // Form fields
+    public $type = 'product';
     public $name = '';
     public $category_id = '';
     public $sku = '';
@@ -51,14 +52,15 @@ class ProductManager extends Component
             : 'required|string|unique:products,sku';
 
         return [
+            'type' => 'required|in:product,service',
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
             'sku' => $skuRule,
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'cost_price' => 'nullable|numeric|min:0',
-            'stock' => 'required|integer|min:0',
-            'low_stock_threshold' => 'required|integer|min:0',
+            'stock' => 'nullable|integer|min:0',
+            'low_stock_threshold' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
             'image' => 'nullable|image|max:2048',
         ];
@@ -80,8 +82,9 @@ class ProductManager extends Component
 
     public function create()
     {
-        $this->reset(['name', 'category_id', 'sku', 'description', 'price', 'cost_price', 'stock', 'low_stock_threshold', 'is_active', 'image', 'existingImage', 'editingId']);
+        $this->reset(['type', 'name', 'category_id', 'sku', 'description', 'price', 'cost_price', 'stock', 'low_stock_threshold', 'is_active', 'image', 'existingImage', 'editingId']);
         $this->sku = strtoupper(Str::random(8));
+        $this->type = 'product';
         $this->is_active = true;
         $this->stock = 0;
         $this->low_stock_threshold = 10;
@@ -91,6 +94,7 @@ class ProductManager extends Component
     public function edit(Product $product)
     {
         $this->editingId = $product->id;
+        $this->type = $product->type ?? 'product';
         $this->name = $product->name;
         $this->category_id = $product->category_id;
         $this->sku = $product->sku;
@@ -109,6 +113,16 @@ class ProductManager extends Component
         $validated = $this->validate();
         unset($validated['image']);
         
+        // If type is service, it doesn't have stock or threshold
+        if ($validated['type'] === 'service') {
+            $validated['stock'] = null;
+            $validated['low_stock_threshold'] = null;
+        } else {
+            // Provide default values if empty when strictly product
+            $validated['stock'] = $validated['stock'] ?? 0;
+            $validated['low_stock_threshold'] = $validated['low_stock_threshold'] ?? 0;
+        }
+
         // Cost Price Logic: Make cost_price nullable and default to null (unknown) if empty
         // Profit calculation will handle null as unknown cost.
         if (isset($validated['cost_price']) && $validated['cost_price'] === '') {
@@ -136,7 +150,7 @@ class ProductManager extends Component
         }
 
         $this->showModal = false;
-        $this->reset(['name', 'category_id', 'sku', 'description', 'price', 'cost_price', 'stock', 'low_stock_threshold', 'is_active', 'image', 'existingImage', 'editingId']);
+        $this->reset(['type', 'name', 'category_id', 'sku', 'description', 'price', 'cost_price', 'stock', 'low_stock_threshold', 'is_active', 'image', 'existingImage', 'editingId']);
     }
 
     private function deleteOldImage()

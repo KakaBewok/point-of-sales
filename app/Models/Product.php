@@ -14,6 +14,7 @@ class Product extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'type',
         'category_id',
         'name',
         'slug',
@@ -26,6 +27,9 @@ class Product extends Model
         'image',
         'thumbnail',
         'is_active',
+        'service_duration',
+        'is_appointment_ready',
+        'assigned_staff_id',
     ];
 
     protected function casts(): array
@@ -79,36 +83,67 @@ class Product extends Model
         return $query->where('is_active', true);
     }
 
+    public function scopeIsProduct($query)
+    {
+        return $query->where('type', 'product');
+    }
+
+    public function scopeIsService($query)
+    {
+        return $query->where('type', 'service');
+    }
+
     public function scopeInStock($query)
     {
-        return $query->where('stock', '>', 0);
+        return $query->where(function ($q) {
+            $q->where('type', 'service')
+              ->orWhere(function ($subq) {
+                  $subq->where('type', 'product')
+                       ->where('stock', '>', 0);
+              });
+        });
     }
 
     public function scopeLowStock($query)
     {
-        return $query->whereColumn('stock', '<=', 'low_stock_threshold')
+        return $query->where('type', 'product')
+                     ->whereColumn('stock', '<=', 'low_stock_threshold')
                      ->where('stock', '>', 0);
     }
 
     public function scopeOutOfStock($query)
     {
-        return $query->where('stock', '<=', 0);
+        return $query->where('type', 'product')
+                     ->where('stock', '<=', 0);
     }
 
     // ─── Helpers ────────────────────────────────────────────────
 
+    public function isProductType(): bool
+    {
+        return $this->type === 'product';
+    }
+
+    public function isServiceType(): bool
+    {
+        return $this->type === 'service';
+    }
+
     public function isLowStock(): bool
     {
+        if ($this->isServiceType()) return false;
         return $this->stock <= $this->low_stock_threshold && $this->stock > 0;
     }
 
     public function isOutOfStock(): bool
     {
+        if ($this->isServiceType()) return false;
         return $this->stock <= 0;
     }
 
     public function hasEnoughStock(int $quantity): bool
     {
+        if ($this->isServiceType()) return true;
         return $this->stock >= $quantity;
     }
 

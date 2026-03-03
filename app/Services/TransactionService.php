@@ -47,7 +47,7 @@ class TransactionService
                     throw new \Exception("Product {$product->name} is not active.");
                 }
 
-                if (!$product->hasEnoughStock($item['quantity'])) {
+                if (!$product->isServiceType() && !$product->hasEnoughStock($item['quantity'])) {
                     throw new \Exception("Stock {$product->name} is not enough. Available: {$product->stock}, requested: {$item['quantity']}");
                 }
 
@@ -145,11 +145,13 @@ class TransactionService
         return DB::transaction(function () use ($transaction) {
             // Reduce stock for each item
             foreach ($transaction->items as $item) {
-                $this->stockService->reduceStock(
-                    $item->product,
-                    $item->quantity,
-                    $transaction->invoice_number,
-                );
+                if ($item->product && !$item->product->isServiceType()) {
+                    $this->stockService->reduceStock(
+                        $item->product,
+                        $item->quantity,
+                        $transaction->invoice_number,
+                    );
+                }
             }
 
             // Mark transaction as completed
@@ -168,11 +170,13 @@ class TransactionService
             // Only restore stock if transaction was completed
             if ($transaction->isCompleted()) {
                 foreach ($transaction->items as $item) {
-                    $this->stockService->returnStock(
-                        $item->product,
-                        $item->quantity,
-                        $transaction->invoice_number,
-                    );
+                    if ($item->product && !$item->product->isServiceType()) {
+                        $this->stockService->returnStock(
+                            $item->product,
+                            $item->quantity,
+                            $transaction->invoice_number,
+                        );
+                    }
                 }
             }
 

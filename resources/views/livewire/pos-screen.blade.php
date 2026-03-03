@@ -69,7 +69,9 @@
                                     @endif
                                     
                                     <div class="absolute top-3 right-3">
-                                        @if($product->stock <= $product->low_stock_threshold)
+                                        @if($product->type === 'service')
+                                            <span class="bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400 px-2.5 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest border border-blue-200 dark:border-blue-800">Jasa</span>
+                                        @elseif($product->stock <= $product->low_stock_threshold)
                                             <span class="bg-red-500 text-white px-2.5 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg animate-pulse">Low: {{ $product->stock }}</span>
                                         @else
                                             <span class="bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400 px-2.5 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest">Stok: {{ $product->stock }}</span>
@@ -191,7 +193,12 @@
                     <div class="bg-zinc-50 dark:bg-zinc-900/50 p-3 rounded-2xl border border-zinc-100 dark:border-zinc-800 flex flex-col gap-3 group transition-all hover:border-green-300">
                         <div class="flex justify-between items-start gap-3">
                             <div class="flex-1">
-                                <h4 class="text-[11px] font-black text-zinc-800 dark:text-zinc-100 uppercase truncate leading-tight">{{ $item['name'] }}</h4>
+                                <h4 class="text-[11px] font-black text-zinc-800 dark:text-zinc-100 uppercase truncate leading-tight flex items-center gap-1">
+                                    {{ $item['name'] }}
+                                    @if(($item['type'] ?? 'product') === 'service')
+                                        <span class="text-[7px] bg-blue-100 text-blue-700 px-1 py-0.5 rounded-sm dark:bg-blue-900 dark:text-blue-300">JASA</span>
+                                    @endif
+                                </h4>
                                 <p class="text-[9px] font-bold text-zinc-400 mt-0.5">@ Rp{{ number_format($item['price'], 0, ',', '.') }}</p>
                             </div>
                             <button wire:click="removeFromCart('{{ $key }}')" class="h-6 w-6 text-zinc-300 hover:text-red-500 transition-colors flex items-center justify-center">
@@ -288,7 +295,7 @@
     {{-- ====================================================================
          2. MODAL REFINEMENT: PROPORTIONAL SIZE AND FONTS
          ==================================================================== --}}
-    <flux:modal wire:model="showPaymentModal" class="max-w-md p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-3xl">
+    <flux:modal wire:model="showPaymentModal" class="max-w-2xl p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-3xl w-full">
         <div class="p-6 space-y-6">
             <header class="flex justify-between items-end border-b border-zinc-100 dark:border-zinc-800 pb-5">
                 <div>
@@ -296,63 +303,103 @@
                     <p class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mt-1">Konfirmasi Pembayaran</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-2xl font-black text-green-600 tracking-tighter leading-none">Rp{{ number_format($this->grandTotal, 0, ',', '.') }}</p>
+                    <p class="text-[10px] font-black tracking-[0.2em] text-zinc-400 uppercase mb-1">Total Bayar</p>
+                    <p class="text-3xl font-black text-green-600 tracking-tighter leading-none">Rp{{ number_format($this->grandTotal, 0, ',', '.') }}</p>
                 </div>
             </header>
 
-            {{-- Method Selection --}}
-            <div class="grid grid-cols-2 gap-4">
-                @foreach(['cash' => 'Tunai', 'qris' => 'QRIS'] as $val => $label)
-                    <label class="relative flex flex-col items-center justify-center p-4 border-2 rounded-2xl cursor-pointer transition-all {{ $paymentMethod === $val ? 'border-green-600 bg-green-50 dark:bg-green-950/20 shadow-sm' : 'border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50' }}">
-                        <input type="radio" wire:model.live="paymentMethod" value="{{ $val }}" class="sr-only">
-                        <div class="h-10 w-10 rounded-xl flex items-center justify-center mb-2 {{ $paymentMethod === $val ? 'bg-green-600 text-white' : 'bg-white dark:bg-zinc-800 text-zinc-400' }}">
-                            <flux:icon name="{{ $val === 'cash' ? 'banknotes' : 'qr-code' }}" class="h-6 w-6" />
-                        </div>
-                        <span class="text-[10px] font-black uppercase tracking-widest text-center {{ $paymentMethod === $val ? 'text-green-700 dark:text-green-400' : 'text-zinc-400' }}">{{ $label }}</span>
-                    </label>
-                @endforeach
-            </div>
-
-            {{-- Context Action Area --}}
-            <div class="bg-zinc-50 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800 min-h-[120px] flex flex-col justify-center">
-                @if($paymentMethod === 'cash')
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between px-1">
-                            <label class="text-[10px] font-black uppercase text-zinc-500">Uang Diterima (Rp)</label>
-                            <button type="button" wire:click="$set('cashReceived', {{ $this->grandTotal }})" class="text-[10px] font-black text-green-600 underline">PAS</button>
-                        </div>
-                        <input 
-                            type="number" 
-                            wire:model.live.debounce.300ms="cashReceived" 
-                            class="w-full h-14 text-3xl font-black text-center tracking-tighter bg-white dark:bg-zinc-900 border-2 border-zinc-200 rounded-2xl focus:border-green-500 outline-none"
-                            autofocus
-                        />
-                        <div class="flex justify-between items-center px-1 pt-1 opacity-80">
-                            <span class="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Kembalian</span>
-                            <span class="text-[12px] font-black {{ $this->changeAmount > 0 ? 'text-emerald-500' : 'text-zinc-400' }}">
-                                Rp{{ number_format($this->changeAmount, 0, ',', '.') }}
-                            </span>
-                        </div>
+            <div class="flex flex-col md:flex-row gap-6">
+                {{-- Left side: Payment Method & Input --}}
+                <div class="flex-1 flex flex-col space-y-6">
+                    {{-- Method Selection --}}
+                    <div class="grid grid-cols-2 gap-4 shrink-0">
+                        @foreach(['cash' => 'Tunai', 'qris' => 'QRIS'] as $val => $label)
+                            <label class="relative flex flex-col items-center justify-center p-4 border-2 rounded-2xl cursor-pointer transition-all {{ $paymentMethod === $val ? 'border-green-600 bg-green-50 dark:bg-green-950/20 shadow-sm' : 'border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 hover:bg-zinc-100' }}">
+                                <input type="radio" wire:model.live="paymentMethod" value="{{ $val }}" class="sr-only">
+                                <div class="h-8 w-8 rounded-xl flex items-center justify-center mb-2 {{ $paymentMethod === $val ? 'bg-green-600 text-white' : 'bg-white dark:bg-zinc-800 text-zinc-400' }}">
+                                    <flux:icon name="{{ $val === 'cash' ? 'banknotes' : 'qr-code' }}" class="h-5 w-5" />
+                                </div>
+                                <span class="text-[10px] font-black uppercase tracking-widest text-center {{ $paymentMethod === $val ? 'text-green-700 dark:text-green-400' : 'text-zinc-400' }}">{{ $label }}</span>
+                            </label>
+                        @endforeach
                     </div>
-                @else
-                        <div class="w-32 h-32 bg-white dark:bg-zinc-800 border-2 border-dashed border-zinc-300 dark:border-zinc-700 flex items-center justify-center rounded-xl mb-4">
-                            <flux:icon name="qr-code" class="h-12 w-12 text-zinc-300 dark:text-zinc-600" />
+
+                    {{-- Context Action Area --}}
+                    <div class="bg-zinc-50 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800 min-h-[160px] flex flex-col justify-center flex-1">
+                        @if($paymentMethod === 'cash')
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between px-1">
+                                    <label class="text-[10px] font-black uppercase tracking-widest text-zinc-500">Uang Diterima</label>
+                                    <button type="button" wire:click="$set('cashReceived', {{ $this->grandTotal }})" class="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded-md font-black hover:bg-green-200 transition-colors">PAS</button>
+                                </div>
+                                
+                                <div class="relative">
+                                    <input 
+                                        type="number" 
+                                        wire:model.live="cashReceived"
+                                        class="w-full h-20 text-4xl font-black text-right pr-4 tracking-tighter bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-700 rounded-2xl focus:border-green-500 outline-none text-zinc-900 dark:text-white transition-all caret-green-600"
+                                        placeholder="0"
+                                        autofocus
+                                    />
+                                    <div class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 font-bold text-lg select-none pointer-events-none">Rp</div>
+                                </div>
+
+                                <div class="flex flex-col gap-2">
+                                    <div class="flex justify-between items-center px-1 opacity-90">
+                                        <span class="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Total Format</span>
+                                        <span class="text-sm font-bold text-zinc-900 dark:text-white">
+                                            Rp {{ number_format((float)$cashReceived, 0, ',', '.') }}
+                                        </span>
+                                    </div>
+                                    <div class="flex justify-between items-center px-1 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+                                        <span class="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Kembalian</span>
+                                        <span class="text-lg font-black {{ $this->changeAmount > 0 ? 'text-emerald-500' : ($this->cashReceived >= $this->grandTotal ? 'text-zinc-400' : 'text-red-500') }}">
+                                            Rp{{ number_format($this->changeAmount, 0, ',', '.') }}
+                                        </span>
+                                    </div>
+                                    @if($this->cashReceived < $this->grandTotal && $this->cashReceived > 0)
+                                        <p class="text-[9px] font-bold text-red-500 uppercase tracking-tight text-right px-1">Kurang: Rp{{ number_format($this->grandTotal - $this->cashReceived, 0, ',', '.') }}</p>
+                                    @endif
+                                </div>
+                            </div>
+                        @else
+                            <div class="flex flex-col items-center justify-center text-center h-full">
+                                <div class="w-32 h-32 bg-white dark:bg-zinc-800 border-2 border-dashed border-zinc-300 dark:border-zinc-700 flex items-center justify-center rounded-xl mb-4">
+                                    <flux:icon name="qr-code" class="h-12 w-12 text-zinc-300 dark:text-zinc-600" />
+                                </div>
+                                <p class="text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] leading-loose">QR Code (Midtrans) akan dibuat otomatis<br>setelah konfirmasi pembayaran.</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                {{-- Right side: Numeric Keypad (Cash only) --}}
+                @if($paymentMethod === 'cash')
+                    <div class="md:w-64 shrink-0 flex flex-col justify-end">
+                        <div class="grid grid-cols-3 gap-3">
+                            @foreach(['1', '2', '3', '4', '5', '6', '7', '8', '9', '000', '00', '0'] as $key)
+                                <button type="button" wire:click="appendKeypad('{{ $key }}')" class="h-14 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white rounded-xl font-bold text-xl transition-colors select-none active:scale-95 shadow-sm">
+                                    {{ $key }}
+                                </button>
+                            @endforeach
+                            <button type="button" wire:click="removeKeypad" class="col-span-3 h-14 bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/40 dark:text-red-400 rounded-xl flex items-center justify-center transition-colors active:scale-95 shadow-sm">
+                                <flux:icon name="backspace" class="h-6 w-6" />
+                            </button>
                         </div>
-                        <p class="text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] leading-loose">QR Code (Midtrans) akan dibuat otomatis<br>setelah konfirmasi pembayaran.</p>
                     </div>
                 @endif
             </div>
 
-            <div class="flex gap-3 pt-2">
-                <button type="button" wire:click="$set('showPaymentModal', false)" class="flex-1 h-12 rounded-xl border border-zinc-200 text-[10px] font-black uppercase text-zinc-400">Kembali</button>
+            <div class="flex gap-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                <button type="button" wire:click="$set('showPaymentModal', false)" class="flex-1 h-14 rounded-xl border border-zinc-200 dark:border-zinc-700 text-[11px] font-black uppercase text-zinc-500 hover:bg-zinc-50 transition-colors">Batal</button>
                 <button 
                     type="button" 
                     wire:click="processPayment" 
                     @if($paymentMethod === 'cash' && $this->cashReceived < $this->grandTotal) disabled @endif
-                    class="flex-[2] h-12 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-black uppercase text-[11px] tracking-[0.2em] shadow-lg disabled:opacity-20 flex items-center justify-center gap-2 group cursor-pointer"
+                    class="flex-[2] h-14 rounded-xl bg-green-600 hover:bg-green-700 text-white font-black uppercase text-[12px] tracking-[0.2em] shadow-lg shadow-green-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group transition-all"
                 >
-                    Proses Bayar
-                    <flux:icon name="check" class="h-3.5 w-3.5" />
+                    Konfirmasi Bayar
+                    <flux:icon name="arrow-right" class="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </button>
             </div>
         </div>

@@ -31,7 +31,14 @@
                             @foreach($transaction->items as $item)
                                 <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors">
                                     <td class="px-6 py-4">
-                                        <div class="font-medium text-zinc-900 dark:text-white">{{ $item->product_name }}</div>
+                                        <div class="flex items-center gap-2">
+                                            <div class="font-medium text-zinc-900 dark:text-white">{{ $item->product_name }}</div>
+                                            @if($item->product && $item->product->type === 'service')
+                                                <span class="inline-flex items-center rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-medium text-blue-700 ring-1 ring-inset ring-blue-600/20 dark:bg-blue-900/30 dark:text-blue-400 dark:ring-blue-900/50">Jasa</span>
+                                            @else
+                                                <span class="inline-flex items-center rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20 dark:bg-emerald-900/30 dark:text-emerald-400 dark:ring-emerald-900/50">Produk</span>
+                                            @endif
+                                        </div>
                                         <div class="text-[10px] text-zinc-500 uppercase tracking-wider mt-0.5">SKU: {{ $item->product?->sku ?? '-' }}</div>
                                     </td>
                                     <td class="px-6 py-4 text-center font-medium">{{ $item->quantity }}</td>

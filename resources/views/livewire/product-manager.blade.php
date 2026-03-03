@@ -57,6 +57,7 @@
                         <th class="px-6 py-4 text-left font-semibold text-zinc-600 dark:text-zinc-400">SKU</th>
                         <th class="px-6 py-4 text-left font-semibold text-zinc-600 dark:text-zinc-400">Kategori</th>
                         <th class="px-6 py-4 text-right font-semibold text-zinc-600 dark:text-zinc-400">Harga</th>
+                        <th class="px-6 py-4 text-center font-semibold text-zinc-600 dark:text-zinc-400">Tipe</th>
                         <th class="px-6 py-4 text-center font-semibold text-zinc-600 dark:text-zinc-400">Stok</th>
                         <th class="px-6 py-4 text-center font-semibold text-zinc-600 dark:text-zinc-400">Status</th>
                         <th class="px-6 py-4 text-right font-semibold text-zinc-600 dark:text-zinc-400">Aksi</th>
@@ -84,10 +85,25 @@
                             <td class="px-6 py-4 text-zinc-600 dark:text-zinc-400">{{ $product->category->name }}</td>
                             <td class="px-6 py-4 text-right font-medium text-zinc-900 dark:text-white">Rp {{ number_format($product->price, 0, ',', '.') }}</td>
                             <td class="px-6 py-4 text-center">
-                                <span class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold ring-1 ring-inset
-                                    {{ $product->stock <= 0 ? 'bg-red-50 text-red-700 ring-red-600/20 dark:bg-red-900/30 dark:text-red-400 dark:ring-red-900/50' : ($product->isLowStock() ? 'bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-900/30 dark:text-amber-400 dark:ring-amber-900/50' : 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-900/30 dark:text-emerald-400 dark:ring-emerald-900/50') }}">
-                                    {{ $product->stock }}
-                                </span>
+                                @if($product->type === 'service')
+                                    <span class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold ring-1 ring-inset bg-blue-50 text-blue-700 ring-blue-600/20 dark:bg-blue-900/30 dark:text-blue-400 dark:ring-blue-900/50">
+                                        Jasa
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold ring-1 ring-inset bg-zinc-50 text-zinc-700 ring-zinc-600/20 dark:bg-zinc-800/50 dark:text-zinc-400 dark:ring-zinc-700">
+                                        Produk
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                @if($product->type === 'service')
+                                    <span class="text-zinc-400 dark:text-zinc-600">-</span>
+                                @else
+                                    <span class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold ring-1 ring-inset
+                                        {{ $product->stock <= 0 ? 'bg-red-50 text-red-700 ring-red-600/20 dark:bg-red-900/30 dark:text-red-400 dark:ring-red-900/50' : ($product->isLowStock() ? 'bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-900/30 dark:text-amber-400 dark:ring-amber-900/50' : 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-900/30 dark:text-emerald-400 dark:ring-emerald-900/50') }}">
+                                        {{ $product->stock }}
+                                    </span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <button outline wire:click="toggleActive({{ $product->id }})" class="cursor-pointer transition-opacity hover:opacity-80">
@@ -136,6 +152,15 @@
 
                     <div class="grid grid-cols-2 gap-4">
                         <flux:field>
+                            <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Tipe Item <span class="text-red-500">*</span></flux:label>
+                            <flux:select class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" wire:model.live="type">
+                                <flux:select.option value="product">Produk Fisik</flux:select.option>
+                                <flux:select.option value="service">Jasa / Layanan</flux:select.option>
+                            </flux:select>
+                            <flux:error name="type" class="mt-1 text-sm text-red-500" />
+                        </flux:field>
+
+                        <flux:field>
                             <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Kategori <span class="text-red-500">*</span></flux:label>
                             <flux:select class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" wire:model="category_id">
                                 <flux:select.option value="">Pilih Kategori</flux:select.option>
@@ -145,7 +170,9 @@
                             </flux:select>
                             <flux:error name="category_id" class="mt-1 text-sm text-red-500" />
                         </flux:field>
-                        
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-4">
                         <flux:field>
                             <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">SKU <span class="text-red-500">*</span></flux:label>
                             <flux:input class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" wire:model="sku" />
@@ -173,7 +200,7 @@
                         </flux:field>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2 gap-4" x-data="{ type: @entangle('type') }" x-show="type === 'product'">
                         <flux:field>
                             <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Stok <span class="text-red-500">*</span></flux:label>
                             <flux:input class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" type="number" wire:model="stock" />
