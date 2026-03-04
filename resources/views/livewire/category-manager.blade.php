@@ -120,6 +120,20 @@
                     Apakah Anda yakin ingin menghapus <span class="font-medium text-gray-700 dark:text-gray-300">{{ $itemToDeleteName ?: 'item ini' }}</span>?
                     <br>Tindakan ini tidak dapat dibatalkan.
                 </p>
+                @if($hasProductsWarning)
+                    <div class="mt-3 rounded-lg bg-amber-50 border border-amber-200 dark:bg-amber-900/20 dark:border-amber-800/50 p-3">
+                        <div class="flex items-start gap-2">
+                            <flux:icon name="exclamation-triangle" class="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                            <p class="text-sm text-amber-800 dark:text-amber-300">
+                                @if($deleteType === 'multiple')
+                                    <strong>{{ $categoriesWithProducts }} kategori</strong> masih memiliki produk. Menghapusnya dapat mempengaruhi data terkait.
+                                @else
+                                    Kategori ini masih memiliki produk. Menghapusnya dapat mempengaruhi data terkait.
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+                @endif
             </div>
             
             <div class="mt-6 flex justify-end gap-3 w-full">

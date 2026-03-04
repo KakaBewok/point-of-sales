@@ -10,6 +10,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Str;
+use App\Services\ActivityLogger;
 
 #[Layout('layouts.app')]
 #[Title('Produk')]
@@ -143,9 +144,11 @@ class ProductManager extends Component
         if ($this->editingId) {
             $product = Product::findOrFail($this->editingId);
             $product->update($validated);
+            ActivityLogger::crud('product_updated', 'product', $product->id, ['name' => $product->name]);
             session()->flash('message', 'Produk berhasil diperbarui.');
         } else {
-            Product::create($validated);
+            $product = Product::create($validated);
+            ActivityLogger::crud('product_created', 'product', $product->id, ['name' => $product->name, 'type' => $product->type]);
             session()->flash('message', 'Produk berhasil ditambahkan.');
         }
 
@@ -196,7 +199,7 @@ class ProductManager extends Component
     public function delete($id)
     {
         $product = Product::findOrFail($id);
-        // Image NOT deleted on soft delete - File lifecycle logic
+        ActivityLogger::crud('product_deleted', 'product', $id, ['name' => $product->name]);
         $product->delete();
         session()->flash('message', 'Produk berhasil dihapus.');
     }
@@ -205,6 +208,7 @@ class ProductManager extends Component
     {
         if (empty($this->selected)) return;
         
+        ActivityLogger::bulk('product_bulk_deleted', 'product', $this->selected);
         Product::whereIn('id', $this->selected)->delete();
         $this->reset(['selected', 'selectAll']);
         $this->resetPage();

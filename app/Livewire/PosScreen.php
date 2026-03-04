@@ -82,7 +82,7 @@ class PosScreen extends Component
 
     public function getChangeAmountProperty(): float
     {
-        return max(0, $this->cashReceived - $this->grandTotal);
+        return max(0, (float) $this->cashReceived - $this->grandTotal);
     }
 
     // ─── Cart Actions ──────────────────────────────────────────

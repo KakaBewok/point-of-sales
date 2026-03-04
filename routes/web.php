@@ -40,6 +40,9 @@ Route::middleware(['auth', 'verified', 'role:admin,cashier'])->group(function ()
 Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/users', UserManager::class)->name('users.index');
     Route::get('/settings', SettingsManager::class)->name('settings.index');
+
+    // Log Viewer (admin only)
+    Route::get('/logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->name('logs.index');
 });
 
 require __DIR__.'/settings.php';

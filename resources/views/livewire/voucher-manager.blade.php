@@ -1,7 +1,12 @@
 <div class="px-6 py-8 md:px-8 space-y-8 max-w-7xl mx-auto flex-1 w-full">
     <div class="flex items-center justify-between">
         <h1 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Manajemen Voucher</h1>
-        <flux:button variant="primary" icon="plus" class="h-10 px-4" wire:click="create">Tambah Voucher</flux:button>
+        <div class="flex items-center gap-3">
+            @if(!empty($selected) && is_array($selected))
+                <flux:button variant="danger" icon="trash" class="h-10 px-4" wire:click="confirmDeleteSelected">Hapus Terpilih ({{ count($selected) }})</flux:button>
+            @endif
+            <flux:button variant="primary" icon="plus" class="h-10 px-4" wire:click="create">Tambah Voucher</flux:button>
+        </div>
     </div>
 
     @if(session()->has('message'))
@@ -23,8 +28,11 @@
         </div>
     @endif
 
-    <div class="flex">
-        <flux:input icon="magnifying-glass" class="h-10 w-full max-w-sm" wire:model.live.debounce.300ms="search" placeholder="Cari kode voucher..." />
+    <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2 max-w-sm w-full">
+            <flux:checkbox wire:model.live="selectAll" label="Pilih Semua" class="mr-2 whitespace-nowrap" />
+            <flux:input icon="magnifying-glass" class="h-10 w-full" wire:model.live.debounce.300ms="search" placeholder="Cari kode voucher..." />
+        </div>
     </div>
 
     <div class="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
@@ -32,6 +40,9 @@
             <table class="w-full text-sm">
                 <thead class="bg-zinc-50 border-b border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800">
                     <tr>
+                        <th class="px-4 py-4 text-center w-12">
+                            <flux:checkbox wire:model.live="selectAll" />
+                        </th>
                         <th class="px-6 py-4 text-left font-semibold text-zinc-600 dark:text-zinc-400">Kode</th>
                         <th class="px-6 py-4 text-right font-semibold text-zinc-600 dark:text-zinc-400">Diskon</th>
                         <th class="px-6 py-4 text-right font-semibold text-zinc-600 dark:text-zinc-400">Min. Transaksi</th>
@@ -43,7 +54,10 @@
                 </thead>
                 <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800/60">
                     @forelse($vouchers as $voucher)
-                        <tr class="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+                        <tr class="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50 {{ in_array((string)$voucher->id, $selected) ? 'bg-blue-50 dark:bg-blue-900/10' : '' }}">
+                            <td class="px-4 py-4 text-center">
+                                <flux:checkbox wire:model.live="selected" value="{{ $voucher->id }}" />
+                            </td>
                             <td class="px-6 py-4 font-mono font-bold text-zinc-900 dark:text-white">{{ $voucher->code }}</td>
                             <td class="px-6 py-4 text-right text-zinc-900 dark:text-white">
                                 @if($voucher->discount_type === 'percentage')
@@ -89,7 +103,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="7" class="px-6 py-10 text-center text-zinc-500">
+                        <tr><td colspan="8" class="px-6 py-10 text-center text-zinc-500">
                             <flux:icon name="ticket" class="mx-auto h-8 w-8 opacity-40 mb-3" />
                             Tidak ada voucher ditemukan.
                         </td></tr>
@@ -191,7 +205,7 @@
                 </h3>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
                     Apakah Anda yakin ingin menghapus <span class="font-medium text-gray-700 dark:text-gray-300">{{ $itemToDeleteName ?: 'item ini' }}</span>?
-                    <br>Tindakan ini tidak dapat dibatalkan.
+                    <br>Data riwayat transaksi tetap aman.
                 </p>
             </div>
             

@@ -1,11 +1,26 @@
 <div class="px-6 py-8 md:px-8 space-y-8 max-w-7xl mx-auto flex-1 w-full">
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h1 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Laporan Transaksi</h1>
-        <flux:button variant="primary" icon="arrow-down-tray" class="h-10 px-4" wire:click="exportExcel" wire:loading.attr="disabled">Export Excel</flux:button>
+        <div class="flex items-center gap-3">
+            @if(!empty($selected) && is_array($selected))
+                <flux:button variant="danger" icon="trash" class="h-10 px-4" wire:click="confirmDeleteSelected">Hapus Terpilih ({{ count($selected) }})</flux:button>
+            @endif
+            <flux:button variant="primary" icon="arrow-down-tray" class="h-10 px-4" wire:click="exportExcel" wire:loading.attr="disabled">Export Excel</flux:button>
+        </div>
     </div>
 
+    @if(session()->has('message'))
+        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" x-transition.opacity.duration.500ms class="fixed top-6 right-6 z-50 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 shadow-xl shadow-emerald-900/10 dark:border-emerald-900/50 dark:bg-emerald-900 dark:text-emerald-400 dark:shadow-black/50 flex items-center gap-3">
+            <flux:icon name="check-circle" class="h-5 w-5" />
+            {{ session('message') }}
+            <button @click="show = false" class="ml-2 text-emerald-600 hover:text-emerald-800 dark:text-emerald-400/70 dark:hover:text-emerald-300 transition-colors">
+                <flux:icon name="x-mark" class="h-4 w-4" />
+            </button>
+        </div>
+    @endif
+
     {{-- Filters --}}
-    <div class="grid grid-cols-1 gap-5 sm:grid-cols-3 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <flux:input type="date" label="Dari Tanggal" class="h-10" wire:model.live="startDate" />
         <flux:input type="date" label="Sampai Tanggal" class="h-10" wire:model.live="endDate" />
         <flux:select label="Metode Pembayaran" class="h-10" wire:model.live="paymentMethod">
@@ -13,6 +28,12 @@
             <flux:select.option value="cash">Tunai</flux:select.option>
             <flux:select.option value="qris">QRIS</flux:select.option>
             <flux:select.option value="va">Virtual Account</flux:select.option>
+        </flux:select>
+        <flux:select label="Kategori" class="h-10" wire:model.live="categoryId">
+            <flux:select.option value="">Semua Kategori</flux:select.option>
+            @foreach($categories as $category)
+                <flux:select.option value="{{ $category->id }}">{{ $category->name }}</flux:select.option>
+            @endforeach
         </flux:select>
     </div>
 
@@ -54,6 +75,9 @@
             <table class="w-full text-sm">
                 <thead class="bg-zinc-50 border-b border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800">
                     <tr>
+                        <th class="px-4 py-4 text-center w-12">
+                            <flux:checkbox wire:model.live="selectAll" />
+                        </th>
                         <th class="px-6 py-4 text-left font-semibold text-zinc-600 dark:text-zinc-400">Invoice / Waktu</th>
                         <th class="px-6 py-4 text-center font-semibold text-zinc-600 dark:text-zinc-400">Item</th>
                         <th class="px-6 py-4 text-right font-semibold text-zinc-600 dark:text-zinc-400">Subtotal</th>
@@ -66,7 +90,10 @@
                 </thead>
                 <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800/60">
                     @forelse($transactions as $trx)
-                        <tr class="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+                        <tr class="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50 {{ in_array((string)$trx->id, $selected) ? 'bg-blue-50 dark:bg-blue-900/10' : '' }}">
+                            <td class="px-4 py-4 text-center">
+                                <flux:checkbox wire:model.live="selected" value="{{ $trx->id }}" />
+                            </td>
                             <td class="px-6 py-4">
                                 <div class="font-bold font-mono text-zinc-900 dark:text-white">{{ $trx->invoice_number }}</div>
                                 <div class="text-xs text-zinc-500 mt-1">{{ $trx->created_at->format('d/m/Y H:i') }} • {{ $trx->user->name ?? '-' }}</div>
@@ -90,11 +117,12 @@
                                 <div class="flex items-center justify-center gap-2">
                                     <flux:button size="sm" variant="primary" class="h-9 px-3 bg-blue-600 hover:bg-blue-700 text-white border-blue-600 shadow-sm" as="a" href="{{ route('reports.detail', $trx->id) }}" wire:navigate>Lihat</flux:button>
                                     <flux:button size="sm" variant="ghost" class="h-9 w-9 px-0 text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800" icon="printer" as="a" href="{{ route('receipt.print', $trx->id) }}" target="_blank" />
+                                    <flux:button size="sm" variant="ghost" class="h-9 w-9 px-0 text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20 dark:hover:text-red-400" icon="trash" wire:click="confirmDelete({{ $trx->id }}, '{{ $trx->invoice_number }}')" />
                                 </div>
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="8" class="px-6 py-12 text-center text-zinc-500">
+                        <tr><td colspan="9" class="px-6 py-12 text-center text-zinc-500">
                             <flux:icon name="document-magnifying-glass" class="mx-auto mb-3 h-8 w-8 opacity-40" />
                             Tidak ada transaksi pada periode ini.
                         </td></tr>
@@ -104,4 +132,32 @@
         </div>
         <div class="border-t border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">{{ $transactions->links() }}</div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <flux:modal wire:model="showDeleteModal" class="max-w-md p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl transition-all">
+        <div class="p-6">
+            <div class="flex flex-col items-center text-center">
+                <div class="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30 mb-4 mx-auto">
+                    <flux:icon name="exclamation-triangle" class="h-6 w-6 text-red-600 dark:text-red-400" />
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
+                    Konfirmasi Hapus
+                </h3>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    Apakah Anda yakin ingin menghapus <span class="font-medium text-gray-700 dark:text-gray-300">{{ $itemToDeleteName ?: 'item ini' }}</span>?
+                    <br>Data akan dihapus secara soft delete.
+                </p>
+            </div>
+            
+            <div class="mt-6 flex justify-end gap-3 w-full">
+                <button type="button" wire:click="$set('showDeleteModal', false)" class="h-10 px-4 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-zinc-800 dark:text-gray-300 dark:hover:bg-zinc-700 font-medium text-sm transition-colors">
+                    Batal
+                </button>
+                <button type="button" wire:click="processDelete" class="h-10 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm transition-colors" wire:loading.attr="disabled" wire:target="processDelete">
+                    <span wire:loading.remove wire:target="processDelete">Hapus</span>
+                    <span wire:loading wire:target="processDelete">Memproses...</span>
+                </button>
+            </div>
+        </div>
+    </flux:modal>
 </div>

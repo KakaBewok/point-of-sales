@@ -10,6 +10,7 @@ use App\Models\TransactionItem;
 use App\Models\Voucher;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Services\ActivityLogger;
 
 class TransactionService
 {
@@ -132,6 +133,17 @@ class TransactionService
                 $this->voucherService->markAsUsed($voucher);
             }
 
+            ActivityLogger::transaction('transaction_created', $transaction->id, [
+                'invoice' => $transaction->invoice_number,
+                'subtotal' => $subtotal,
+                'discount' => $totalDiscount,
+                'tax' => $taxAmount,
+                'grand_total' => $grandTotal,
+                'items_count' => count($itemsData),
+                'voucher_id' => $voucher?->id,
+                'has_manual_discount' => $manualDiscount > 0,
+            ]);
+
             return $transaction->load(['items', 'voucher']);
         });
     }
@@ -156,6 +168,11 @@ class TransactionService
 
             // Mark transaction as completed
             $transaction->markAsCompleted();
+
+            ActivityLogger::transaction('transaction_completed', $transaction->id, [
+                'invoice' => $transaction->invoice_number,
+                'grand_total' => $transaction->grand_total,
+            ]);
 
             return $transaction->fresh(['items', 'payment', 'voucher', 'user']);
         });
@@ -192,6 +209,11 @@ class TransactionService
 
             $transaction->markAsCancelled();
 
+            ActivityLogger::warning('transaction_cancelled', 'transaction', $transaction->id, [
+                'invoice' => $transaction->invoice_number,
+                'grand_total' => $transaction->grand_total,
+            ]);
+
             return $transaction->fresh(['items', 'payment', 'voucher', 'user']);
         });
     }
@@ -218,6 +240,13 @@ class TransactionService
 
             // Complete the transaction immediately for cash
             $this->completeTransaction($transaction);
+
+            ActivityLogger::transaction('payment_processed', $transaction->id, [
+                'method' => 'cash',
+                'amount' => $transaction->grand_total,
+                'cash_received' => $cashReceived,
+                'change' => $cashReceived - $transaction->grand_total,
+            ]);
 
             return $payment;
         });

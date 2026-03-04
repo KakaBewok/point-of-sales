@@ -4,12 +4,17 @@
         @include('partials.head')
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
-        <flux:sidebar sticky collapsible="mobile" class="z-50 border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+        <flux:sidebar sticky collapsible="mobile" class="z-50 border-e border-zinc-200 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-950">
             <flux:sidebar.header>
                 <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-2 px-1">
-                    <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white font-bold text-sm">
-                        POS
-                    </div>
+                    @php $storeLogo = App\Models\Setting::get('store_logo', ''); @endphp
+                    @if($storeLogo)
+                        <img src="{{ Illuminate\Support\Facades\Storage::url($storeLogo) }}" class="h-8 w-8 rounded-lg object-contain" alt="Logo" />
+                    @else
+                        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white font-bold text-sm">
+                            POS
+                        </div>
+                    @endif
                     <span class="text-sm font-semibold text-zinc-800 dark:text-white truncate">{{ App\Models\Setting::getStoreName() }}</span>
                 </a>
                 <flux:sidebar.collapse class="lg:hidden" />
