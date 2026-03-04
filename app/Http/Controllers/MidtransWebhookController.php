@@ -10,7 +10,8 @@ class MidtransWebhookController extends Controller
 {
     public function __construct(
         protected MidtransService $midtransService,
-    ) {}
+    ) {
+    }
 
     /**
      * Handle incoming Midtrans webhook/notification.
@@ -25,7 +26,7 @@ class MidtransWebhookController extends Controller
             $orderId = $payload['order_id'] ?? '';
             $statusCode = $payload['status_code'] ?? '';
             $grossAmount = $payload['gross_amount'] ?? '';
-            $signatureKey = $payload['signature_key'] ?? '';
+            $signatureKey = $payload['signature_key'] ?? ''; // from midtrans
 
             $expectedSignature = hash('sha512', $orderId . $statusCode . $grossAmount . $serverKey);
 

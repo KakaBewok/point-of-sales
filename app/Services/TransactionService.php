@@ -10,6 +10,7 @@ use App\Models\TransactionItem;
 use App\Models\Voucher;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Services\ActivityLogger;
 
 class TransactionService
 {
@@ -44,11 +45,11 @@ class TransactionService
                 $product = Product::lockForUpdate()->findOrFail($item['product_id']);
 
                 if (!$product->is_active) {
-                    throw new \Exception("Produk '{$product->name}' sudah tidak aktif.");
+                    throw new \Exception("Product {$product->name} is not active.");
                 }
 
-                if (!$product->hasEnoughStock($item['quantity'])) {
-                    throw new \Exception("Stok tidak cukup untuk '{$product->name}'. Tersedia: {$product->stock}");
+                if (!$product->isServiceType() && !$product->hasEnoughStock($item['quantity'])) {
+                    throw new \Exception("Stock {$product->name} is not enough. Available: {$product->stock}, requested: {$item['quantity']}");
                 }
 
                 $itemSubtotal = $product->price * $item['quantity'];
@@ -103,13 +104,13 @@ class TransactionService
             // 6. Create transaction
             $transaction = Transaction::create([
                 'user_id' => Auth::id(),
-                'subtotal' => $subtotal,
-                'discount_type' => $discountType,
+                'subtotal' => $subtotal, // before discount and tax
+                'discount_type' => $discountType, // percentage or fixed
                 'discount_value' => $discountValue,
                 'discount_amount' => $totalDiscount,
                 'tax_rate' => $taxRate,
                 'tax_amount' => $taxAmount,
-                'grand_total' => $grandTotal,
+                'grand_total' => $grandTotal, // total after discount and tax
                 'voucher_id' => $voucher?->id,
                 'status' => 'pending',
                 'notes' => $notes,
@@ -132,6 +133,17 @@ class TransactionService
                 $this->voucherService->markAsUsed($voucher);
             }
 
+            ActivityLogger::transaction('transaction_created', $transaction->id, [
+                'invoice' => $transaction->invoice_number,
+                'subtotal' => $subtotal,
+                'discount' => $totalDiscount,
+                'tax' => $taxAmount,
+                'grand_total' => $grandTotal,
+                'items_count' => count($itemsData),
+                'voucher_id' => $voucher?->id,
+                'has_manual_discount' => $manualDiscount > 0,
+            ]);
+
             return $transaction->load(['items', 'voucher']);
         });
     }
@@ -145,15 +157,22 @@ class TransactionService
         return DB::transaction(function () use ($transaction) {
             // Reduce stock for each item
             foreach ($transaction->items as $item) {
-                $this->stockService->reduceStock(
-                    $item->product,
-                    $item->quantity,
-                    $transaction->invoice_number,
-                );
+                if ($item->product && !$item->product->isServiceType()) {
+                    $this->stockService->reduceStock(
+                        $item->product,
+                        $item->quantity,
+                        $transaction->invoice_number,
+                    );
+                }
             }
 
             // Mark transaction as completed
             $transaction->markAsCompleted();
+
+            ActivityLogger::transaction('transaction_completed', $transaction->id, [
+                'invoice' => $transaction->invoice_number,
+                'grand_total' => $transaction->grand_total,
+            ]);
 
             return $transaction->fresh(['items', 'payment', 'voucher', 'user']);
         });
@@ -168,11 +187,13 @@ class TransactionService
             // Only restore stock if transaction was completed
             if ($transaction->isCompleted()) {
                 foreach ($transaction->items as $item) {
-                    $this->stockService->returnStock(
-                        $item->product,
-                        $item->quantity,
-                        $transaction->invoice_number,
-                    );
+                    if ($item->product && !$item->product->isServiceType()) {
+                        $this->stockService->returnStock(
+                            $item->product,
+                            $item->quantity,
+                            $transaction->invoice_number,
+                        );
+                    }
                 }
             }
 
@@ -188,6 +209,11 @@ class TransactionService
 
             $transaction->markAsCancelled();
 
+            ActivityLogger::warning('transaction_cancelled', 'transaction', $transaction->id, [
+                'invoice' => $transaction->invoice_number,
+                'grand_total' => $transaction->grand_total,
+            ]);
+
             return $transaction->fresh(['items', 'payment', 'voucher', 'user']);
         });
     }
@@ -198,7 +224,7 @@ class TransactionService
     public function processCashPayment(Transaction $transaction, float $cashReceived): Payment
     {
         if ($cashReceived < $transaction->grand_total) {
-            throw new \Exception('Jumlah uang yang diterima kurang dari total transaksi.');
+            throw new \Exception('The amount of money received is less than the total transaction.');
         }
 
         return DB::transaction(function () use ($transaction, $cashReceived) {
@@ -214,6 +240,13 @@ class TransactionService
 
             // Complete the transaction immediately for cash
             $this->completeTransaction($transaction);
+
+            ActivityLogger::transaction('payment_processed', $transaction->id, [
+                'method' => 'cash',
+                'amount' => $transaction->grand_total,
+                'cash_received' => $cashReceived,
+                'change' => $cashReceived - $transaction->grand_total,
+            ]);
 
             return $payment;
         });

@@ -53,14 +53,39 @@ class Dashboard extends Component
             ->get();
 
         // Revenue chart data (last 7 days)
+        // $chartData = collect();
+        // for ($i = 6; $i >= 0; $i--) {
+        //     $date = now()->subDays($i);
+        //     $revenue = Transaction::completed()
+        //         ->whereDate('created_at', $date)
+        //         ->sum('grand_total');
+        //     $chartData->push([
+        //         'date' => $date->format('d M'),
+        //         'revenue' => (float) $revenue,
+        //     ]);
+        // }
+
+        // 1. Get data from 7 days ago to now in one query
+        $rawChartData = Transaction::completed()
+            ->where('created_at', '>=', now()->subDays(6)->startOfDay())
+            ->selectRaw('DATE(created_at) as date, SUM(grand_total) as revenue')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get()
+            ->keyBy('date'); // Change index to date for easier lookup
+
+        // 2. Prepare final result (to ensure empty dates are still displayed)
         $chartData = collect();
+
         for ($i = 6; $i >= 0; $i--) {
-            $date = now()->subDays($i);
-            $revenue = Transaction::completed()
-                ->whereDate('created_at', $date)
-                ->sum('grand_total');
+            $date = now()->subDays($i)->format('Y-m-d');
+            $displayDate = now()->subDays($i)->format('d M');
+
+            // Check if there is data for this date in the query result
+            $revenue = $rawChartData->has($date) ? $rawChartData[$date]->revenue : 0;
+
             $chartData->push([
-                'date' => $date->format('d M'),
+                'date' => $displayDate,
                 'revenue' => (float) $revenue,
             ]);
         }

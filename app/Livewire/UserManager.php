@@ -19,6 +19,11 @@ class UserManager extends Component
     public $showModal = false;
     public $editingId = null;
 
+    public $showDeleteModal = false;
+    public $itemToDeleteId = null;
+    public $itemToDeleteName = null;
+    public $deleteType = 'single';
+
     public $name = '';
     public $email = '';
     public $password = '';
@@ -60,13 +65,19 @@ class UserManager extends Component
 
     public function edit(User $user)
     {
+        // Prevent editing the store owner
+        if ($user->isOwner()) {
+            session()->flash('error', 'Tidak dapat mengedit akun pemilik toko.');
+            return;
+        }
+
         $this->editingId = $user->id;
         $this->name = $user->name;
         $this->email = $user->email;
         $this->role = $user->role;
         $this->is_active = $user->is_active;
         $this->permissions = $user->permissions ?? [];
-        $this->password = ''; // Don't show existing password
+        $this->password = '';
         $this->showModal = true;
     }
 
@@ -102,9 +113,54 @@ class UserManager extends Component
         $this->showModal = false;
     }
 
+    public function confirmDelete($id, $name = '')
+    {
+        $this->itemToDeleteId = $id;
+        $this->itemToDeleteName = $name;
+        $this->deleteType = 'single';
+        $this->showDeleteModal = true;
+    }
+
+    public function processDelete()
+    {
+        if ($this->deleteType === 'single' && $this->itemToDeleteId) {
+            $this->delete($this->itemToDeleteId);
+        }
+        
+        $this->showDeleteModal = false;
+        $this->reset(['itemToDeleteId', 'itemToDeleteName', 'deleteType']);
+    }
+
+    public function delete($id)
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->id === auth()->id()) {
+            session()->flash('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
+            return;
+        }
+
+        if ($user->isOwner()) {
+            session()->flash('error', 'Tidak dapat menghapus akun pemilik toko.');
+            return;
+        }
+
+        try {
+            $user->delete();
+            session()->flash('message', 'Pengguna berhasil dihapus.');
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->getCode() === '23000') {
+                session()->flash('error', 'Pengguna tidak bisa dihapus karena masih terkait dengan data lain (misal: transaksi/stok).');
+            } else {
+                session()->flash('error', 'Terjadi kesalahan saat menghapus pengguna.');
+            }
+        }
+    }
+
     public function render()
     {
-        $users = User::when($this->search, fn($q) => $q->where('name', 'like', "%{$this->search}%")->orWhere('email', 'like', "%{$this->search}%"))
+        $users = User::where('role', '!=', 'owner') // Don't show store owner in list
+            ->when($this->search, fn($q) => $q->where('name', 'like', "%{$this->search}%")->orWhere('email', 'like', "%{$this->search}%"))
             ->orderBy('name')
             ->paginate(15);
 

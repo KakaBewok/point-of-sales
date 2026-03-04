@@ -10,6 +10,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Str;
+use App\Services\ActivityLogger;
 
 #[Layout('layouts.app')]
 #[Title('Produk')]
@@ -22,11 +23,17 @@ class ProductManager extends Component
     public $showModal = false;
     public $editingId = null;
 
+    public $showDeleteModal = false;
+    public $itemToDeleteId = null;
+    public $itemToDeleteName = null;
+    public $deleteType = 'single';
+
     // Bulk Delete
     public $selected = [];
     public $selectAll = false;
 
     // Form fields
+    public $type = 'product';
     public $name = '';
     public $category_id = '';
     public $sku = '';
@@ -46,14 +53,15 @@ class ProductManager extends Component
             : 'required|string|unique:products,sku';
 
         return [
+            'type' => 'required|in:product,service',
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
             'sku' => $skuRule,
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'cost_price' => 'nullable|numeric|min:0',
-            'stock' => 'required|integer|min:0',
-            'low_stock_threshold' => 'required|integer|min:0',
+            'stock' => 'nullable|integer|min:0',
+            'low_stock_threshold' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
             'image' => 'nullable|image|max:2048',
         ];
@@ -75,8 +83,9 @@ class ProductManager extends Component
 
     public function create()
     {
-        $this->reset(['name', 'category_id', 'sku', 'description', 'price', 'cost_price', 'stock', 'low_stock_threshold', 'is_active', 'image', 'existingImage', 'editingId']);
+        $this->reset(['type', 'name', 'category_id', 'sku', 'description', 'price', 'cost_price', 'stock', 'low_stock_threshold', 'is_active', 'image', 'existingImage', 'editingId']);
         $this->sku = strtoupper(Str::random(8));
+        $this->type = 'product';
         $this->is_active = true;
         $this->stock = 0;
         $this->low_stock_threshold = 10;
@@ -86,6 +95,7 @@ class ProductManager extends Component
     public function edit(Product $product)
     {
         $this->editingId = $product->id;
+        $this->type = $product->type ?? 'product';
         $this->name = $product->name;
         $this->category_id = $product->category_id;
         $this->sku = $product->sku;
@@ -104,6 +114,16 @@ class ProductManager extends Component
         $validated = $this->validate();
         unset($validated['image']);
         
+        // If type is service, it doesn't have stock or threshold
+        if ($validated['type'] === 'service') {
+            $validated['stock'] = null;
+            $validated['low_stock_threshold'] = null;
+        } else {
+            // Provide default values if empty when strictly product
+            $validated['stock'] = $validated['stock'] ?? 0;
+            $validated['low_stock_threshold'] = $validated['low_stock_threshold'] ?? 0;
+        }
+
         // Cost Price Logic: Make cost_price nullable and default to null (unknown) if empty
         // Profit calculation will handle null as unknown cost.
         if (isset($validated['cost_price']) && $validated['cost_price'] === '') {
@@ -124,14 +144,16 @@ class ProductManager extends Component
         if ($this->editingId) {
             $product = Product::findOrFail($this->editingId);
             $product->update($validated);
+            ActivityLogger::crud('product_updated', 'product', $product->id, ['name' => $product->name]);
             session()->flash('message', 'Produk berhasil diperbarui.');
         } else {
-            Product::create($validated);
+            $product = Product::create($validated);
+            ActivityLogger::crud('product_created', 'product', $product->id, ['name' => $product->name, 'type' => $product->type]);
             session()->flash('message', 'Produk berhasil ditambahkan.');
         }
 
         $this->showModal = false;
-        $this->reset(['name', 'category_id', 'sku', 'description', 'price', 'cost_price', 'stock', 'low_stock_threshold', 'is_active', 'image', 'existingImage', 'editingId']);
+        $this->reset(['type', 'name', 'category_id', 'sku', 'description', 'price', 'cost_price', 'stock', 'low_stock_threshold', 'is_active', 'image', 'existingImage', 'editingId']);
     }
 
     private function deleteOldImage()
@@ -147,9 +169,37 @@ class ProductManager extends Component
         }
     }
 
-    public function delete(Product $product)
+    public function confirmDelete($id, $name = '')
     {
-        // Image NOT deleted on soft delete - File lifecycle logic
+        $this->itemToDeleteId = $id;
+        $this->itemToDeleteName = $name;
+        $this->deleteType = 'single';
+        $this->showDeleteModal = true;
+    }
+
+    public function confirmDeleteSelected()
+    {
+        $this->itemToDeleteName = count($this->selected) . ' produk terpilih';
+        $this->deleteType = 'multiple';
+        $this->showDeleteModal = true;
+    }
+
+    public function processDelete()
+    {
+        if ($this->deleteType === 'single' && $this->itemToDeleteId) {
+            $this->delete($this->itemToDeleteId);
+        } elseif ($this->deleteType === 'multiple') {
+            $this->deleteSelected();
+        }
+        
+        $this->showDeleteModal = false;
+        $this->reset(['itemToDeleteId', 'itemToDeleteName', 'deleteType']);
+    }
+
+    public function delete($id)
+    {
+        $product = Product::findOrFail($id);
+        ActivityLogger::crud('product_deleted', 'product', $id, ['name' => $product->name]);
         $product->delete();
         session()->flash('message', 'Produk berhasil dihapus.');
     }
@@ -158,6 +208,7 @@ class ProductManager extends Component
     {
         if (empty($this->selected)) return;
         
+        ActivityLogger::bulk('product_bulk_deleted', 'product', $this->selected);
         Product::whereIn('id', $this->selected)->delete();
         $this->reset(['selected', 'selectAll']);
         $this->resetPage();

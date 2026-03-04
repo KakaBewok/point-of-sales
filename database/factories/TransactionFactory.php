@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Store;
 use App\Models\User;
 use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -24,6 +25,7 @@ class TransactionFactory extends Factory
         $taxAmount = 0;
 
         return [
+            'store_id' => Store::factory(),
             'invoice_number' => Transaction::generateInvoiceNumber(),
             'user_id' => User::factory(),
             'subtotal' => $subtotal,

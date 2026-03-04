@@ -4,7 +4,7 @@
         <h1 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Manajemen Produk</h1>
         <div class="flex items-center gap-3">
             @if(count($selected) > 0)
-                <flux:button variant="danger" icon="trash" class="h-10 px-4" wire:click="deleteSelected" wire:confirm="Hapus {{ count($selected) }} produk terpilih?">Hapus Terpilih ({{ count($selected) }})</flux:button>
+                <flux:button variant="danger" icon="trash" class="h-10 px-4" wire:click="confirmDeleteSelected">Hapus Terpilih ({{ count($selected) }})</flux:button>
             @endif
             <flux:button variant="primary" icon="plus" class="h-10 px-4" wire:click="create">Tambah Produk</flux:button>
         </div>
@@ -57,6 +57,7 @@
                         <th class="px-6 py-4 text-left font-semibold text-zinc-600 dark:text-zinc-400">SKU</th>
                         <th class="px-6 py-4 text-left font-semibold text-zinc-600 dark:text-zinc-400">Kategori</th>
                         <th class="px-6 py-4 text-right font-semibold text-zinc-600 dark:text-zinc-400">Harga</th>
+                        <th class="px-6 py-4 text-center font-semibold text-zinc-600 dark:text-zinc-400">Tipe</th>
                         <th class="px-6 py-4 text-center font-semibold text-zinc-600 dark:text-zinc-400">Stok</th>
                         <th class="px-6 py-4 text-center font-semibold text-zinc-600 dark:text-zinc-400">Status</th>
                         <th class="px-6 py-4 text-right font-semibold text-zinc-600 dark:text-zinc-400">Aksi</th>
@@ -84,10 +85,25 @@
                             <td class="px-6 py-4 text-zinc-600 dark:text-zinc-400">{{ $product->category->name }}</td>
                             <td class="px-6 py-4 text-right font-medium text-zinc-900 dark:text-white">Rp {{ number_format($product->price, 0, ',', '.') }}</td>
                             <td class="px-6 py-4 text-center">
-                                <span class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold ring-1 ring-inset
-                                    {{ $product->stock <= 0 ? 'bg-red-50 text-red-700 ring-red-600/20 dark:bg-red-900/30 dark:text-red-400 dark:ring-red-900/50' : ($product->isLowStock() ? 'bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-900/30 dark:text-amber-400 dark:ring-amber-900/50' : 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-900/30 dark:text-emerald-400 dark:ring-emerald-900/50') }}">
-                                    {{ $product->stock }}
-                                </span>
+                                @if($product->type === 'service')
+                                    <span class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold ring-1 ring-inset bg-blue-50 text-blue-700 ring-blue-600/20 dark:bg-blue-900/30 dark:text-blue-400 dark:ring-blue-900/50">
+                                        Jasa
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold ring-1 ring-inset bg-zinc-50 text-zinc-700 ring-zinc-600/20 dark:bg-zinc-800/50 dark:text-zinc-400 dark:ring-zinc-700">
+                                        Produk
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                @if($product->type === 'service')
+                                    <span class="text-zinc-400 dark:text-zinc-600">-</span>
+                                @else
+                                    <span class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold ring-1 ring-inset
+                                        {{ $product->stock <= 0 ? 'bg-red-50 text-red-700 ring-red-600/20 dark:bg-red-900/30 dark:text-red-400 dark:ring-red-900/50' : ($product->isLowStock() ? 'bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-900/30 dark:text-amber-400 dark:ring-amber-900/50' : 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-900/30 dark:text-emerald-400 dark:ring-emerald-900/50') }}">
+                                        {{ $product->stock }}
+                                    </span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <button outline wire:click="toggleActive({{ $product->id }})" class="cursor-pointer transition-opacity hover:opacity-80">
@@ -99,7 +115,7 @@
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
                                     <flux:button size="sm" variant="ghost" class="h-8 w-8 px-0" icon="pencil" wire:click="edit({{ $product->id }})" />
-                                    <flux:button size="sm" variant="ghost" class="h-8 w-8 px-0 text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20 dark:hover:text-red-400" icon="trash" wire:click="delete({{ $product->id }})" wire:confirm="Hapus produk ini?" />
+                                    <flux:button size="sm" variant="ghost" class="h-8 w-8 px-0 text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20 dark:hover:text-red-400" icon="trash" wire:click="confirmDelete({{ $product->id }}, '{{ addslashes($product->name) }}')" />
                                 </div>
                             </td>
                         </tr>
@@ -136,6 +152,15 @@
 
                     <div class="grid grid-cols-2 gap-4">
                         <flux:field>
+                            <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Tipe Item <span class="text-red-500">*</span></flux:label>
+                            <flux:select class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" wire:model.live="type">
+                                <flux:select.option value="product">Produk Fisik</flux:select.option>
+                                <flux:select.option value="service">Jasa / Layanan</flux:select.option>
+                            </flux:select>
+                            <flux:error name="type" class="mt-1 text-sm text-red-500" />
+                        </flux:field>
+
+                        <flux:field>
                             <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Kategori <span class="text-red-500">*</span></flux:label>
                             <flux:select class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" wire:model="category_id">
                                 <flux:select.option value="">Pilih Kategori</flux:select.option>
@@ -145,7 +170,9 @@
                             </flux:select>
                             <flux:error name="category_id" class="mt-1 text-sm text-red-500" />
                         </flux:field>
-                        
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-4">
                         <flux:field>
                             <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">SKU <span class="text-red-500">*</span></flux:label>
                             <flux:input class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" wire:model="sku" />
@@ -173,7 +200,7 @@
                         </flux:field>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2 gap-4" x-data="{ type: @entangle('type') }" x-show="type === 'product'">
                         <flux:field>
                             <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Stok <span class="text-red-500">*</span></flux:label>
                             <flux:input class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" type="number" wire:model="stock" />
@@ -217,6 +244,34 @@
                 <button type="button" class="h-10 px-4 rounded-lg bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 font-medium text-sm transition-colors" wire:click="$set('showModal', false)">Batal</button>
                 <button type="submit" form="productForm" class="h-10 px-6 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold text-sm transition-colors">{{ $editingId ? 'Perbarui' : 'Simpan' }}</button>
             </footer>
+        </div>
+    </flux:modal>
+
+    <!-- Delete Confirmation Modal -->
+    <flux:modal wire:model="showDeleteModal" class="max-w-md p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl transition-all">
+        <div class="p-6">
+            <div class="flex flex-col items-center text-center">
+                <div class="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30 mb-4 mx-auto">
+                    <flux:icon name="exclamation-triangle" class="h-6 w-6 text-red-600 dark:text-red-400" />
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
+                    Konfirmasi Hapus
+                </h3>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    Apakah Anda yakin ingin menghapus <span class="font-medium text-gray-700 dark:text-gray-300">{{ $itemToDeleteName ?: 'item ini' }}</span>?
+                    <br>Tindakan ini tidak dapat dibatalkan.
+                </p>
+            </div>
+            
+            <div class="mt-6 flex justify-end gap-3 w-full">
+                <button type="button" wire:click="$set('showDeleteModal', false)" class="h-10 px-4 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-zinc-800 dark:text-gray-300 dark:hover:bg-zinc-700 font-medium text-sm transition-colors">
+                    Batal
+                </button>
+                <button type="button" wire:click="processDelete" class="h-10 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm transition-colors" wire:loading.attr="disabled" wire:target="processDelete">
+                    <span wire:loading.remove wire:target="processDelete">Hapus</span>
+                    <span wire:loading wire:target="processDelete">Memproses...</span>
+                </button>
+            </div>
         </div>
     </flux:modal>
 </div>

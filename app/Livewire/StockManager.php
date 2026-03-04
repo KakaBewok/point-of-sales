@@ -85,7 +85,7 @@ class StockManager extends Component
 
     public function render()
     {
-        $products = Product::query()
+        $products = Product::isProduct()
             ->when($this->search, fn ($q) => $q->where('name', 'like', "%{$this->search}%")->orWhere('sku', 'like', "%{$this->search}%"))
             ->when($this->filterType === 'low_stock', fn ($q) => $q->lowStock())
             ->when($this->filterType === 'out_of_stock', fn ($q) => $q->outOfStock())

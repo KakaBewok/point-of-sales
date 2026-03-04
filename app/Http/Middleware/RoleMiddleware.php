@@ -28,18 +28,18 @@ class RoleMiddleware
         if (!$user->is_active) {
             auth()->logout();
             if ($request->expectsJson()) {
-                return response()->json(['message' => 'Akun Anda telah dinonaktifkan.'], 403);
+                return response()->json(['message' => 'Your account has been deactivated. Please contact the administrator.'], 403);
             }
             return redirect()->route('login')->withErrors([
-                'email' => 'Akun Anda telah dinonaktifkan. Hubungi administrator.',
+                'email' => 'Your account has been deactivated. Please contact the administrator.',
             ]);
         }
 
         if (!empty($roles) && !in_array($user->role, $roles)) {
             if ($request->expectsJson()) {
-                return response()->json(['message' => 'Anda tidak memiliki akses.'], 403);
+                return response()->json(['message' => 'You do not have permission to access this page.'], 403);
             }
-            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+            abort(403, 'You do not have permission to access this page.');
         }
 
         return $next($request);

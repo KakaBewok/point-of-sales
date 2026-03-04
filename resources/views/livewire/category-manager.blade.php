@@ -3,7 +3,7 @@
         <h1 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Manajemen Kategori</h1>
         <div class="flex items-center gap-3">
             @if(!empty($selected) && is_array($selected))
-                <flux:button variant="danger" icon="trash" class="h-10 px-4" wire:click="deleteSelected" wire:confirm="Hapus {{ count($selected) }} kategori terpilih?">Hapus Terpilih ({{ count($selected) }})</flux:button>
+                <flux:button variant="danger" icon="trash" class="h-10 px-4" wire:click="confirmDeleteSelected">Hapus Terpilih ({{ count($selected) }})</flux:button>
             @endif
             <flux:button variant="primary" icon="plus" class="h-10 px-4" wire:click="create">Tambah Kategori</flux:button>
         </div>
@@ -54,7 +54,7 @@
                     <span class="text-sm font-medium text-zinc-500 dark:text-zinc-400">{{ $category->products_count }} produk</span>
                     <div class="flex gap-2">
                         <flux:button size="sm" variant="ghost" class="h-8 w-8 px-0" icon="pencil" wire:click="edit({{ $category->id }})" />
-                        <flux:button size="sm" variant="ghost" class="h-8 w-8 px-0 text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20 dark:hover:text-red-400" icon="trash" wire:click="delete({{ $category->id }})" wire:confirm="Hapus kategori ini?" />
+                        <flux:button size="sm" variant="ghost" class="h-8 w-8 px-0 text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20 dark:hover:text-red-400" icon="trash" wire:click="confirmDelete({{ $category->id }}, '{{ addslashes($category->name) }}')" />
                     </div>
                 </div>
             </div>
@@ -103,6 +103,48 @@
                 <button type="button" class="h-10 px-4 rounded-lg bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 font-medium text-sm transition-colors" wire:click="$set('showModal', false)">Batal</button>
                 <button type="submit" form="categoryForm" class="h-10 px-6 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold text-sm transition-colors">{{ $editingId ? 'Perbarui' : 'Simpan' }}</button>
             </footer>
+        </div>
+    </flux:modal>
+
+    <!-- Delete Confirmation Modal -->
+    <flux:modal wire:model="showDeleteModal" class="max-w-md p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl transition-all">
+        <div class="p-6">
+            <div class="flex flex-col items-center text-center">
+                <div class="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30 mb-4 mx-auto">
+                    <flux:icon name="exclamation-triangle" class="h-6 w-6 text-red-600 dark:text-red-400" />
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
+                    Konfirmasi Hapus
+                </h3>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    Apakah Anda yakin ingin menghapus <span class="font-medium text-gray-700 dark:text-gray-300">{{ $itemToDeleteName ?: 'item ini' }}</span>?
+                    <br>Tindakan ini tidak dapat dibatalkan.
+                </p>
+                @if($hasProductsWarning)
+                    <div class="mt-3 rounded-lg bg-amber-50 border border-amber-200 dark:bg-amber-900/20 dark:border-amber-800/50 p-3">
+                        <div class="flex items-start gap-2">
+                            <flux:icon name="exclamation-triangle" class="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                            <p class="text-sm text-amber-800 dark:text-amber-300">
+                                @if($deleteType === 'multiple')
+                                    <strong>{{ $categoriesWithProducts }} kategori</strong> masih memiliki produk. Menghapusnya dapat mempengaruhi data terkait.
+                                @else
+                                    Kategori ini masih memiliki produk. Menghapusnya dapat mempengaruhi data terkait.
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+                @endif
+            </div>
+            
+            <div class="mt-6 flex justify-end gap-3 w-full">
+                <button type="button" wire:click="$set('showDeleteModal', false)" class="h-10 px-4 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-zinc-800 dark:text-gray-300 dark:hover:bg-zinc-700 font-medium text-sm transition-colors">
+                    Batal
+                </button>
+                <button type="button" wire:click="processDelete" class="h-10 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm transition-colors" wire:loading.attr="disabled" wire:target="processDelete">
+                    <span wire:loading.remove wire:target="processDelete">Hapus</span>
+                    <span wire:loading wire:target="processDelete">Memproses...</span>
+                </button>
+            </div>
         </div>
     </flux:modal>
 </div>

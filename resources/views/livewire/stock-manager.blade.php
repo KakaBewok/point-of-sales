@@ -1,4 +1,4 @@
-<div class="px-6 py-8 md:px-8 space-y-8 max-w-7xl mx-auto flex-1 w-full bg-zinc-50 dark:bg-zinc-950 min-h-screen">
+<div class="px-6 py-8 md:px-8 space-y-8 max-w-7xl mx-auto flex-1 w-full min-h-screen">
     <div class="flex items-center justify-between">
         <h1 class="text-2xl font-black tracking-tighter uppercase text-zinc-900 dark:text-white">Manajemen Stok</h1>
     </div>
@@ -28,7 +28,7 @@
             <flux:input icon="magnifying-glass" class="h-12 !rounded-2xl bg-zinc-100 border-none dark:bg-zinc-800" wire:model.live.debounce.300ms="search" placeholder="Cari nama produk atau SKU..." />
         </div>
         <div class="w-full sm:w-64">
-            <flux:select wire:model.live="filterType" class="h-12 !rounded-2xl bg-zinc-100 border-none dark:bg-zinc-800" placeholder="Semua Produk">
+            <flux:select wire:model.live="filterType" class="border-zinc-300 h-12 !rounded-2xl" placeholder="Semua Produk">
                 <flux:select.option value="">Semua Produk</flux:select.option>
                 <flux:select.option value="active">Produk Aktif</flux:select.option>
                 <flux:select.option value="low_stock">Stok Menipis</flux:select.option>
@@ -96,7 +96,7 @@
             <div class="space-y-6 flex-1 overflow-y-auto pr-2">
                 @forelse($recentLogs as $log)
                     <div class="flex items-start gap-4">
-                        <div class="mt-0.5 rounded-2xl h-10 w-10 flex items-center justify-center shrink-0 {{ $log->getTypeBadgeColor() }} {{ str_contains($log->getTypeBadgeColor(), 'green') ? 'bg-emerald-50 text-emerald-600' : (str_contains($log->getTypeBadgeColor(), 'red') ? 'bg-red-50 text-red-600' : 'bg-zinc-100 text-zinc-600') }}">
+                        <div class="mt-0.5 rounded-2xl h-10 w-10 flex items-center justify-center shrink-0 {{ $log->getBadgeColor() }}">
                             <flux:icon :name="match($log->type) { 'in' => 'arrow-down', 'sale', 'out' => 'arrow-up', 'adjustment' => 'arrows-right-left', 'return' => 'arrow-uturn-left', default => 'cube' }" class="h-5 w-5" />
                         </div>
                         <div class="flex-1 min-w-0">

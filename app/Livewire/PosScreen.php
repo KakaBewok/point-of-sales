@@ -82,7 +82,7 @@ class PosScreen extends Component
 
     public function getChangeAmountProperty(): float
     {
-        return max(0, $this->cashReceived - $this->grandTotal);
+        return max(0, (float) $this->cashReceived - $this->grandTotal);
     }
 
     // ─── Cart Actions ──────────────────────────────────────────
@@ -93,15 +93,16 @@ class PosScreen extends Component
         if (!$product || !$product->is_active) return;
 
         $key = (string) $productId;
+        $isService = $product->isServiceType();
 
         if (isset($this->cart[$key])) {
-            if ($this->cart[$key]['quantity'] >= $product->stock) {
+            if (!$isService && $this->cart[$key]['quantity'] >= $product->stock) {
                 session()->flash('error', "Stok {$product->name} tidak cukup.");
                 return;
             }
             $this->cart[$key]['quantity']++;
         } else {
-            if ($product->stock <= 0) {
+            if (!$isService && $product->stock <= 0) {
                 session()->flash('error', "Stok {$product->name} habis.");
                 return;
             }
@@ -110,7 +111,8 @@ class PosScreen extends Component
                 'name' => $product->name,
                 'price' => (float) $product->price,
                 'quantity' => 1,
-                'stock' => $product->stock,
+                'stock' => $isService ? null : $product->stock,
+                'type' => $product->type,
             ];
         }
     }
@@ -124,7 +126,9 @@ class PosScreen extends Component
             return;
         }
 
-        if ($quantity > $this->cart[$key]['stock']) {
+        $isService = ($this->cart[$key]['type'] ?? 'product') === 'service';
+
+        if (!$isService && $quantity > $this->cart[$key]['stock']) {
             session()->flash('error', 'Melebihi stok tersedia.');
             return;
         }
@@ -135,7 +139,10 @@ class PosScreen extends Component
     public function incrementQuantity(string $key)
     {
         if (!isset($this->cart[$key])) return;
-        if ($this->cart[$key]['quantity'] >= $this->cart[$key]['stock']) {
+        
+        $isService = ($this->cart[$key]['type'] ?? 'product') === 'service';
+
+        if (!$isService && $this->cart[$key]['quantity'] >= $this->cart[$key]['stock']) {
             session()->flash('error', 'Stok tidak cukup.');
             return;
         }
@@ -207,6 +214,31 @@ class PosScreen extends Component
         $this->paymentMethod = 'cash';
         $this->cashReceived = ceil($this->grandTotal / 1000) * 1000;
         $this->showPaymentModal = true;
+    }
+
+    public function appendKeypad($value)
+    {
+        $current = (string) $this->cashReceived;
+        
+        // If current is 0, replace it unless appending 00/000
+        if ($current === '0') {
+            if ($value === '0' || $value === '00' || $value === '000') {
+                return;
+            }
+            $this->cashReceived = (float) $value;
+        } else {
+            $this->cashReceived = (float) ($current . $value);
+        }
+    }
+
+    public function removeKeypad()
+    {
+        $currentStr = (string) $this->cashReceived;
+        if (strlen($currentStr) <= 1) {
+            $this->cashReceived = 0;
+        } else {
+            $this->cashReceived = (float) substr($currentStr, 0, -1);
+        }
     }
 
     public function processPayment()

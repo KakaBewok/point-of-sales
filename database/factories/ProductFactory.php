@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Category;
+use App\Models\Store;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -22,6 +23,7 @@ class ProductFactory extends Factory
         $price = fake()->numberBetween(5, 200) * 1000;
 
         return [
+            'store_id' => Store::factory(),
             'category_id' => Category::factory(),
             'name' => ucwords($name),
             'slug' => Str::slug($name),

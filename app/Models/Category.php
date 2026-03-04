@@ -8,12 +8,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Traits\BelongsToStore;
 
 class Category extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, BelongsToStore;
 
     protected $fillable = [
+        'store_id',
         'name',
         'slug',
         'description',

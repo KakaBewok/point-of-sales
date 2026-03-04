@@ -11,14 +11,24 @@ use App\Livewire\VoucherManager;
 use App\Livewire\ReportManager;
 use App\Livewire\UserManager;
 use App\Livewire\SettingsManager;
+use App\Livewire\StoreRegistration;
 
-// Redirect home to dashboard
+// ─── Public Routes ─────────────────────────────────────────────
+// Landing Page
 Route::get('/', function () {
-    return redirect()->route('dashboard');
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+    return view('landing');
 })->name('home');
 
-// Cashier & Admin routes (POS)
-Route::middleware(['auth', 'verified', 'role:admin,cashier'])->group(function () {
+// Store Registration (replaces Fortify registration)
+Route::middleware('guest')->group(function () {
+    Route::get('/register', StoreRegistration::class)->name('register');
+});
+
+// ─── Tenant Routes (require auth + active store) ──────────────
+Route::middleware(['auth', 'verified', 'store.active', 'role:owner,admin,cashier'])->group(function () {
     Route::get('/dashboard', Dashboard::class)->name('dashboard')->middleware('permission:dashboard');
     Route::get('/pos', PosScreen::class)->name('pos.index')->middleware('permission:pos');
     Route::get('/products', ProductManager::class)->name('products.index')->middleware('permission:products');
@@ -27,7 +37,8 @@ Route::middleware(['auth', 'verified', 'role:admin,cashier'])->group(function ()
     Route::get('/stock/logs', StockLogViewer::class)->name('stock.logs')->middleware('permission:stock');
     Route::get('/vouchers', VoucherManager::class)->name('vouchers.index')->middleware('permission:vouchers');
     Route::get('/reports', ReportManager::class)->name('reports.index')->middleware('permission:reports');
-    
+    Route::get('/reports/{id}', \App\Livewire\ReportDetail::class)->name('reports.detail')->middleware('permission:reports');
+
     // Print Receipt
     Route::get('/print/receipt/{transaction}', function (\App\Models\Transaction $transaction) {
         $transaction->load(['items.product', 'payment', 'user']);
@@ -35,11 +46,13 @@ Route::middleware(['auth', 'verified', 'role:admin,cashier'])->group(function ()
     })->name('receipt.print')->middleware('permission:pos');
 });
 
-// Admin only routes
-Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+// ─── Admin/Owner Routes ────────────────────────────────────────
+Route::middleware(['auth', 'verified', 'store.active', 'role:owner,admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/users', UserManager::class)->name('users.index');
     Route::get('/settings', SettingsManager::class)->name('settings.index');
+
+    // Log Viewer (admin/owner only)
+    Route::get('/logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->name('logs.index');
 });
 
 require __DIR__.'/settings.php';
-

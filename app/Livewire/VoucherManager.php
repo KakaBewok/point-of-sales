@@ -7,6 +7,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Services\ActivityLogger;
 
 #[Layout('layouts.app')]
 #[Title('Voucher')]
@@ -17,6 +18,14 @@ class VoucherManager extends Component
     public $search = '';
     public $showModal = false;
     public $editingId = null;
+
+    public $showDeleteModal = false;
+    public $itemToDeleteId = null;
+    public $itemToDeleteName = null;
+    public $deleteType = 'single';
+
+    public $selected = [];
+    public $selectAll = false;
 
     public $code = '';
     public $discount_type = 'percentage';
@@ -46,6 +55,16 @@ class VoucherManager extends Component
     public function updatingSearch()
     {
         $this->resetPage();
+    }
+
+    public function updatedSelectAll($value)
+    {
+        if ($value) {
+            $this->selected = Voucher::when($this->search, fn ($q) => $q->where('code', 'like', "%{$this->search}%"))
+                                      ->pluck('id')->map(fn($id) => (string) $id)->toArray();
+        } else {
+            $this->selected = [];
+        }
     }
 
     public function create()
@@ -90,23 +109,65 @@ class VoucherManager extends Component
 
         if ($this->editingId) {
             Voucher::findOrFail($this->editingId)->update($data);
+            ActivityLogger::crud('voucher_updated', 'voucher', $this->editingId, ['code' => $data['code']]);
             session()->flash('message', 'Voucher berhasil diperbarui.');
         } else {
-            Voucher::create($data);
+            $v = Voucher::create($data);
+            ActivityLogger::crud('voucher_created', 'voucher', $v->id, ['code' => $v->code]);
             session()->flash('message', 'Voucher berhasil ditambahkan.');
         }
 
         $this->showModal = false;
     }
 
-    public function delete(Voucher $voucher)
+    public function confirmDelete($id, $name = '')
     {
-        if ($voucher->used_count > 0) {
-            session()->flash('error', 'Voucher tidak bisa dihapus karena sudah pernah digunakan.');
-            return;
+        $this->itemToDeleteId = $id;
+        $this->itemToDeleteName = $name;
+        $this->deleteType = 'single';
+        $this->showDeleteModal = true;
+    }
+
+    public function confirmDeleteSelected()
+    {
+        if (empty($this->selected)) return;
+
+        $this->itemToDeleteName = count($this->selected) . ' voucher terpilih';
+        $this->deleteType = 'multiple';
+        $this->showDeleteModal = true;
+    }
+
+    public function processDelete()
+    {
+        if ($this->deleteType === 'single' && $this->itemToDeleteId) {
+            $this->delete($this->itemToDeleteId);
+        } elseif ($this->deleteType === 'multiple') {
+            $this->deleteSelected();
         }
+        
+        $this->showDeleteModal = false;
+        $this->reset(['itemToDeleteId', 'itemToDeleteName', 'deleteType']);
+    }
+
+    public function delete($id)
+    {
+        $voucher = Voucher::findOrFail($id);
+        // Soft delete - allows deleting even if used (transaction history preserved)
+        ActivityLogger::crud('voucher_deleted', 'voucher', $id, ['code' => $voucher->code]);
         $voucher->delete();
         session()->flash('message', 'Voucher berhasil dihapus.');
+    }
+
+    public function deleteSelected()
+    {
+        if (empty($this->selected)) return;
+
+        ActivityLogger::bulk('voucher_bulk_deleted', 'voucher', $this->selected);
+        Voucher::whereIn('id', $this->selected)->delete();
+        
+        $deletedCount = count($this->selected);
+        $this->reset(['selected', 'selectAll']);
+        session()->flash('message', "{$deletedCount} voucher berhasil dihapus.");
     }
 
     public function render()

@@ -1,7 +1,12 @@
 <div class="px-6 py-8 md:px-8 space-y-8 max-w-7xl mx-auto flex-1 w-full">
     <div class="flex items-center justify-between">
         <h1 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Manajemen Voucher</h1>
-        <flux:button variant="primary" icon="plus" class="h-10 px-4" wire:click="create">Tambah Voucher</flux:button>
+        <div class="flex items-center gap-3">
+            @if(!empty($selected) && is_array($selected))
+                <flux:button variant="danger" icon="trash" class="h-10 px-4" wire:click="confirmDeleteSelected">Hapus Terpilih ({{ count($selected) }})</flux:button>
+            @endif
+            <flux:button variant="primary" icon="plus" class="h-10 px-4" wire:click="create">Tambah Voucher</flux:button>
+        </div>
     </div>
 
     @if(session()->has('message'))
@@ -23,8 +28,11 @@
         </div>
     @endif
 
-    <div class="flex">
-        <flux:input icon="magnifying-glass" class="h-10 w-full max-w-sm" wire:model.live.debounce.300ms="search" placeholder="Cari kode voucher..." />
+    <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2 max-w-sm w-full">
+            <flux:checkbox wire:model.live="selectAll" label="Pilih Semua" class="mr-2 whitespace-nowrap" />
+            <flux:input icon="magnifying-glass" class="h-10 w-full" wire:model.live.debounce.300ms="search" placeholder="Cari kode voucher..." />
+        </div>
     </div>
 
     <div class="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
@@ -32,6 +40,9 @@
             <table class="w-full text-sm">
                 <thead class="bg-zinc-50 border-b border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800">
                     <tr>
+                        <th class="px-4 py-4 text-center w-12">
+                            <flux:checkbox wire:model.live="selectAll" />
+                        </th>
                         <th class="px-6 py-4 text-left font-semibold text-zinc-600 dark:text-zinc-400">Kode</th>
                         <th class="px-6 py-4 text-right font-semibold text-zinc-600 dark:text-zinc-400">Diskon</th>
                         <th class="px-6 py-4 text-right font-semibold text-zinc-600 dark:text-zinc-400">Min. Transaksi</th>
@@ -43,7 +54,10 @@
                 </thead>
                 <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800/60">
                     @forelse($vouchers as $voucher)
-                        <tr class="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+                        <tr class="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50 {{ in_array((string)$voucher->id, $selected) ? 'bg-blue-50 dark:bg-blue-900/10' : '' }}">
+                            <td class="px-4 py-4 text-center">
+                                <flux:checkbox wire:model.live="selected" value="{{ $voucher->id }}" />
+                            </td>
                             <td class="px-6 py-4 font-mono font-bold text-zinc-900 dark:text-white">{{ $voucher->code }}</td>
                             <td class="px-6 py-4 text-right text-zinc-900 dark:text-white">
                                 @if($voucher->discount_type === 'percentage')
@@ -84,12 +98,12 @@
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
                                     <flux:button size="sm" variant="ghost" class="h-8 w-8 px-0" icon="pencil" wire:click="edit({{ $voucher->id }})" />
-                                    <flux:button size="sm" variant="ghost" class="h-8 w-8 px-0 text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20 dark:hover:text-red-400" icon="trash" wire:click="delete({{ $voucher->id }})" wire:confirm="Hapus voucher ini?" />
+                                    <flux:button size="sm" variant="ghost" class="h-8 w-8 px-0 text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20 dark:hover:text-red-400" icon="trash" wire:click="confirmDelete({{ $voucher->id }}, '{{ addslashes($voucher->code) }}')" />
                                 </div>
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="7" class="px-6 py-10 text-center text-zinc-500">
+                        <tr><td colspan="8" class="px-6 py-10 text-center text-zinc-500">
                             <flux:icon name="ticket" class="mx-auto h-8 w-8 opacity-40 mb-3" />
                             Tidak ada voucher ditemukan.
                         </td></tr>
@@ -176,6 +190,34 @@
                 <button type="button" class="h-10 px-4 rounded-lg bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 font-medium text-sm transition-colors" wire:click="$set('showModal', false)">Batal</button>
                 <button type="submit" form="voucherForm" class="h-10 px-6 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold text-sm transition-colors">{{ $editingId ? 'Perbarui' : 'Simpan' }}</button>
             </footer>
+        </div>
+    </flux:modal>
+
+    <!-- Delete Confirmation Modal -->
+    <flux:modal wire:model="showDeleteModal" class="max-w-md p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl transition-all">
+        <div class="p-6">
+            <div class="flex flex-col items-center text-center">
+                <div class="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30 mb-4 mx-auto">
+                    <flux:icon name="exclamation-triangle" class="h-6 w-6 text-red-600 dark:text-red-400" />
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
+                    Konfirmasi Hapus
+                </h3>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    Apakah Anda yakin ingin menghapus <span class="font-medium text-gray-700 dark:text-gray-300">{{ $itemToDeleteName ?: 'item ini' }}</span>?
+                    <br>Data riwayat transaksi tetap aman.
+                </p>
+            </div>
+            
+            <div class="mt-6 flex justify-end gap-3 w-full">
+                <button type="button" wire:click="$set('showDeleteModal', false)" class="h-10 px-4 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-zinc-800 dark:text-gray-300 dark:hover:bg-zinc-700 font-medium text-sm transition-colors">
+                    Batal
+                </button>
+                <button type="button" wire:click="processDelete" class="h-10 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm transition-colors" wire:loading.attr="disabled" wire:target="processDelete">
+                    <span wire:loading.remove wire:target="processDelete">Hapus</span>
+                    <span wire:loading wire:target="processDelete">Memproses...</span>
+                </button>
+            </div>
         </div>
     </flux:modal>
 </div>

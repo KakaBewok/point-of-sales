@@ -6,12 +6,15 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Traits\BelongsToStore;
 
 class Voucher extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes, BelongsToStore;
 
     protected $fillable = [
+        'store_id',
         'code',
         'discount_type',
         'discount_value',
