@@ -5,7 +5,9 @@ namespace Tests\Unit;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Setting;
+use App\Models\Store;
 use App\Models\Transaction;
+use App\Models\User;
 use App\Models\Voucher;
 use App\Services\TransactionService;
 use App\Services\VoucherService;
@@ -21,12 +23,18 @@ class TransactionCalculationTest extends TestCase
     protected Category $category;
     protected Product $product;
 
+    protected User $user;
+    protected \App\Models\Store $store;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->transactionService = app(TransactionService::class);
-        $this->category = Category::factory()->create();
+        $this->user = \App\Models\User::factory()->admin()->create();
+        $this->store = $this->user->store;
+        $this->category = Category::factory()->create(['store_id' => $this->store->id]);
         $this->product = Product::factory()->create([
+            'store_id' => $this->store->id,
             'category_id' => $this->category->id,
             'price' => 100000,
             'cost_price' => 60000,
@@ -39,8 +47,7 @@ class TransactionCalculationTest extends TestCase
 
     public function test_subtotal_calculated_correctly_for_single_item(): void
     {
-        $user = \App\Models\User::factory()->admin()->create();
-        $this->actingAs($user);
+        $this->actingAs($this->user);
 
         // Disable tax for predictable assertions
         Setting::set('tax_enabled', '0', 'tax');
@@ -54,10 +61,10 @@ class TransactionCalculationTest extends TestCase
 
     public function test_subtotal_calculated_correctly_for_multiple_items(): void
     {
-        $user = \App\Models\User::factory()->admin()->create();
-        $this->actingAs($user);
+        $this->actingAs($this->user);
 
         $product2 = Product::factory()->create([
+            'store_id' => $this->store->id,
             'category_id' => $this->category->id,
             'price' => 50000,
             'stock' => 20,
@@ -79,8 +86,7 @@ class TransactionCalculationTest extends TestCase
 
     public function test_percentage_discount_applied_correctly(): void
     {
-        $user = \App\Models\User::factory()->admin()->create();
-        $this->actingAs($user);
+        $this->actingAs($this->user);
 
         Setting::set('tax_enabled', '0', 'tax');
 
@@ -98,8 +104,7 @@ class TransactionCalculationTest extends TestCase
 
     public function test_fixed_discount_applied_correctly(): void
     {
-        $user = \App\Models\User::factory()->admin()->create();
-        $this->actingAs($user);
+        $this->actingAs($this->user);
 
         Setting::set('tax_enabled', '0', 'tax');
 
@@ -116,8 +121,7 @@ class TransactionCalculationTest extends TestCase
 
     public function test_discount_cannot_exceed_subtotal(): void
     {
-        $user = \App\Models\User::factory()->admin()->create();
-        $this->actingAs($user);
+        $this->actingAs($this->user);
 
         Setting::set('tax_enabled', '0', 'tax');
 
@@ -136,8 +140,7 @@ class TransactionCalculationTest extends TestCase
 
     public function test_tax_applied_when_enabled(): void
     {
-        $user = \App\Models\User::factory()->admin()->create();
-        $this->actingAs($user);
+        $this->actingAs($this->user);
 
         Setting::set('tax_enabled', '1', 'tax');
         Setting::set('tax_rate', '11', 'tax');
@@ -154,8 +157,7 @@ class TransactionCalculationTest extends TestCase
 
     public function test_no_tax_when_disabled(): void
     {
-        $user = \App\Models\User::factory()->admin()->create();
-        $this->actingAs($user);
+        $this->actingAs($this->user);
 
         Setting::set('tax_enabled', '0', 'tax');
 
@@ -172,8 +174,7 @@ class TransactionCalculationTest extends TestCase
 
     public function test_cash_payment_change_calculated_correctly(): void
     {
-        $user = \App\Models\User::factory()->admin()->create();
-        $this->actingAs($user);
+        $this->actingAs($this->user);
 
         Setting::set('tax_enabled', '0', 'tax');
 
@@ -190,8 +191,7 @@ class TransactionCalculationTest extends TestCase
 
     public function test_cash_payment_fails_when_insufficient(): void
     {
-        $user = \App\Models\User::factory()->admin()->create();
-        $this->actingAs($user);
+        $this->actingAs($this->user);
 
         Setting::set('tax_enabled', '0', 'tax');
 
@@ -207,8 +207,7 @@ class TransactionCalculationTest extends TestCase
 
     public function test_stock_deducted_after_payment(): void
     {
-        $user = \App\Models\User::factory()->admin()->create();
-        $this->actingAs($user);
+        $this->actingAs($this->user);
 
         Setting::set('tax_enabled', '0', 'tax');
 
@@ -226,10 +225,10 @@ class TransactionCalculationTest extends TestCase
 
     public function test_service_type_not_deducted_stock(): void
     {
-        $user = \App\Models\User::factory()->admin()->create();
-        $this->actingAs($user);
+        $this->actingAs($this->user);
 
         $service = Product::factory()->create([
+            'store_id' => $this->store->id,
             'category_id' => $this->category->id,
             'price' => 75000,
             'stock' => null,
@@ -252,8 +251,7 @@ class TransactionCalculationTest extends TestCase
 
     public function test_inactive_product_rejected(): void
     {
-        $user = \App\Models\User::factory()->admin()->create();
-        $this->actingAs($user);
+        $this->actingAs($this->user);
 
         $this->product->update(['is_active' => false]);
 
@@ -269,8 +267,7 @@ class TransactionCalculationTest extends TestCase
 
     public function test_out_of_stock_rejected(): void
     {
-        $user = \App\Models\User::factory()->admin()->create();
-        $this->actingAs($user);
+        $this->actingAs($this->user);
 
         $this->product->update(['stock' => 1]);
 

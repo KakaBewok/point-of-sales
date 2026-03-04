@@ -65,13 +65,19 @@ class UserManager extends Component
 
     public function edit(User $user)
     {
+        // Prevent editing the store owner
+        if ($user->isOwner()) {
+            session()->flash('error', 'Tidak dapat mengedit akun pemilik toko.');
+            return;
+        }
+
         $this->editingId = $user->id;
         $this->name = $user->name;
         $this->email = $user->email;
         $this->role = $user->role;
         $this->is_active = $user->is_active;
         $this->permissions = $user->permissions ?? [];
-        $this->password = ''; // Don't show existing password
+        $this->password = '';
         $this->showModal = true;
     }
 
@@ -128,12 +134,17 @@ class UserManager extends Component
     public function delete($id)
     {
         $user = User::findOrFail($id);
-        
+
         if ($user->id === auth()->id()) {
             session()->flash('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
             return;
         }
-        
+
+        if ($user->isOwner()) {
+            session()->flash('error', 'Tidak dapat menghapus akun pemilik toko.');
+            return;
+        }
+
         try {
             $user->delete();
             session()->flash('message', 'Pengguna berhasil dihapus.');
@@ -148,7 +159,8 @@ class UserManager extends Component
 
     public function render()
     {
-        $users = User::when($this->search, fn($q) => $q->where('name', 'like', "%{$this->search}%")->orWhere('email', 'like', "%{$this->search}%"))
+        $users = User::where('role', '!=', 'owner') // Don't show store owner in list
+            ->when($this->search, fn($q) => $q->where('name', 'like', "%{$this->search}%")->orWhere('email', 'like', "%{$this->search}%"))
             ->orderBy('name')
             ->paginate(15);
 

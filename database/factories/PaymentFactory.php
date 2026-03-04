@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Store;
 use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -18,6 +19,7 @@ class PaymentFactory extends Factory
     public function definition(): array
     {
         return [
+            'store_id' => Store::factory(),
             'transaction_id' => Transaction::factory(),
             'method' => 'cash',
             'amount' => fake()->numberBetween(20, 500) * 1000,

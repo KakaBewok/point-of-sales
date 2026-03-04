@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -10,11 +11,12 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Traits\BelongsToStore;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable, TwoFactorAuthenticatable, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, TwoFactorAuthenticatable, SoftDeletes, BelongsToStore;
 
     /**
      * The attributes that are mass assignable.
@@ -29,6 +31,7 @@ class User extends Authenticatable
         'permissions',
         'avatar',
         'is_active',
+        'store_id',
     ];
 
     /**
@@ -72,6 +75,11 @@ class User extends Authenticatable
 
     // ─── Helpers ────────────────────────────────────────────────
 
+    public function isOwner(): bool
+    {
+        return $this->role === 'owner';
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
@@ -84,7 +92,7 @@ class User extends Authenticatable
 
     public function hasPermission(string $permission): bool
     {
-        if ($this->isAdmin()) {
+        if ($this->isAdmin() || $this->isOwner()) {
             return true;
         }
 

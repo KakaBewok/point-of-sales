@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Product;
+use App\Models\Store;
 use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -22,6 +23,7 @@ class TransactionItemFactory extends Factory
         $quantity = fake()->numberBetween(1, 5);
 
         return [
+            'store_id' => Store::factory(),
             'transaction_id' => Transaction::factory(),
             'product_id' => $product->id,
             'product_name' => $product->name,

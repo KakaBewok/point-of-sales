@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Store;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -18,6 +19,7 @@ class VoucherFactory extends Factory
     public function definition(): array
     {
         return [
+            'store_id' => Store::factory(),
             'code' => strtoupper(Str::random(8)),
             'discount_type' => fake()->randomElement(['percentage', 'fixed']),
             'discount_value' => fake()->randomElement([5, 10, 15, 20, 25000, 50000]),

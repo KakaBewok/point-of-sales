@@ -21,7 +21,9 @@ class ProductValidationTest extends TestCase
     {
         parent::setUp();
         $this->admin = User::factory()->admin()->create();
-        $this->category = Category::factory()->create();
+        $this->category = Category::factory()->create([
+            'store_id' => $this->admin->store_id,
+        ]);
     }
 
     // ─── Required Fields ───────────────────────────────────────
