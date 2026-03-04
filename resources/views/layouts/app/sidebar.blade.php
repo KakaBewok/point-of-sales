@@ -77,8 +77,8 @@
                     </flux:navlist.group>
                     @endif
 
-                    {{-- Admin Only --}}
-                    @if(auth()->user()->isAdmin())
+                    {{-- Admin and OwnerOnly --}}
+                    @if(auth()->user()->canAccessAdminMenu())
                     <flux:navlist.group expandable :heading="__('Sistem')" :expanded="request()->routeIs('admin.*')">
                         <flux:navlist.item icon="users" :href="route('admin.users.index')" :current="request()->routeIs('admin.users.*')" wire:navigate>
                             {{ __('Pengguna') }}

@@ -75,6 +75,11 @@ class User extends Authenticatable
 
     // ─── Helpers ────────────────────────────────────────────────
 
+    public function canAccessAdminMenu(): bool
+    {
+        return $this->isAdmin() || $this->isOwner();
+    }
+
     public function isOwner(): bool
     {
         return $this->role === 'owner';
