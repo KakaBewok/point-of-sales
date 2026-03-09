@@ -32,6 +32,7 @@ class User extends Authenticatable
         'avatar',
         'is_active',
         'store_id',
+        'is_superadmin',
     ];
 
     /**
@@ -58,6 +59,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_active' => 'boolean',
             'permissions' => 'array',
+            'is_superadmin' => 'boolean',
         ];
     }
 
@@ -74,6 +76,11 @@ class User extends Authenticatable
     }
 
     // ─── Helpers ────────────────────────────────────────────────
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->is_superadmin;
+    }
 
     public function canAccessAdminMenu(): bool
     {

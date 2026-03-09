@@ -27,6 +27,10 @@ Route::middleware('guest')->group(function () {
     Route::get('/register', StoreRegistration::class)->name('register');
 });
 
+Route::get('/subscription-expired', function () {
+    return view('subscription-expired');
+})->name('subscription.expired');
+
 // ─── Tenant Routes (require auth + active store) ──────────────
 Route::middleware(['auth', 'verified', 'store.active', 'role:owner,admin,cashier'])->group(function () {
     Route::get('/dashboard', Dashboard::class)->name('dashboard')->middleware('permission:dashboard');
@@ -53,6 +57,11 @@ Route::middleware(['auth', 'verified', 'store.active', 'role:owner,admin'])->pre
 
     // Log Viewer (admin/owner only)
     Route::get('/logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->name('logs.index');
+});
+
+// ─── Superadmin Routes ─────────────────────────────────────────
+Route::middleware(['auth', 'verified', 'is_superadmin'])->prefix('superadmin')->name('superadmin.')->group(function () {
+    Route::get('/stores', \App\Livewire\Superadmin\StoreSubscriptions::class)->name('stores.index');
 });
 
 require __DIR__.'/settings.php';

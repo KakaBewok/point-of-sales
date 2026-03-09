@@ -72,7 +72,8 @@ class StoreRegistration extends Component
                 'slug' => $this->storeSlug,
                 'phone' => $this->storePhone ?: null,
                 'address' => $this->storeAddress ?: null,
-                'subscription_status' => 'active',
+                'subscription_status' => 'trial',
+                'trial_ends_at' => now()->addDays(7),
             ]);
 
             // 2. Create owner user (bypass global scope)

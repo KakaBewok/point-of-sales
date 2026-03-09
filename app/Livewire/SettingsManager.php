@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Setting;
+use App\Services\QrisService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -33,6 +34,11 @@ class SettingsManager extends Component
     public $logo = null;       // File upload temporary
     public $currentLogo = '';   // Existing logo path
 
+    // QRIS
+    public $qrisImage = null;           // File upload temporary
+    public $currentQrisImage = '';       // Stored image path
+    public $currentQrisPayload = '';     // Stored raw EMVCo payload
+
     public function mount()
     {
         $this->store_name = Setting::get('store_name', 'My POS');
@@ -50,6 +56,13 @@ class SettingsManager extends Component
 
         // Logo
         $this->currentLogo = Setting::get('store_logo', '');
+
+        // QRIS – loaded from the Store record
+        $store = auth()->user()->store ?? null;
+        if ($store) {
+            $this->currentQrisImage   = $store->qris_image_path ?? '';
+            $this->currentQrisPayload = $store->qris_payload ?? '';
+        }
     }
 
     public function save()
@@ -116,6 +129,90 @@ class SettingsManager extends Component
         ActivityLogger::settings('logo_removed');
         
         session()->flash('message', 'Logo berhasil dihapus.');
+    }
+
+    // ─── QRIS ────────────────────────────────────────────────────
+
+    public function saveQris()
+    {
+        $this->validate([
+            'qrisImage' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        ], [
+            'qrisImage.required' => 'Pilih file gambar QRIS terlebih dahulu.',
+            'qrisImage.image'    => 'File harus berupa gambar.',
+            'qrisImage.mimes'    => 'Format gambar harus JPG atau PNG.',
+            'qrisImage.max'      => 'Ukuran file maksimal 2MB.',
+        ]);
+
+        $store = auth()->user()->store ?? null;
+
+        if (! $store) {
+            session()->flash('error', 'Store tidak ditemukan. Pastikan akun Anda terhubung ke toko.');
+            return;
+        }
+
+        $qrisService = app(QrisService::class);
+
+        // Store the image to a temporary location, then read the QR
+        $tmpPath    = $this->qrisImage->getRealPath();
+        $storagePath = $this->qrisImage->store('qris', 'public');
+        $absolutePath = Storage::disk('public')->path(str_replace('public/', '', $storagePath));
+        // Use the real uploaded tmp path for reading (avoids storage symlink issues)
+        $readPath = $this->qrisImage->getRealPath();
+
+        try {
+            $payload = $qrisService->extractPayloadFromImage($readPath);
+            $qrisService->validateQrisPayload($payload);
+        } catch (\Exception $e) {
+            // Remove the already-stored image since it's invalid
+            Storage::disk('public')->delete($storagePath);
+            session()->flash('error', $e->getMessage());
+            $this->qrisImage = null;
+            return;
+        }
+
+        // Delete old QRIS image if exists
+        if ($this->currentQrisImage && Storage::disk('public')->exists($this->currentQrisImage)) {
+            Storage::disk('public')->delete($this->currentQrisImage);
+        }
+
+        // Save to Store record
+        $store->update([
+            'qris_image_path' => $storagePath,
+            'qris_payload'    => $payload,
+        ]);
+
+        $this->currentQrisImage   = $storagePath;
+        $this->currentQrisPayload = $payload;
+        $this->qrisImage = null;
+
+        ActivityLogger::settings('qris_updated', ['store_id' => $store->id]);
+
+        session()->flash('message', 'QRIS berhasil disimpan dan divalidasi.');
+    }
+
+    public function removeQris()
+    {
+        $store = auth()->user()->store ?? null;
+
+        if ($store) {
+            if ($this->currentQrisImage && Storage::disk('public')->exists($this->currentQrisImage)) {
+                Storage::disk('public')->delete($this->currentQrisImage);
+            }
+
+            $store->update([
+                'qris_image_path' => null,
+                'qris_payload'    => null,
+            ]);
+
+            ActivityLogger::settings('qris_removed', ['store_id' => $store->id]);
+        }
+
+        $this->currentQrisImage   = '';
+        $this->currentQrisPayload = '';
+        $this->qrisImage = null;
+
+        session()->flash('message', 'QRIS berhasil dihapus.');
     }
 
     public function render()

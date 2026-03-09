@@ -5,7 +5,7 @@ namespace App\Livewire;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Setting;
-use App\Services\MidtransService;
+use App\Services\QrisService;
 use App\Services\TransactionService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -28,6 +28,14 @@ class PosScreen extends Component
     public $manualDiscountType = '';
     public $manualDiscountValue = 0;
 
+    // Modal States & Temporary Inputs
+    public $showDiscountModal = false;
+    public $tempDiscountType = '';
+    public $tempDiscountValue = '';
+
+    public $showVoucherModal = false;
+    public $tempVoucherCode = '';
+
     // Payment
     public $showPaymentModal = false;
     public $paymentMethod = 'cash';
@@ -37,7 +45,10 @@ class PosScreen extends Component
     // Payment result
     public $showResultModal = false;
     public $paymentResult = null;
-    public $qrisUrl = '';
+    public $qrisImageData = '';    // base64 data-URI of the generated QR image
+
+    // QRIS availability
+    public $qrisNotConfigured = false;
 
     // Computed totals
     public function getSubtotalProperty(): float
@@ -83,6 +94,31 @@ class PosScreen extends Component
     public function getChangeAmountProperty(): float
     {
         return max(0, (float) $this->cashReceived - $this->grandTotal);
+    }
+
+    public function updatedManualDiscountType($value)
+    {
+        $this->validateDiscount();
+    }
+
+    public function updatedManualDiscountValue($value)
+    {
+        $this->validateDiscount();
+    }
+
+    public function validateDiscount()
+    {
+        $this->manualDiscountValue = (float) $this->manualDiscountValue;
+        
+        if ($this->manualDiscountValue < 0) {
+            $this->manualDiscountValue = 0;
+        }
+
+        if ($this->manualDiscountType === 'percentage' && $this->manualDiscountValue > 100) {
+            $this->manualDiscountValue = 100;
+        } elseif ($this->manualDiscountType === 'fixed' && $this->manualDiscountValue > $this->subtotal) {
+            $this->manualDiscountValue = $this->subtotal;
+        }
     }
 
     // ─── Cart Actions ──────────────────────────────────────────
@@ -174,6 +210,37 @@ class PosScreen extends Component
 
     // ─── Voucher ────────────────────────────────────────────────
 
+    public function openVoucherModal()
+    {
+        $this->tempVoucherCode = $this->voucherCode;
+        $this->voucherError = '';
+        $this->showVoucherModal = true;
+    }
+
+    public function appendVoucherKeypad($value)
+    {
+        $this->tempVoucherCode .= $value;
+    }
+
+    public function removeVoucherKeypad()
+    {
+        $this->tempVoucherCode = substr($this->tempVoucherCode, 0, -1);
+    }
+
+    public function clearVoucherKeypad()
+    {
+        $this->tempVoucherCode = '';
+    }
+
+    public function applyVoucherAction()
+    {
+        $this->voucherCode = $this->tempVoucherCode;
+        $this->applyVoucher();
+        if (!$this->voucherError) {
+            $this->showVoucherModal = false;
+        }
+    }
+
     public function applyVoucher()
     {
         $this->voucherError = '';
@@ -203,6 +270,57 @@ class PosScreen extends Component
         $this->voucherError = '';
     }
 
+    // ─── Discount ───────────────────────────────────────────────
+
+    public function openDiscountModal()
+    {
+        $this->tempDiscountType = $this->manualDiscountType ?: 'percentage';
+        $this->tempDiscountValue = $this->manualDiscountValue ?: '';
+        $this->showDiscountModal = true;
+    }
+
+    public function appendDiscountKeypad($value)
+    {
+        $current = (string) $this->tempDiscountValue;
+        if ($current === '0') {
+            if ($value === '0' || $value === '00' || $value === '000') {
+                return;
+            }
+            $this->tempDiscountValue = $value;
+        } else {
+            $this->tempDiscountValue = $current . $value;
+        }
+    }
+
+    public function removeDiscountKeypad()
+    {
+        $currentStr = (string) $this->tempDiscountValue;
+        if (strlen($currentStr) <= 1) {
+            $this->tempDiscountValue = '';
+        } else {
+            $this->tempDiscountValue = substr($currentStr, 0, -1);
+        }
+    }
+
+    public function clearDiscountKeypad()
+    {
+        $this->tempDiscountValue = '';
+    }
+
+    public function applyDiscountAction()
+    {
+        $this->manualDiscountType = $this->tempDiscountType;
+        $this->manualDiscountValue = (float) $this->tempDiscountValue;
+        $this->validateDiscount();
+        $this->showDiscountModal = false;
+    }
+
+    public function resetDiscount()
+    {
+        $this->manualDiscountType = '';
+        $this->manualDiscountValue = 0;
+    }
+
     // ─── Payment ────────────────────────────────────────────────
 
     public function openPaymentModal()
@@ -211,9 +329,26 @@ class PosScreen extends Component
             session()->flash('error', 'Keranjang masih kosong.');
             return;
         }
+
+        // Check QRIS availability when switching to QRIS
+        $this->qrisNotConfigured = false;
+        $store = auth()->user()->store ?? null;
+        if (! $store || empty($store->qris_payload)) {
+            $this->qrisNotConfigured = true;
+        }
+
         $this->paymentMethod = 'cash';
         $this->cashReceived = ceil($this->grandTotal / 1000) * 1000;
         $this->showPaymentModal = true;
+    }
+
+    public function updatedPaymentMethod()
+    {
+        // Re-check QRIS when user switches payment method
+        if ($this->paymentMethod === 'qris') {
+            $store = auth()->user()->store ?? null;
+            $this->qrisNotConfigured = ! $store || empty($store->qris_payload);
+        }
     }
 
     public function appendKeypad($value)
@@ -275,18 +410,38 @@ class PosScreen extends Component
                     'change' => $payment->change_amount,
                     'transaction_id' => $transaction->id,
                 ];
+
             } elseif ($this->paymentMethod === 'qris') {
-                $midtransService = app(MidtransService::class);
-                $payment = $midtransService->createQrisPayment($transaction);
-                $this->qrisUrl = $payment->qris_url;
-                $this->paymentResult = [
-                    'success' => true,
-                    'method' => 'qris',
-                    'invoice' => $transaction->invoice_number,
-                    'grand_total' => $transaction->grand_total,
-                    'qris_url' => $payment->qris_url,
-                    'expires_at' => $payment->expires_at?->format('H:i'),
+                $store = auth()->user()->store;
+
+                if (! $store || empty($store->qris_payload)) {
+                    throw new \Exception('QRIS belum dikonfigurasi. Silakan upload gambar QRIS di halaman Pengaturan.');
+                }
+
+                // Generate dynamic QRIS payload locally
+                $qrisService = app(QrisService::class);
+                $dynamicPayload = $qrisService->generateDynamicPayload(
+                    $store->qris_payload,
+                    $transaction->grand_total
+                );
+                $this->qrisImageData = $qrisService->generateQrImage($dynamicPayload);
+
+                // Record payment as pending (cashier confirms visually after customer scans)
+                $payment = \App\Models\Payment::create([
                     'transaction_id' => $transaction->id,
+                    'method'         => 'qris',
+                    'amount'         => $transaction->grand_total,
+                    'status'         => 'pending',
+                ]);
+
+                $this->paymentResult = [
+                    'success'        => true,
+                    'method'         => 'qris',
+                    'invoice'        => $transaction->invoice_number,
+                    'grand_total'    => $transaction->grand_total,
+                    'qris_image'     => $this->qrisImageData,
+                    'transaction_id' => $transaction->id,
+                    'payment_id'     => $payment->id,
                 ];
             }
 
@@ -301,12 +456,34 @@ class PosScreen extends Component
         }
     }
 
+    /**
+     * Called when the cashier confirms the customer has paid via QRIS.
+     * Marks the payment as successful and completes the transaction.
+     */
+    public function confirmQrisPayment()
+    {
+        if (! $this->paymentResult || $this->paymentResult['method'] !== 'qris') return;
+
+        $payment = \App\Models\Payment::find($this->paymentResult['payment_id'] ?? null);
+
+        if ($payment) {
+            $payment->markAsSuccess();
+
+            $transaction = $payment->transaction;
+            if ($transaction && $transaction->isPending()) {
+                app(TransactionService::class)->completeTransaction($transaction);
+            }
+        }
+
+        $this->paymentResult['qris_confirmed'] = true;
+    }
+
     public function newTransaction()
     {
         $this->clearCart();
         $this->showResultModal = false;
         $this->paymentResult = null;
-        $this->qrisUrl = '';
+        $this->qrisImageData = '';
         $this->notes = '';
     }
 

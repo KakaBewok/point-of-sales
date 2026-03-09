@@ -224,24 +224,40 @@
                 @endforelse
             </div>
 
-            {{-- 1. VOUCHER SECTION: MORE COMPACT --}}
-            <div class="px-3 py-2 bg-zinc-50 dark:bg-zinc-900/50 border-t border-zinc-100 dark:border-zinc-800 shrink-0">
-                <div class="flex gap-2 items-center">
-                    <input 
-                        type="text" 
-                        wire:model="voucherCode" 
-                        placeholder="VOUCHER / PROMO" 
-                        @if($voucherApplied) disabled @endif
-                        class="flex-1 min-w-0 py-2 px-3 bg-white dark:bg-zinc-800 border-2 border-zinc-200 dark:border-zinc-700 rounded-lg text-sm font-bold uppercase focus:border-green-500 outline-none"
-                    />
-                    @if($voucherApplied)
-                        <button wire:click="resetVoucher" class="py-2 px-3 bg-red-50 text-red-600 rounded-lg text-sm font-black uppercase border border-red-100 shrink-0">Batal</button>
-                    @else
-                        <button wire:click="applyVoucher" class="py-2 px-3 bg-zinc-900 text-white rounded-lg text-sm font-black uppercase shadow-sm shrink-0">Gunakan</button>
-                    @endif
-                </div>
-                @if($voucherError)
-                    <p class="text-[10px] font-bold text-red-500 mt-1 ml-1">{{ $voucherError }}</p>
+            {{-- DISCOUNT & VOUCHER BUTTONS --}}
+            <div class="px-3 py-3 bg-zinc-50 dark:bg-zinc-900/50 border-t border-zinc-100 dark:border-zinc-800 shrink-0 flex gap-2">
+                @if($manualDiscountType && $manualDiscountValue > 0)
+                    <div class="flex-1 flex flex-col bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl overflow-hidden relative group">
+                        <button wire:click="openDiscountModal" class="flex-1 px-3 py-1.5 text-left hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors">
+                            <span class="text-[9px] font-black text-amber-600 dark:text-amber-500 uppercase block mb-0.5">Diskon ({{ $manualDiscountType === 'percentage' ? $manualDiscountValue.'%' : 'Rp' }})</span>
+                            <span class="text-xs font-bold text-amber-700 dark:text-amber-400">Rp{{ number_format($this->manualDiscountAmount, 0, ',', '.') }}</span>
+                        </button>
+                        <button wire:click="resetDiscount" class="absolute right-0 top-0 bottom-0 w-8 flex items-center justify-center text-amber-400 hover:text-amber-600 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors border-l border-amber-200 dark:border-amber-800/50">
+                            <flux:icon name="x-mark" class="h-3 w-3" />
+                        </button>
+                    </div>
+                @else
+                    <button wire:click="openDiscountModal" class="flex-1 py-3 px-2 bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 border-2 border-zinc-200 dark:border-zinc-700 rounded-xl text-[10px] font-black uppercase text-zinc-600 dark:text-zinc-300 shadow-sm transition-colors flex items-center justify-center gap-1.5">
+                        <flux:icon name="receipt-percent" class="h-4 w-4" />
+                        Diskon
+                    </button>
+                @endif
+
+                @if($voucherApplied)
+                    <div class="flex-1 flex flex-col bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl overflow-hidden relative group">
+                        <div class="flex-1 px-3 py-1.5 text-left">
+                            <span class="text-[9px] font-black text-emerald-600 dark:text-emerald-500 uppercase block mb-0.5">Vcr ({{ $voucherCode }})</span>
+                            <span class="text-xs font-bold text-emerald-700 dark:text-emerald-400">Rp{{ number_format($this->voucherDiscount, 0, ',', '.') }}</span>
+                        </div>
+                        <button wire:click="resetVoucher" class="absolute right-0 top-0 bottom-0 w-8 flex items-center justify-center text-emerald-400 hover:text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors border-l border-emerald-200 dark:border-emerald-800/50">
+                            <flux:icon name="x-mark" class="h-3 w-3" />
+                        </button>
+                    </div>
+                @else
+                    <button wire:click="openVoucherModal" class="flex-1 py-3 px-2 bg-zinc-900 dark:bg-zinc-700 hover:bg-zinc-800 dark:hover:bg-zinc-600 border-2 border-zinc-900 dark:border-zinc-700 rounded-xl text-[10px] font-black uppercase text-white shadow-sm transition-colors flex items-center justify-center gap-1.5">
+                        <flux:icon name="ticket" class="h-4 w-4" />
+                        Voucher
+                    </button>
                 @endif
             </div>
 
@@ -363,12 +379,39 @@
                                 </div>
                             </div>
                         @else
-                            <div class="flex flex-col items-center justify-center text-center h-full">
-                                <div class="w-32 h-32 bg-white dark:bg-zinc-800 border-2 border-dashed border-zinc-300 dark:border-zinc-700 flex items-center justify-center rounded-xl mb-4">
-                                    <flux:icon name="qr-code" class="h-12 w-12 text-zinc-300 dark:text-zinc-600" />
+                            {{-- QRIS Payment Panel --}}
+                            @if($qrisNotConfigured)
+                                {{-- Not configured warning --}}
+                                <div class="flex flex-col items-center justify-center text-center h-full gap-4">
+                                    <div class="w-16 h-16 bg-amber-100 dark:bg-amber-950/40 border-2 border-amber-200 dark:border-amber-800 flex items-center justify-center rounded-2xl">
+                                        <flux:icon name="exclamation-triangle" class="h-8 w-8 text-amber-500" />
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-1">QRIS Belum Dikonfigurasi</p>
+                                        <p class="text-[10px] font-medium text-zinc-400 uppercase tracking-wide leading-loose">
+                                            Silakan upload gambar QRIS<br>
+                                            di halaman <strong>Pengaturan</strong>
+                                        </p>
+                                    </div>
                                 </div>
-                                <p class="text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] leading-loose">QR Code (Midtrans) akan dibuat otomatis<br>setelah konfirmasi pembayaran.</p>
-                            </div>
+                            @else
+                                {{-- QRIS ready --}}
+                                <div class="flex flex-col items-center justify-center text-center h-full gap-4">
+                                    <div class="w-20 h-20 bg-green-50 dark:bg-green-950/30 border-2 border-green-200 dark:border-green-800 flex items-center justify-center rounded-2xl">
+                                        <flux:icon name="qr-code" class="h-10 w-10 text-green-600 dark:text-green-400" />
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-1">QRIS Siap Digunakan</p>
+                                        <p class="text-[10px] font-medium text-zinc-400 uppercase tracking-wide leading-loose">
+                                            QR code dinamis akan digenerate<br>
+                                            setelah konfirmasi pembayaran
+                                        </p>
+                                    </div>
+                                    <div class="px-3 py-1.5 bg-green-100 dark:bg-green-900/30 rounded-full">
+                                        <p class="text-[9px] font-black text-green-700 dark:text-green-400 uppercase tracking-widest">Total: Rp{{ number_format($this->grandTotal, 0, ',', '.') }}</p>
+                                    </div>
+                                </div>
+                            @endif
                         @endif
                     </div>
                 </div>
@@ -396,6 +439,7 @@
                     type="button" 
                     wire:click="processPayment" 
                     @if($paymentMethod === 'cash' && $this->cashReceived < $this->grandTotal) disabled @endif
+                    @if($paymentMethod === 'qris' && $qrisNotConfigured) disabled @endif
                     class="flex-[2] h-14 rounded-xl bg-green-600 hover:bg-green-700 text-white font-black uppercase text-[12px] tracking-[0.2em] shadow-lg shadow-green-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group transition-all"
                 >
                     Konfirmasi Bayar
@@ -416,12 +460,39 @@
                 <h2 class="text-xl font-black uppercase tracking-tighter text-zinc-900 dark:text-white leading-none">Berhasil!</h2>
                 <p class="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mt-2 mb-8">Invoice #{{ $paymentResult['invoice'] }}</p>
 
-                @if($paymentResult['method'] === 'qris' && $qrisUrl)
-                    <div class="mb-8 w-full flex flex-col items-center">
-                        <div class="p-4 bg-white border-4 border-zinc-100 rounded-3xl shadow-md">
-                            <img src="{{ $qrisUrl }}" class="h-48 w-48 object-contain">
-                        </div>
-                        <p class="mt-4 text-2xl font-black text-green-600 tracking-tighter leading-none">Rp{{ number_format($paymentResult['grand_total'], 0, ',', '.') }}</p>
+                @if($paymentResult['method'] === 'qris')
+                    <div class="mb-6 w-full flex flex-col items-center gap-4">
+                        {{-- Generated dynamic QR code --}}
+                        @if($qrisImageData)
+                            <div class="p-3 bg-white border-4 border-zinc-100 rounded-3xl shadow-lg">
+                                <img src="{{ $qrisImageData }}" class="h-52 w-52 object-contain" alt="QRIS">
+                            </div>
+                        @endif
+
+                        <p class="text-2xl font-black text-green-600 tracking-tighter leading-none">
+                            Rp{{ number_format($paymentResult['grand_total'], 0, ',', '.') }}
+                        </p>
+
+                        <p class="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] text-center">
+                            Tunjukkan QR ke pelanggan<br>untuk di-scan
+                        </p>
+
+                        {{-- Confirm payment received button --}}
+                        @if(!($paymentResult['qris_confirmed'] ?? false))
+                            <button
+                                wire:click="confirmQrisPayment"
+                                type="button"
+                                class="w-full h-12 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg"
+                            >
+                                <flux:icon name="check-circle" class="h-4 w-4" />
+                                Konfirmasi Pembayaran Diterima
+                            </button>
+                        @else
+                            <div class="w-full h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-2">
+                                <flux:icon name="check-circle" class="h-4 w-4" />
+                                Pembayaran Dikonfirmasi
+                            </div>
+                        @endif
                     </div>
                 @elseif($paymentResult['method'] === 'va')
                     <div class="mb-8 w-full bg-zinc-50 dark:bg-zinc-950 p-6 rounded-3xl border border-zinc-100 dark:border-zinc-800">
@@ -451,6 +522,96 @@
                 </div>
             </div>
         @endif
+    </flux:modal>
+
+    {{-- ====================================================================
+         DISCOUNT MODAL WITH NUMERIC KEYPAD
+         ==================================================================== --}}
+    <flux:modal wire:model="showDiscountModal" class="max-w-sm p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-3xl w-full">
+        <div class="p-6 space-y-5">
+            <header class="text-center pb-4 border-b border-zinc-100 dark:border-zinc-800">
+                <h2 class="text-lg font-black uppercase tracking-tighter text-zinc-900 dark:text-white leading-none">Input Diskon</h2>
+            </header>
+
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-2">
+                    <button wire:click="$set('tempDiscountType', 'percentage')" class="py-3 rounded-xl border-2 text-xs font-black uppercase transition-all {{ $tempDiscountType === 'percentage' ? 'border-amber-500 bg-amber-50 text-amber-700' : 'border-zinc-200 bg-zinc-50 text-zinc-500' }}">Persen (%)</button>
+                    <button wire:click="$set('tempDiscountType', 'fixed')" class="py-3 rounded-xl border-2 text-xs font-black uppercase transition-all {{ $tempDiscountType === 'fixed' ? 'border-amber-500 bg-amber-50 text-amber-700' : 'border-zinc-200 bg-zinc-50 text-zinc-500' }}">Nominal (Rp)</button>
+                </div>
+
+                <div class="relative">
+                    <input type="text" readonly value="{{ $tempDiscountValue ? number_format((float)$tempDiscountValue, 0, ',', '.') : '' }}" class="w-full h-16 text-center text-3xl font-black bg-white dark:bg-zinc-950 border-2 border-zinc-200 dark:border-zinc-800 rounded-2xl text-zinc-900 dark:text-white" placeholder="0">
+                    <div class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 font-bold text-lg select-none pointer-events-none">{{ $tempDiscountType === 'fixed' ? 'Rp' : '%' }}</div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2">
+                    @foreach(['1', '2', '3', '4', '5', '6', '7', '8', '9', '000', '00', '0'] as $key)
+                        <button type="button" wire:click="appendDiscountKeypad('{{ $key }}')" class="h-14 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white rounded-xl font-bold text-xl transition-colors active:scale-95 shadow-sm">
+                            {{ $key }}
+                        </button>
+                    @endforeach
+                    <button type="button" wire:click="clearDiscountKeypad" class="col-span-1 h-12 bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400 rounded-xl font-black text-xs uppercase active:scale-95 shadow-sm">Clear</button>
+                    <button type="button" wire:click="removeDiscountKeypad" class="col-span-2 h-12 bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/40 rounded-xl flex items-center justify-center transition-colors active:scale-95 shadow-sm">
+                        <flux:icon name="backspace" class="h-6 w-6" />
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button type="button" wire:click="$set('showDiscountModal', false)" class="flex-1 h-12 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 text-xs font-black uppercase text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">Batal</button>
+                <button type="button" wire:click="applyDiscountAction" class="flex-1 h-12 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-black uppercase shadow-lg shadow-amber-500/30 transition-all">Terapkan</button>
+            </div>
+        </div>
+    </flux:modal>
+
+    {{-- ====================================================================
+         VOUCHER MODAL WITH ON-SCREEN KEYBOARD
+         ==================================================================== --}}
+    <flux:modal wire:model="showVoucherModal" class="max-w-xl p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-3xl w-full">
+        <div class="p-6 space-y-5">
+            <header class="text-center pb-4 border-b border-zinc-100 dark:border-zinc-800">
+                <h2 class="text-lg font-black uppercase tracking-tighter text-zinc-900 dark:text-white leading-none">Input Kode Voucher</h2>
+            </header>
+
+            <div class="space-y-4 relative">
+                <input type="text" readonly value="{{ $tempVoucherCode }}" class="w-full h-16 text-center text-3xl font-black uppercase bg-white dark:bg-zinc-950 border-2 border-zinc-200 dark:border-zinc-800 rounded-2xl text-zinc-900 dark:text-white" placeholder="KODE VOUCHER">
+
+                <div class="space-y-2">
+                    <div class="flex justify-center gap-1.5">
+                        @foreach(str_split('1234567890') as $key)
+                            <button type="button" wire:click="appendVoucherKeypad('{{ $key }}')" class="h-12 w-10 flex-1 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-white rounded-xl font-black text-lg shadow-sm active:scale-95">{{ $key }}</button>
+                        @endforeach
+                    </div>
+                    <div class="flex justify-center gap-1.5">
+                        @foreach(str_split('QWERTYUIOP') as $key)
+                            <button type="button" wire:click="appendVoucherKeypad('{{ $key }}')" class="h-12 w-10 flex-1 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-white rounded-xl font-black text-lg shadow-sm active:scale-95">{{ $key }}</button>
+                        @endforeach
+                    </div>
+                    <div class="flex justify-center gap-1.5 px-3">
+                        @foreach(str_split('ASDFGHJKL') as $key)
+                            <button type="button" wire:click="appendVoucherKeypad('{{ $key }}')" class="h-12 w-10 flex-1 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-white rounded-xl font-black text-lg shadow-sm active:scale-95">{{ $key }}</button>
+                        @endforeach
+                    </div>
+                    <div class="flex justify-center gap-1.5 px-6">
+                        @foreach(str_split('ZXCVBNM') as $key)
+                            <button type="button" wire:click="appendVoucherKeypad('{{ $key }}')" class="h-12 w-10 flex-1 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-white rounded-xl font-black text-lg shadow-sm active:scale-95">{{ $key }}</button>
+                        @endforeach
+                        <button type="button" wire:click="removeVoucherKeypad" class="h-12 flex-[1.5] bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/40 rounded-xl flex items-center justify-center shadow-sm active:scale-95">
+                            <flux:icon name="backspace" class="h-5 w-5" />
+                        </button>
+                    </div>
+                </div>
+
+                @if($voucherError)
+                    <p class="text-[11px] font-bold text-red-500 text-center uppercase mt-2">{{ $voucherError }}</p>
+                @endif
+            </div>
+
+            <div class="flex gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800 mt-4">
+                <button type="button" wire:click="$set('showVoucherModal', false)" class="flex-[0.5] h-12 rounded-xl border border-zinc-200 dark:border-zinc-700 text-xs font-black uppercase text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">Batal</button>
+                <button type="button" wire:click="applyVoucherAction" class="flex-1 h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase shadow-lg shadow-emerald-600/30 transition-all flex justify-center items-center gap-2">Terapkan Voucher</button>
+            </div>
+        </div>
     </flux:modal>
 
     <style>

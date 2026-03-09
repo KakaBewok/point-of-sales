@@ -23,17 +23,20 @@ class EnsureStoreIsActive
         }
 
         if (!$user->store->canAccess()) {
-            auth()->logout();
+            if ($user->store->isTrialExpired() || ($user->store->isActive() && $user->store->subscription_ends_at?->isPast())) {
+                $user->store->update(['subscription_status' => 'expired']);
+            }
 
             $message = match ($user->store->subscription_status) {
-                'suspended' => 'Your store has been suspended. Please contact support.',
-                'cancelled' => 'Your store subscription has been cancelled.',
-                default => 'Your store subscription has expired.',
+                'suspended' => 'Toko Anda telah ditangguhkan. Silakan hubungi support.',
+                'cancelled' => 'Langganan toko Anda telah dibatalkan.',
+                'expired' => 'Langganan Anda telah berakhir. Silakan perpanjang untuk lanjut menggunakan sistem.',
+                default => 'Akses toko Anda telah berakhir.',
             };
 
-            return redirect()->route('login')->withErrors([
-                'email' => $message,
-            ]);
+            auth()->logout();
+
+            return redirect()->route('subscription.expired')->with('error', $message);
         }
 
         return $next($request);

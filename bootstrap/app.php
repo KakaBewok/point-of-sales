@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => RoleMiddleware::class,
             'permission' => \App\Http\Middleware\CheckPermissions::class,
             'store.active' => EnsureStoreIsActive::class,
+            'is_superadmin' => \App\Http\Middleware\IsSuperadmin::class,
         ]);
 
         // Exclude Midtrans webhook from CSRF verification

@@ -10,6 +10,62 @@
             </div>
         </div>
 
+        {{-- Subscription Banners --}}
+        @if(auth()->user()->store)
+            @php
+                $store = auth()->user()->store;
+                $now = now();
+            @endphp
+            
+            @if($store->isExpired() || ($store->isTrial() && $store->isTrialExpired()) || ($store->isActive() && $store->subscription_ends_at && $store->subscription_ends_at->isPast()))
+                <div class="rounded-lg bg-red-50 border border-red-200 p-4 shadow-sm dark:bg-red-900/20 dark:border-red-900/50">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <flux:icon name="exclamation-triangle" class="h-5 w-5 text-red-600 dark:text-red-400" />
+                        </div>
+                        <div class="ml-3 text-sm text-red-800 dark:text-red-300">
+                            <p class="font-medium">Langganan Anda telah berakhir.</p>
+                            <p class="mt-1">Harap segera perpanjang untuk mengembalikan akses sistem Anda.</p>
+                        </div>
+                    </div>
+                </div>
+            @elseif($store->isTrial())
+                @php
+                    $daysLeft = $store->trial_ends_at ? $now->startOfDay()->diffInDays($store->trial_ends_at->startOfDay(), false) : 0;
+                @endphp
+                @if($daysLeft <= 2 && $daysLeft >= 0)
+                    <div class="rounded-lg bg-yellow-50 border border-yellow-200 p-4 shadow-sm dark:bg-yellow-900/20 dark:border-yellow-900/50">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <flux:icon name="clock" class="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+                            </div>
+                            <div class="ml-3 text-sm text-yellow-800 dark:text-yellow-300">
+                                <p class="font-medium">Masa percobaan gratis Anda akan berakhir dalam {{ $daysLeft }} hari.</p>
+                                <p class="mt-1">Harap berlangganan untuk tetap bisa menggunakan sistem setelah masa percobaan.</p>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            @elseif($store->isActive() && $store->subscription_ends_at)
+                @php
+                    $daysLeft = $now->startOfDay()->diffInDays($store->subscription_ends_at->startOfDay(), false);
+                @endphp
+                @if($daysLeft <= 3 && $daysLeft >= 0)
+                    <div class="rounded-lg bg-yellow-50 border border-yellow-200 p-4 shadow-sm dark:bg-yellow-900/20 dark:border-yellow-900/50">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <flux:icon name="clock" class="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+                            </div>
+                            <div class="ml-3 text-sm text-yellow-800 dark:text-yellow-300">
+                                <p class="font-medium">Langganan Anda akan berakhir dalam {{ $daysLeft }} hari.</p>
+                                <p class="mt-1">Harap perpanjang untuk menghindari gangguan layanan.</p>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            @endif
+        @endif
+
         {{-- Summary Cards --}}
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {{-- Today Revenue --}}

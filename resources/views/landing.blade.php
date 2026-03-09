@@ -219,9 +219,11 @@
             .footer .container { flex-direction: column; gap: 16px; text-align: center; }
             .hero { padding: 120px 0 60px; }
         }
+        @media (min-width: 769px) {
+            .pricing-grid { grid-template-columns: repeat(2, 1fr); max-width: 800px; margin: 0 auto; }
+        }
         @media (min-width: 769px) and (max-width: 1024px) {
             .features-grid { grid-template-columns: repeat(2, 1fr); }
-            .pricing-grid { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
@@ -230,7 +232,7 @@
 <!-- Navbar -->
 <nav class="navbar">
     <div class="container">
-        <a href="/" class="navbar-brand">POS<span>ify</span></a>
+        <a href="/" class="navbar-brand">CALA<span>POS</span></a>
         <div class="navbar-links">
             <a href="#features" class="hide-mobile">Fitur</a>
             <a href="#pricing" class="hide-mobile">Harga</a>
@@ -349,42 +351,30 @@
         </div>
         <div class="pricing-grid">
             <div class="pricing-card">
-                <div class="plan-name">Starter</div>
-                <div class="price">Gratis <span></span></div>
-                <div class="price-note">Selamanya</div>
+                <div class="plan-name">Paket Bulanan</div>
+                <div class="price">Rp 50k <span>/ bulan</span></div>
+                <div class="price-note">Akses penuh ke semua fitur</div>
                 <ul>
-                    <li><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> 1 Pengguna</li>
-                    <li><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> 50 Produk</li>
-                    <li><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Laporan Dasar</li>
-                    <li><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Pembayaran Tunai</li>
-                </ul>
-                <a href="{{ route('register') }}" class="btn btn-outline" style="width:100%">Mulai Gratis</a>
-            </div>
-            <div class="pricing-card popular">
-                <div class="plan-name">Professional</div>
-                <div class="price">Rp 99k <span>/ bulan</span></div>
-                <div class="price-note">Untuk bisnis yang berkembang</div>
-                <ul>
-                    <li><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> 5 Pengguna</li>
-                    <li><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Produk Unlimited</li>
-                    <li><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Laporan Lengkap</li>
-                    <li><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> QRIS & Multi-Pembayaran</li>
+                    <li><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Point of Sale lengkap</li>
+                    <li><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Manajemen Stok</li>
+                    <li><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Laporan Real-time</li>
+                    <li><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Multi-user / Kasir</li>
                     <li><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Voucher & Diskon</li>
                 </ul>
-                <a href="{{ route('register') }}" class="btn btn-primary" style="width:100%">Coba Gratis 14 Hari</a>
+                <a href="{{ route('register') }}" class="btn btn-outline" style="width:100%">Mulai Coba Gratis 7 Hari</a>
             </div>
-            <div class="pricing-card">
-                <div class="plan-name">Enterprise</div>
-                <div class="price">Rp 249k <span>/ bulan</span></div>
-                <div class="price-note">Untuk bisnis besar</div>
+            <div class="pricing-card popular">
+                <div class="plan-name">Paket Tahunan</div>
+                <div class="price">Rp 550k <span>/ tahun</span></div>
+                <div class="price-note">Hemat Rp 50k, paling direkomendasikan</div>
                 <ul>
-                    <li><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Unlimited Pengguna</li>
-                    <li><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Multi-Cabang</li>
-                    <li><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> API & Integrasi</li>
-                    <li><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Priority Support</li>
-                    <li><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Custom Branding</li>
+                    <li><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Semua Fitur Bulanan</li>
+                    <li><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Penghematan Biaya</li>
+                    <li><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Gratis Pembaruan Sistem</li>
+                    <li><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Dukungan Prioritas</li>
+                    <li><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Akses Stabil Penuh</li>
                 </ul>
-                <a href="{{ route('register') }}" class="btn btn-outline" style="width:100%">Hubungi Kami</a>
+                <a href="{{ route('register') }}" class="btn btn-primary" style="width:100%">Mulai Coba Gratis 7 Hari</a>
             </div>
         </div>
     </div>

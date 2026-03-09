@@ -17,12 +17,19 @@ class Store extends Model
         'phone',
         'subscription_status',
         'trial_ends_at',
+        'qris_image_path',
+        'qris_payload',
+        'subscription_plan',
+        'subscription_starts_at',
+        'subscription_ends_at',
     ];
 
     protected function casts(): array
     {
         return [
             'trial_ends_at' => 'datetime',
+            'subscription_starts_at' => 'datetime',
+            'subscription_ends_at' => 'datetime',
         ];
     }
 
@@ -80,15 +87,29 @@ class Store extends Model
         return $this->subscription_status === 'suspended';
     }
 
+    public function isExpired(): bool
+    {
+        return $this->subscription_status === 'expired';
+    }
+
     public function isTrialExpired(): bool
     {
         return $this->isTrial() && $this->trial_ends_at?->isPast();
     }
 
+    // Update canAccess logic according to new business rules
     public function canAccess(): bool
     {
-        if ($this->isActive()) return true;
+        if ($this->isExpired() || $this->isSuspended() || $this->subscription_status === 'cancelled') {
+            return false;
+        }
+
         if ($this->isTrial() && !$this->isTrialExpired()) return true;
+
+        if ($this->isActive() && $this->subscription_ends_at && !$this->subscription_ends_at->isPast()) {
+            return true;
+        }
+
         return false;
     }
 }
