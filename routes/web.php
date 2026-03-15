@@ -13,7 +13,6 @@ use App\Livewire\UserManager;
 use App\Livewire\SettingsManager;
 use App\Livewire\StoreRegistration;
 
-// ─── Public Routes ─────────────────────────────────────────────
 // Landing Page
 Route::get('/', function () {
     if (auth()->check()) {
@@ -22,7 +21,7 @@ Route::get('/', function () {
     return view('landing');
 })->name('home');
 
-// Store Registration (replaces Fortify registration)
+// Store Registration
 Route::middleware('guest')->group(function () {
     Route::get('/register', StoreRegistration::class)->name('register');
 });

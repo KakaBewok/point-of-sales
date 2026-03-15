@@ -44,8 +44,6 @@ trait BelongsToStore
         });
     }
 
-    // ─── Relationship ──────────────────────────────────────────
-
     public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);

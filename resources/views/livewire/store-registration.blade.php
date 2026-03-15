@@ -10,7 +10,7 @@
     <form wire:submit="register" class="flex flex-col gap-6">
         {{-- Store Information --}}
         <div class="space-y-1">
-            <h2 class="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Informasi Toko</h2>
+            <h2 class="text-sm text-slate-700 dark:text-zinc-300 uppercase tracking-wider font-extrabold">Informasi Toko</h2>
             <div class="h-px bg-zinc-200 dark:bg-zinc-700"></div>
         </div>
 
