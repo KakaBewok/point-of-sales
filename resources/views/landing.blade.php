@@ -12,10 +12,10 @@
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans antialiased leading-relaxed">
 
-<!-- Navbar -->
+<!-- Navigasi bar -->
 <nav class="fixed top-0 inset-x-0 z-50 bg-gray-50/85 backdrop-blur-md border-b border-gray-200 h-16">
     <div class="h-full flex items-center justify-between mx-auto max-w-6xl px-6">
-        <a href="/" class="text-xl font-extrabold text-gray-900 tracking-tight">CALA<span class="text-blue-600">POS</span></a>
+        <a href="/" class="text-xl font-extrabold text-gray-900 tracking-tight">CALA<span class="text-blue-500">POS</span></a>
         <div class="flex items-center gap-2">
             <a href="{{ route('login') }}" class="inline-flex items-center justify-center text-sm font-semibold px-6 py-2.5 rounded-md transition bg-transparent text-gray-900 border border-gray-200 hover:bg-blue-50 hover:border-blue-600 hover:text-blue-600">Masuk</a>
         </div>
