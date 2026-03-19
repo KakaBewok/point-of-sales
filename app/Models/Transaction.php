@@ -25,6 +25,7 @@ class Transaction extends Model
         'tax_rate',
         'tax_amount',
         'grand_total',
+        'qris_type',
         'voucher_id',
         'status',
         'notes',

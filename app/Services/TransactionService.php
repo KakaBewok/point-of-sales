@@ -35,8 +35,9 @@ class TransactionService
         ?string $discountType = null,
         float $discountValue = 0,
         ?string $notes = null,
+        ?string $qrisType = null,
     ): Transaction {
-        return DB::transaction(function () use ($cartItems, $voucherCode, $discountType, $discountValue, $notes) {
+        return DB::transaction(function () use ($cartItems, $voucherCode, $discountType, $discountValue, $notes, $qrisType) {
             // 1. Validate and gather products
             $subtotal = 0;
             $itemsData = [];
@@ -114,6 +115,7 @@ class TransactionService
                 'voucher_id' => $voucher?->id,
                 'status' => 'pending',
                 'notes' => $notes,
+                'qris_type' => $qrisType,
             ]);
 
             // 7. Create transaction items

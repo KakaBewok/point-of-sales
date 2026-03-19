@@ -89,10 +89,25 @@
                         </flux:navlist.item>
                     </flux:navlist.group>
                     @endif
+
+                    
                 </flux:navlist>
             </flux:sidebar.nav>
 
             <flux:spacer />
+
+            {{-- Contact --}}
+                    @php
+                        $contact = env('CONTACT', '085156497401');
+                        if (str_starts_with($contact, '0')) {
+                            $contact = '62' . substr($contact, 1);
+                        }
+                        $message = urlencode("Halo admin, saya mau konsultasi tentang aplikasi POS");
+                        $waUrl = "https://wa.me/{$contact}?text={$message}";
+                    @endphp
+                    <flux:navlist.item icon="chat-bubble-left-ellipsis" :href="$waUrl" target="_blank" class="mt-2 text-emerald-600 dark:text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30">
+                        {{ __('Contact Admin') }}
+                    </flux:navlist.item>
 
             <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />
         </flux:sidebar>

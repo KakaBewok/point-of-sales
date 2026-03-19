@@ -389,6 +389,12 @@ class PosScreen extends Component
                 'quantity' => $item['quantity'],
             ])->values()->toArray();
 
+            $qrisType = null;
+            if ($this->paymentMethod === 'qris') {
+                $store = auth()->user()->store ?? null;
+                $qrisType = (! $store || empty($store->qris_payload)) ? 'external' : 'dynamic';
+            }
+
             // Create transaction
             $transaction = $transactionService->createTransaction(
                 cartItems: $cartItems,
@@ -396,6 +402,7 @@ class PosScreen extends Component
                 discountType: $this->manualDiscountType ?: null,
                 discountValue: (float) $this->manualDiscountValue,
                 notes: $this->notes ?: null,
+                qrisType: $qrisType,
             );
 
             // Process payment based on method
@@ -412,19 +419,20 @@ class PosScreen extends Component
                 ];
 
             } elseif ($this->paymentMethod === 'qris') {
-                $store = auth()->user()->store;
+                $store = auth()->user()->store ?? null;
+                $isExternal = (! $store || empty($store->qris_payload));
 
-                if (! $store || empty($store->qris_payload)) {
-                    throw new \Exception('QRIS belum dikonfigurasi. Silakan upload gambar QRIS di halaman Pengaturan.');
+                if (!$isExternal) {
+                    // Generate dynamic QRIS payload locally
+                    $qrisService = app(QrisService::class);
+                    $dynamicPayload = $qrisService->generateDynamicPayload(
+                        $store->qris_payload,
+                        $transaction->grand_total
+                    );
+                    $this->qrisImageData = $qrisService->generateQrImage($dynamicPayload);
+                } else {
+                    $this->qrisImageData = '';
                 }
-
-                // Generate dynamic QRIS payload locally
-                $qrisService = app(QrisService::class);
-                $dynamicPayload = $qrisService->generateDynamicPayload(
-                    $store->qris_payload,
-                    $transaction->grand_total
-                );
-                $this->qrisImageData = $qrisService->generateQrImage($dynamicPayload);
 
                 // Record payment as pending (cashier confirms visually after customer scans)
                 $payment = \App\Models\Payment::create([
@@ -440,6 +448,7 @@ class PosScreen extends Component
                     'invoice'        => $transaction->invoice_number,
                     'grand_total'    => $transaction->grand_total,
                     'qris_image'     => $this->qrisImageData,
+                    'qris_type'      => $isExternal ? 'external' : 'dynamic',
                     'transaction_id' => $transaction->id,
                     'payment_id'     => $payment->id,
                 ];

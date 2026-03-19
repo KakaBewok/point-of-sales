@@ -381,17 +381,20 @@
                         @else
                             {{-- QRIS Payment Panel --}}
                             @if($qrisNotConfigured)
-                                {{-- Not configured warning --}}
+                                {{-- External QRIS flow (Not configured in system) --}}
                                 <div class="flex flex-col items-center justify-center text-center h-full gap-4">
-                                    <div class="w-16 h-16 bg-amber-100 dark:bg-amber-950/40 border-2 border-amber-200 dark:border-amber-800 flex items-center justify-center rounded-2xl">
-                                        <flux:icon name="exclamation-triangle" class="h-8 w-8 text-amber-500" />
+                                    <div class="w-16 h-16 bg-blue-100 dark:bg-blue-950/40 border-2 border-blue-200 dark:border-blue-800 flex items-center justify-center rounded-2xl">
+                                        <flux:icon name="qr-code" class="h-8 w-8 text-blue-500" />
                                     </div>
                                     <div>
-                                        <p class="text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-1">QRIS Belum Dikonfigurasi</p>
+                                        <p class="text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-1">QRIS Eksternal</p>
                                         <p class="text-[10px] font-medium text-zinc-400 uppercase tracking-wide leading-loose">
-                                            Silakan upload gambar QRIS<br>
-                                            di halaman <strong>Pengaturan</strong>
+                                            Toko menggunakan QRIS Eksternal.<br>
+                                            Pelanggan scan QR dari EDC atau QR Cetak.
                                         </p>
+                                    </div>
+                                    <div class="px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                                        <p class="text-[9px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest">Total: Rp{{ number_format($this->grandTotal, 0, ',', '.') }}</p>
                                     </div>
                                 </div>
                             @else
@@ -439,7 +442,6 @@
                     type="button" 
                     wire:click="processPayment" 
                     @if($paymentMethod === 'cash' && $this->cashReceived < $this->grandTotal) disabled @endif
-                    @if($paymentMethod === 'qris' && $qrisNotConfigured) disabled @endif
                     class="flex-[2] h-14 rounded-xl bg-green-600 hover:bg-green-700 text-white font-black uppercase text-[12px] tracking-[0.2em] shadow-lg shadow-green-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group transition-all"
                 >
                     Konfirmasi Bayar
@@ -474,7 +476,11 @@
                         </p>
 
                         <p class="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] text-center">
-                            Tunjukkan QR ke pelanggan<br>untuk di-scan
+                            @if(isset($paymentResult['qris_type']) && $paymentResult['qris_type'] === 'external')
+                                Pastikan pembayaran sudah diterima<br>lewat EDC atau mutasi rekening
+                            @else
+                                Tunjukkan QR ke pelanggan<br>untuk di-scan
+                            @endif
                         </p>
 
                         {{-- Confirm payment received button --}}
