@@ -149,21 +149,20 @@
 
         {{-- Stored QRIS preview --}}
         @if($currentQrisImage)
-            <div class="flex items-start gap-5 mt-5 p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl">
-                <div class="h-28 w-28 shrink-0 rounded-xl border-2 border-emerald-300 dark:border-emerald-700 bg-white overflow-hidden flex items-center justify-center shadow-sm">
+            <div class="flex items-start gap-5 mt-5 p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-100 rounded-xl">
+                <div class="h-28 w-28 shrink-0 rounded-xl border-2 border-emerald-100 dark:border-emerald-100 bg-white overflow-hidden flex items-center justify-center shadow-sm">
                     <img src="{{ \Illuminate\Support\Facades\Storage::url($currentQrisImage) }}" class="h-full w-full object-contain p-1" alt="QRIS Tersimpan">
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">QRIS Tersimpan &amp; Aktif</p>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">QRIS Aktif</p>
                     <p class="text-[10px] font-mono text-zinc-500 dark:text-zinc-400 break-all line-clamp-4 leading-relaxed bg-zinc-100 dark:bg-zinc-800 p-2 rounded-lg">{{ Str::limit($currentQrisPayload, 120) }}</p>
                     <button
                         wire:click="removeQris"
-                        wire:confirm="Yakin hapus QRIS? Pembayaran QRIS di kasir tidak akan tersedia sampai QRIS baru diupload."
                         type="button"
                         class="mt-3 text-xs text-red-600 hover:text-red-700 font-semibold flex items-center gap-1.5 transition-colors"
                     >
-                        <flux:icon name="trash" class="h-3.5 w-3.5" />
-                        Hapus QRIS
+                        <flux:icon name="trash" class="h-4 w-4" />
+                        Hapus
                     </button>
                 </div>
             </div>
@@ -188,7 +187,7 @@
                         <img src="{{ $qrisImage->temporaryUrl() }}" class="h-full w-full object-contain p-1" alt="Preview">
                     </div>
                     <div>
-                        <p class="text-xs font-bold text-zinc-700 dark:text-zinc-300">{{ $qrisImage->getClientOriginalName() }}</p>
+                        <p class="text-xs font-bold text-zinc-700 dark:text-zinc-300">{{ Str::limit($qrisImage->getClientOriginalName(), 8) }}</p>
                         <p class="text-[10px] text-zinc-400 mt-0.5">{{ number_format($qrisImage->getSize() / 1024, 1) }} KB</p>
                         <button
                         wire:click="removeQris"
@@ -220,7 +219,7 @@
                 <flux:button
                     wire:click="saveQris"
                     variant="primary"
-                    class="h-10 px-6"
+                    class="h-10 px-6 cursor-pointer"
                 >
                     Simpan dan Validasi QRIS
                 </flux:button>

@@ -32,7 +32,7 @@ Route::get('/subscription-expired', function () {
 
 // Tenant Routes (require auth + active store)
 Route::middleware(['auth', 'verified', 'store.active', 'role:owner,admin,cashier'])->group(function () {
-    Route::get('/dashboard', Dashboard::class)->name('dashboard')->middleware('permission:dashboard');
+    Route::get('/dashboard', Dashboard::class)->name('dashboard')->middleware('permission:dashboard'); // done
     Route::get('/pos', PosScreen::class)->name('pos.index')->middleware('permission:pos');
     Route::get('/products', ProductManager::class)->name('products.index')->middleware('permission:products');
     Route::get('/categories', CategoryManager::class)->name('categories.index')->middleware('permission:categories');

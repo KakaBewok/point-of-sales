@@ -1,11 +1,11 @@
-<div class="px-6 py-8 md:px-8 space-y-8 max-w-7xl mx-auto flex-1 w-full">
+<div class="px-1 py-8 md:px-8 space-y-8 max-w-7xl mx-auto flex-1 w-full">
         {{-- Header --}}
-        <div class="flex items-center justify-between">
+        <div class="flex items-start md:items-center justify-between">
             <div>
                 <h1 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Dashboard</h1>
-                <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Selamat datang kembali, {{ auth()->user()->name }}.</p>
+                <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Selamat datang kembali, {{ auth()->user()->name }} !</p>
             </div>
-            <div class="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+            <div class="text-xs md:text-sm font-medium text-zinc-500 dark:text-zinc-400">
                 {{ now()->translatedFormat('l, d F Y') }}
             </div>
         </div>
@@ -20,7 +20,7 @@
             @if($store->isExpired() || ($store->isTrial() && $store->isTrialExpired()) || ($store->isActive() && $store->subscription_ends_at && $store->subscription_ends_at->isPast()))
                 <div class="rounded-lg bg-red-50 border border-red-200 p-4 shadow-sm dark:bg-red-900/20 dark:border-red-900/50">
                     <div class="flex items-start">
-                        <div class="flex-shrink-0">
+                        <div class="shrink-0">
                             <flux:icon name="exclamation-triangle" class="h-5 w-5 text-red-600 dark:text-red-400" />
                         </div>
                         <div class="ml-3 text-sm text-red-800 dark:text-red-300">
@@ -36,12 +36,12 @@
                 @if($daysLeft <= 2 && $daysLeft >= 0)
                     <div class="rounded-lg bg-yellow-50 border border-yellow-200 p-4 shadow-sm dark:bg-yellow-900/20 dark:border-yellow-900/50">
                         <div class="flex items-start">
-                            <div class="flex-shrink-0">
+                            <div class="shrink-0">
                                 <flux:icon name="clock" class="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
                             </div>
                             <div class="ml-3 text-sm text-yellow-800 dark:text-yellow-300">
                                 <p class="font-medium">Masa percobaan gratis Anda akan berakhir dalam {{ $daysLeft }} hari.</p>
-                                <p class="mt-1">Harap berlangganan untuk tetap bisa menggunakan sistem setelah masa percobaan.</p>
+                                <p class="text-xs md:text-sm mt-1 font-extralight text-yellow-600">Harap berlangganan untuk tetap bisa menggunakan sistem setelah masa percobaan.</p>
                             </div>
                         </div>
                     </div>
@@ -53,12 +53,12 @@
                 @if($daysLeft <= 3 && $daysLeft >= 0)
                     <div class="rounded-lg bg-yellow-50 border border-yellow-200 p-4 shadow-sm dark:bg-yellow-900/20 dark:border-yellow-900/50">
                         <div class="flex items-start">
-                            <div class="flex-shrink-0">
+                            <div class="shrink-0">
                                 <flux:icon name="clock" class="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
                             </div>
                             <div class="ml-3 text-sm text-yellow-800 dark:text-yellow-300">
                                 <p class="font-medium">Langganan Anda akan berakhir dalam {{ $daysLeft }} hari.</p>
-                                <p class="mt-1">Harap perpanjang untuk menghindari gangguan layanan.</p>
+                                <p class="text-xs md:text-sm mt-1 font-extralight text-yellow-600">Harap perpanjang untuk menghindari gangguan layanan.</p>
                             </div>
                         </div>
                     </div>
@@ -129,7 +129,7 @@
                 <div class="space-y-4">
                     @php $maxRevenue = $chartData->max('revenue') ?: 1; @endphp
                     @foreach($chartData as $day)
-                        <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-1 md:gap-4">
                             <span class="w-16 text-sm text-zinc-500 dark:text-zinc-400">{{ $day['date'] }}</span>
                             <div class="flex-1">
                                 <div class="h-6 w-full rounded-md bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
@@ -146,11 +146,11 @@
             </div>
 
             {{-- Best Selling --}}
-            <div class="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-                <h3 class="mb-5 text-base font-semibold text-zinc-900 dark:text-white">Produk Terlaris (Bulan Ini)</h3>
-                <div class="space-y-4">
+            <div class="w-full rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                <h3 class="mb-5 text-base font-semibold text-zinc-900 dark:text-white">Produk Terlaris Bulan Ini</h3>
+                <div class="space-y-4 w-full">
                     @forelse($bestSelling as $index => $item)
-                        <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-4 w-full">
                             <span class="flex h-8 w-8 items-center justify-center rounded-md bg-zinc-100 text-sm font-bold text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
                                 {{ $index + 1 }}
                             </span>
@@ -181,7 +181,7 @@
                     <table class="w-full text-sm">
                         <thead>
                             <tr class="border-b border-zinc-200 dark:border-zinc-800">
-                                <th class="pb-3 text-left font-medium text-zinc-500 dark:text-zinc-400">Invoice</th>
+                                <th class="hidden md:block pb-3 text-left font-medium text-zinc-500 dark:text-zinc-400">Invoice</th>
                                 <th class="pb-3 text-left font-medium text-zinc-500 dark:text-zinc-400">Kasir</th>
                                 <th class="pb-3 text-right font-medium text-zinc-500 dark:text-zinc-400">Total</th>
                                 <th class="pb-3 text-right font-medium text-zinc-500 dark:text-zinc-400">Metode</th>
@@ -190,14 +190,13 @@
                         <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800/60">
                             @forelse($recentTransactions as $trx)
                                 <tr class="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
-                                    <td class="py-3 font-medium text-zinc-900 dark:text-white">{{ $trx->invoice_number }}</td>
+                                    <td class="hidden md:block py-3 font-medium text-zinc-900 dark:text-white">{{ $trx->invoice_number }}</td>
                                     <td class="py-3 text-zinc-600 dark:text-zinc-400">{{ $trx->user->name ?? '-' }}</td>
                                     <td class="py-3 text-right font-medium text-zinc-900 dark:text-white">Rp {{ number_format($trx->grand_total, 0, ',', '.') }}</td>
                                     <td class="py-3 text-right">
                                         <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium border
                                             {{ $trx->payment?->method === 'cash' ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-900/20 dark:text-emerald-400' : '' }}
                                             {{ $trx->payment?->method === 'qris' ? 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900/50 dark:bg-blue-900/20 dark:text-blue-400' : '' }}
-                                            {{ $trx->payment?->method === 'va' ? 'border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-900/50 dark:bg-violet-900/20 dark:text-violet-400' : '' }}
                                         ">
                                             {{ strtoupper($trx->payment?->method ?? '-') }}
                                         </span>
