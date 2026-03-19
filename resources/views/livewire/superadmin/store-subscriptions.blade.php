@@ -5,7 +5,7 @@
             <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">View and manually update subscription statuses for all stores.</p>
         </div>
         <div class="w-72">
-            <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search by name or slug..." 
+            <input type="text" wire:model.live.debounce.500ms="search" placeholder="Search by store name..." 
                    class="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white">
         </div>
     </div>
@@ -34,7 +34,7 @@
                         <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
                             <td class="px-6 py-4">
                                 <div class="font-medium text-zinc-900 dark:text-white">{{ $store->name }}</div>
-                                <div class="text-xs text-zinc-500">{{ $store->slug }}</div>
+                                <div class="text-xs text-zinc-500">{{ $store->address ?? '' }}</div>
                             </td>
                             <td class="px-6 py-4 text-zinc-600 dark:text-zinc-400">{{ $store->phone ?? '-' }}</td>
                             <td class="px-6 py-4">

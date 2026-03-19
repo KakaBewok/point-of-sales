@@ -20,32 +20,21 @@
                 label="Nama Toko"
                 type="text"
                 required
-                placeholder="Contoh: Toko Sejahtera"
+                placeholder="Toko Sejahtera"
             />
-            @error('storeName') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
-
-            <flux:input
-                wire:model="storeSlug"
-                label="Slug Toko"
-                type="text"
-                required
-                placeholder="contoh: toko-sejahtera"
-                description="URL unik untuk toko Anda (otomatis dari nama toko)"
-            />
-            @error('storeSlug') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
 
             <flux:input
                 wire:model="storePhone"
                 label="Nomor Telepon"
-                type="text"
-                placeholder="08xx-xxxx-xxxx"
+                type="number"
+                placeholder="0851xxxxxxx"
             />
 
             <flux:textarea
                 wire:model="storeAddress"
                 label="Alamat"
-                placeholder="Alamat lengkap toko"
-                rows="2"
+                placeholder="Bogor, Indonesia"
+                rows="3"
             />
         </div>
 
@@ -61,18 +50,16 @@
                 label="Nama Lengkap"
                 type="text"
                 required
-                placeholder="Nama pemilik toko"
+                placeholder="Rakabuming"
             />
-            @error('ownerName') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
 
             <flux:input
                 wire:model="email"
                 label="Email"
                 type="email"
                 required
-                placeholder="email@contoh.com"
+                placeholder="raka@gmail.com"
             />
-            @error('email') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
 
             <flux:input
                 wire:model="password"
@@ -82,8 +69,7 @@
                 placeholder="Minimal 8 karakter"
                 viewable
             />
-            @error('password') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
-
+            
             <flux:input
                 wire:model="password_confirmation"
                 label="Konfirmasi Password"

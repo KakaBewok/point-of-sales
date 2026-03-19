@@ -16,7 +16,6 @@ class StoreRegistration extends Component
 {
     // Store fields
     public $storeName = '';
-    public $storeSlug = '';
     public $storePhone = '';
     public $storeAddress = '';
 
@@ -26,17 +25,10 @@ class StoreRegistration extends Component
     public $password = '';
     public $password_confirmation = '';
 
-    // Auto-generate slug from store name
-    public function updatedStoreName($value): void
-    {
-        $this->storeSlug = Str::slug($value);
-    }
-
     protected function rules(): array
     {
         return [
             'storeName' => 'required|string|max:255',
-            'storeSlug' => 'required|string|max:255|unique:stores,slug|alpha_dash',
             'storePhone' => 'nullable|string|max:50',
             'storeAddress' => 'nullable|string|max:1000',
             'ownerName' => 'required|string|max:255',
@@ -49,9 +41,6 @@ class StoreRegistration extends Component
     {
         return [
             'storeName.required' => 'Nama toko wajib diisi.',
-            'storeSlug.required' => 'Slug toko wajib diisi.',
-            'storeSlug.unique' => 'Slug ini sudah digunakan, pilih yang lain.',
-            'storeSlug.alpha_dash' => 'Slug hanya boleh berisi huruf, angka, dash, dan underscore.',
             'ownerName.required' => 'Nama pemilik wajib diisi.',
             'email.required' => 'Email wajib diisi.',
             'email.unique' => 'Email ini sudah terdaftar.',
@@ -69,7 +58,7 @@ class StoreRegistration extends Component
             // 1. Create store
             $store = Store::create([
                 'name' => $this->storeName,
-                'slug' => $this->storeSlug,
+                'slug' => strtolower(Str::slug($this->storeName)),
                 'phone' => $this->storePhone ?: null,
                 'address' => $this->storeAddress ?: null,
                 'subscription_status' => 'trial',

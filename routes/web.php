@@ -15,22 +15,22 @@ use App\Livewire\StoreRegistration;
 
 // Landing Page
 Route::get('/', function () {
-    if (auth()->check()) {
-        return redirect()->route('dashboard');
-    }
+    // if (auth()->check()) {
+    //     return redirect()->route('dashboard');
+    // }
     return view('landing');
 })->name('home');
 
 // Store Registration
-Route::middleware('guest')->group(function () {
+// Route::middleware('guest')->group(function () {
     Route::get('/register', StoreRegistration::class)->name('register');
-});
+// });
 
 Route::get('/subscription-expired', function () {
     return view('subscription-expired');
 })->name('subscription.expired');
 
-// ─── Tenant Routes (require auth + active store) ──────────────
+// Tenant Routes (require auth + active store)
 Route::middleware(['auth', 'verified', 'store.active', 'role:owner,admin,cashier'])->group(function () {
     Route::get('/dashboard', Dashboard::class)->name('dashboard')->middleware('permission:dashboard');
     Route::get('/pos', PosScreen::class)->name('pos.index')->middleware('permission:pos');
@@ -49,7 +49,7 @@ Route::middleware(['auth', 'verified', 'store.active', 'role:owner,admin,cashier
     })->name('receipt.print')->middleware('permission:pos');
 });
 
-// ─── Admin/Owner Routes ────────────────────────────────────────
+// Admin/Owner Routes
 Route::middleware(['auth', 'verified', 'store.active', 'role:owner,admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/users', UserManager::class)->name('users.index');
     Route::get('/settings', SettingsManager::class)->name('settings.index');
@@ -58,7 +58,7 @@ Route::middleware(['auth', 'verified', 'store.active', 'role:owner,admin'])->pre
     Route::get('/logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->name('logs.index');
 });
 
-// ─── Superadmin Routes ─────────────────────────────────────────
+// Superadmin Routes
 Route::middleware(['auth', 'verified', 'is_superadmin'])->prefix('superadmin')->name('superadmin.')->group(function () {
     Route::get('/stores', \App\Livewire\Superadmin\StoreSubscriptions::class)->name('stores.index');
 });

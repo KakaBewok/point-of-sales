@@ -150,7 +150,7 @@ class UserManager extends Component
             session()->flash('message', 'Pengguna berhasil dihapus.');
         } catch (\Illuminate\Database\QueryException $e) {
             if ($e->getCode() === '23000') {
-                session()->flash('error', 'Pengguna tidak bisa dihapus karena masih terkait dengan data lain (misal: transaksi/stok).');
+                session()->flash('error', 'Pengguna tidak bisa dihapus karena masih terkait dengan data lain (seperti data transaksi/stok).');
             } else {
                 session()->flash('error', 'Terjadi kesalahan saat menghapus pengguna.');
             }

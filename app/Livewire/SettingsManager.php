@@ -69,11 +69,11 @@ class SettingsManager extends Component
     {
         $this->validate([
             'store_name' => 'required|string|max:255',
-            'store_address' => 'nullable|string',
+            'store_address' => 'nullable|string|max:255',
             'store_phone' => 'nullable|string|max:50',
             'tax_enabled' => 'boolean',
             'tax_rate' => 'required|numeric|min:0|max:100',
-            'receipt_footer' => 'nullable|string',
+            'receipt_footer' => 'nullable|string|max:255',
             'social_instagram' => 'nullable|url|max:500',
             'social_tiktok' => 'nullable|url|max:500',
             'social_facebook' => 'nullable|url|max:500',

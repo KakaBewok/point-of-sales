@@ -30,8 +30,6 @@ use Illuminate\Support\Facades\Log;
  */
 class QrisService
 {
-    // ─── Public API ─────────────────────────────────────────────
-
     /**
      * Read the raw QRIS EMVCo payload from an uploaded image file.
      *
