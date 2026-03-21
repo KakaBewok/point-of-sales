@@ -40,8 +40,8 @@
                     @endif
 
                     {{-- Management --}}
-                    @if(auth()->user()->hasPermission('products') || auth()->user()->hasPermission('categories') || auth()->user()->hasPermission('stock') || auth()->user()->hasPermission('vouchers'))
-                    <flux:navlist.group expandable :heading="__('Manajemen')" :expanded="request()->routeIs('products.*') || request()->routeIs('categories.*') || request()->routeIs('stock.*') || request()->routeIs('vouchers.*')">
+                    @if(auth()->user()->hasPermission('products') || auth()->user()->hasPermission('categories') || auth()->user()->hasPermission('stock') || auth()->user()->hasPermission('vouchers') || auth()->user()->hasPermission('expense_categories') || auth()->user()->hasPermission('expenses'))
+                    <flux:navlist.group expandable :heading="__('Manajemen')" :expanded="request()->routeIs('products.*') || request()->routeIs('categories.*') || request()->routeIs('stock.*') || request()->routeIs('vouchers.*') || request()->routeIs('expense-categories.*') || request()->routeIs('expenses.*')">
                         @if(auth()->user()->hasPermission('products'))
                             <flux:navlist.item icon="cube" :href="route('products.index')" :current="request()->routeIs('products.*')" wire:navigate>
                                 {{ __('Produk') }}
@@ -50,7 +50,7 @@
 
                         @if(auth()->user()->hasPermission('categories'))
                             <flux:navlist.item icon="tag" :href="route('categories.index')" :current="request()->routeIs('categories.*')" wire:navigate>
-                                {{ __('Kategori') }}
+                                {{ __('Kategori Produk') }}
                             </flux:navlist.item>
                         @endif
 
@@ -65,15 +65,35 @@
                                 {{ __('Voucher') }}
                             </flux:navlist.item>
                         @endif
+
+                        @if(auth()->user()->hasPermission('expense_categories'))
+                            <flux:navlist.item icon="folder" :href="route('expense-categories.index')" :current="request()->routeIs('expense-categories.*')" wire:navigate>
+                                {{ __('Kategori Pengeluaran') }}
+                            </flux:navlist.item>
+                        @endif
+
+                        @if(auth()->user()->hasPermission('expenses'))
+                            <flux:navlist.item icon="banknotes" :href="route('expenses.index')" :current="request()->routeIs('expenses.*')" wire:navigate>
+                                {{ __('Pengeluaran') }}
+                            </flux:navlist.item>
+                        @endif
                     </flux:navlist.group>
                     @endif
 
                     {{-- Reports --}}
-                    @if(auth()->user()->hasPermission('reports'))
+                    @if(auth()->user()->hasPermission('reports') || auth()->user()->hasPermission('expense_reports'))
                     <flux:navlist.group expandable :heading="__('Laporan')" :expanded="request()->routeIs('reports.*')">
-                        <flux:navlist.item icon="chart-bar" :href="route('reports.index')" :current="request()->routeIs('reports.*')" wire:navigate>
+                        @if(auth()->user()->hasPermission('reports'))
+                        <flux:navlist.item icon="chart-bar" :href="route('reports.index')" :current="request()->routeIs('reports.index')" wire:navigate>
                             {{ __('Laporan Penjualan') }}
                         </flux:navlist.item>
+                        @endif
+
+                        @if(auth()->user()->hasPermission('expense_reports'))
+                        <flux:navlist.item icon="document-chart-bar" :href="route('reports.expenses')" :current="request()->routeIs('reports.expenses')" wire:navigate>
+                            {{ __('Laporan Pengeluaran') }}
+                        </flux:navlist.item>
+                        @endif
                     </flux:navlist.group>
                     @endif
 
@@ -106,7 +126,7 @@
                         $waUrl = "https://wa.me/{$contact}?text={$message}";
                     @endphp
                     <flux:navlist.item icon="chat-bubble-left-ellipsis" :href="$waUrl" target="_blank" class="mt-2 text-emerald-600 dark:text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/30">
-                        {{ __('Contact Admin') }}
+                        {{ __('Tanya Admin') }}
                     </flux:navlist.item>
 
             <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />

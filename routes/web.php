@@ -9,6 +9,9 @@ use App\Livewire\StockManager;
 use App\Livewire\StockLogViewer;
 use App\Livewire\VoucherManager;
 use App\Livewire\ReportManager;
+use App\Livewire\ExpenseCategoryManager;
+use App\Livewire\ExpenseManager;
+use App\Livewire\ExpenseReport;
 use App\Livewire\UserManager;
 use App\Livewire\SettingsManager;
 use App\Livewire\StoreRegistration;
@@ -40,7 +43,12 @@ Route::middleware(['auth', 'verified', 'store.active', 'role:owner,admin,cashier
     Route::get('/stock/logs', StockLogViewer::class)->name('stock.logs')->middleware('permission:stock');
     Route::get('/vouchers', VoucherManager::class)->name('vouchers.index')->middleware('permission:vouchers');
     Route::get('/reports', ReportManager::class)->name('reports.index')->middleware('permission:reports');
+    Route::get('/reports/expenses', ExpenseReport::class)->name('reports.expenses')->middleware('permission:expense_reports');
     Route::get('/reports/{id}', \App\Livewire\ReportDetail::class)->name('reports.detail')->middleware('permission:reports');
+
+    // Expense Management
+    Route::get('/expense-categories', ExpenseCategoryManager::class)->name('expense-categories.index')->middleware('permission:expense_categories');
+    Route::get('/expenses', ExpenseManager::class)->name('expenses.index')->middleware('permission:expenses');
 
     // Print Receipt
     Route::get('/print/receipt/{transaction}', function (\App\Models\Transaction $transaction) {

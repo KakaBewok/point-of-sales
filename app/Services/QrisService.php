@@ -49,7 +49,7 @@ class QrisService
             $payload = $qrReader->text();
         } catch (\Throwable $e) {
             Log::error('QrisService::extractPayloadFromImage error', ['error' => $e->getMessage()]);
-            throw new \Exception('Gagal membaca QR dari gambar. Pastikan gambar jelas dan berformat JPEG/PNG.');
+            throw new \Exception('Gagal membaca QR. Pastikan gambar jelas dan berformat JPEG/PNG.');
         }
 
         if (empty($payload)) {

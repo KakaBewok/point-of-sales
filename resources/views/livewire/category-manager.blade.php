@@ -1,6 +1,6 @@
 <div class="px-6 py-8 md:px-8 space-y-8 max-w-7xl mx-auto flex-1 w-full">
     <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Manajemen Kategori</h1>
+        <h1 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Kategori Produk</h1>
         <div class="flex items-center gap-3">
             @if(!empty($selected) && is_array($selected))
                 <flux:button variant="danger" icon="trash" class="h-10 px-4" wire:click="confirmDeleteSelected">Hapus Terpilih ({{ count($selected) }})</flux:button>

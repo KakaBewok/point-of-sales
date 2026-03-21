@@ -2,6 +2,8 @@
 
 namespace App\Livewire;
 
+use App\Models\Expense;
+use App\Models\ExpenseCategory;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Transaction;
@@ -90,6 +92,42 @@ class Dashboard extends Component
             ]);
         }
 
+        // ─── Expense Stats ─────────────────────────────────────────
+        $todayExpenses = Expense::today()->sum('amount');
+        $monthlyExpenses = Expense::thisMonth()->sum('amount');
+
+        // Expense by category (this month)
+        $expenseByCategory = Expense::thisMonth()
+            ->selectRaw('category_id, SUM(amount) as total')
+            ->groupBy('category_id')
+            ->with('category')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get()
+            ->map(fn($e) => [
+                'name' => $e->category->name ?? 'Lainnya',
+                'total' => (float) $e->total,
+            ]);
+
+        // Expense trend (last 7 days)
+        $rawExpenseChart = Expense::where('expense_date', '>=', now()->subDays(6)->startOfDay())
+            ->selectRaw('expense_date as date, SUM(amount) as total')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get()
+            ->keyBy(fn($item) => $item->date instanceof \Carbon\Carbon ? $item->date->format('Y-m-d') : $item->date);
+
+        $expenseChartData = collect();
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $displayDate = now()->subDays($i)->format('d M');
+            $total = $rawExpenseChart->has($date) ? $rawExpenseChart[$date]->total : 0;
+            $expenseChartData->push([
+                'date' => $displayDate,
+                'total' => (float) $total,
+            ]);
+        }
+
         return view('livewire.dashboard', [
             'todayRevenue' => $todayRevenue,
             'todayTransactions' => $todayTransactions,
@@ -101,6 +139,10 @@ class Dashboard extends Component
             'bestSelling' => $bestSelling,
             'recentTransactions' => $recentTransactions,
             'chartData' => $chartData,
+            'todayExpenses' => $todayExpenses,
+            'monthlyExpenses' => $monthlyExpenses,
+            'expenseByCategory' => $expenseByCategory,
+            'expenseChartData' => $expenseChartData,
         ]);
     }
 }

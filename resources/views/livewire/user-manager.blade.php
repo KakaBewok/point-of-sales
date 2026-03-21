@@ -123,21 +123,25 @@
                     @if($role === 'cashier')
                         <div class="mt-4 border-t border-zinc-100 dark:border-zinc-800 pt-4">
                             <flux:label class="text-sm font-medium mb-3 block text-zinc-700 dark:text-zinc-300">Hak Akses Modul</flux:label>
-                            <div class="grid grid-cols-2 gap-3 mt-2 cursor-pointer">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2 cursor-pointer">
                                 <flux:checkbox label="Dashboard" wire:model="permissions" value="dashboard" />
                                 <flux:checkbox label="Kasir" wire:model="permissions" value="pos" />
                                 <flux:checkbox label="Produk" wire:model="permissions" value="products" />
-                                <flux:checkbox label="Kategori" wire:model="permissions" value="categories" />
-                                <flux:checkbox label="Stok" wire:model="permissions" value="stock" />
+                                <flux:checkbox label="Kategori Produk" wire:model="permissions" value="categories" />
+                                <flux:checkbox label="Stok Produk" wire:model="permissions" value="stock" />
                                 <flux:checkbox label="Voucher" wire:model="permissions" value="vouchers" />
-                                <flux:checkbox label="Laporan" wire:model="permissions" value="reports" />
+                                <flux:checkbox label="Laporan Penjualan" wire:model="permissions" value="reports" />
+                                <flux:checkbox label="Kategori Pengeluaran" wire:model="permissions" value="expense_categories" />
+                                <flux:checkbox label="Pengeluaran" wire:model="permissions" value="expenses" />
+                                <flux:checkbox label="Laporan Pengeluaran" wire:model="permissions" value="expense_reports" />
                             </div>
                         </div>
                     @endif
 
                     @if($editingId !== auth()->id())
-                        <div class="pt-2">
-                            <flux:checkbox label="Status Akun" wire:model="is_active" />
+                    <flux:label class="text-sm font-medium mb-3 block text-zinc-700 dark:text-zinc-300">Status Akun</flux:label>
+                        <div class="pt-2 cursor-pointer">
+                            <flux:checkbox label="Aktif" wire:model="is_active" />
                         </div>
                     @endif
                 </form>
