@@ -93,8 +93,10 @@ class StockManager extends Component
             ->orderBy('name')
             ->paginate(15);
 
-        // Recent logs
-        $recentLogs = StockLog::with('product', 'user')
+        // Recent logs - Filtered to only show logs for existing (non-deleted) products
+        $recentLogs = StockLog::query()
+            ->whereHas('product') // This automatically excludes soft-deleted products
+            ->with(['product', 'user'])
             ->orderByDesc('created_at')
             ->limit(5)
             ->get();

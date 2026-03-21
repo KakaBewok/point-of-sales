@@ -83,7 +83,12 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 hidden md:table-cell">
-                                <div class="text-zinc-900 dark:text-white font-medium truncate max-w-[150px]" title="{{ $expense->description }}">{{ $expense->description ? mb_substr($expense->description, 0, 30) . (mb_strlen($expense->description) > 30 ? '...' : '') : '-' }}</div>
+                                <div class="text-zinc-900 dark:text-white font-medium truncate max-w-[150px] flex items-center gap-2" title="{{ $expense->description }}">
+                                    <span>{{ $expense->description ? (mb_strlen($expense->description) > 30 ? mb_substr($expense->description, 0, 30) . '...' : $expense->description) : '-' }}</span>
+                                    @if($expense->trashed())
+                                        <span class="shrink-0 inline-flex items-center rounded-md bg-red-50 px-1.5 py-0.5 text-[10px] font-medium text-red-700 ring-1 ring-inset ring-red-600/10 dark:bg-red-900/40 dark:text-red-400">Archived</span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <span class="text-base font-bold text-red-600 dark:text-red-400">Rp {{ number_format($expense->amount, 0, ',', '.') }}</span>

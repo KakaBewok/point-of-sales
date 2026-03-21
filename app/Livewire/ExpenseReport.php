@@ -135,7 +135,8 @@ class ExpenseReport extends Component
 
     protected function buildQuery()
     {
-        $query = Expense::query()
+        // Include soft-deleted expenses for historical record persistent
+        $query = Expense::withTrashed()
             ->with(['category', 'creator'])
             ->orderByDesc('expense_date')
             ->orderByDesc('created_at');
