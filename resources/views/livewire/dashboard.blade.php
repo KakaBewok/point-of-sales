@@ -5,7 +5,7 @@
     ═══════════════════════════════════════════════════════════ --}}
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
         <div>
-            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Dashboard</h1>
+            <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900 dark:text-white">Dashboard</h1>
             <p class="mt-0.5 sm:mt-1 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">Selamat datang kembali, {{ auth()->user()->name }} !</p>
         </div>
         <div class="text-xs sm:text-sm font-medium text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-700 px-3 py-1.5 rounded-lg">
