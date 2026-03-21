@@ -132,8 +132,8 @@
             <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />
         </flux:sidebar>
 
-        {{-- Mobile Header --}}
-        <flux:header class="lg:hidden">
+        {{-- Mobile Header (sticky on scroll) --}}
+        <flux:header sticky class="lg:hidden border-b border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm">
             <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
             <flux:spacer />
