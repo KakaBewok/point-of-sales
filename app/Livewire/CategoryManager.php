@@ -27,13 +27,13 @@ class CategoryManager extends Component
 
     public $name = '';
     public $description = '';
-    public $sort_order = 0;
+    public $sort_order = 1;
     public $is_active = true;
 
     protected $rules = [
         'name' => 'required|string|max:255',
         'description' => 'nullable|string|max:500',
-        'sort_order' => 'required|integer|min:0',
+        'sort_order' => 'required|integer|min:1',
         'is_active' => 'boolean',
     ];
 
@@ -167,7 +167,7 @@ class CategoryManager extends Component
     {
         $categories = Category::withCount('products')
             ->when($this->search, fn ($q) => $q->where('name', 'like', "%{$this->search}%"))
-            ->ordered()
+            ->orderBy('sort_order', 'asc')
             ->get();
 
         return view('livewire.category-manager', ['categories' => $categories]);

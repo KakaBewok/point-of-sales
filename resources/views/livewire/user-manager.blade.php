@@ -1,7 +1,7 @@
 <div class="px-1 py-8 md:px-3 space-y-8 max-w-7xl mx-auto flex-1 w-full">
     <div class="flex items-center justify-between">
         <h1 class="text-lg md:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Manajemen Pengguna</h1>
-        <flux:button variant="primary" icon="plus" class="text-md cursor-pointer h-10 px-4" wire:click="create">Tambah Pengguna</flux:button>
+        <flux:button variant="primary" icon="plus" class="text-md cursor-pointer h-10 px-4" wire:click="create">Pengguna</flux:button>
     </div>
 
     @if(session()->has('message'))

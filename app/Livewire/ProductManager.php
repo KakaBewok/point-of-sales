@@ -33,7 +33,7 @@ class ProductManager extends Component
     public $selectAll = false;
 
     // Form fields
-    public $type = 'product';
+    public $type = 'service';
     public $name = '';
     public $category_id = '';
     public $sku = '';
@@ -41,7 +41,7 @@ class ProductManager extends Component
     public $price = '';
     public $cost_price = '';
     public $stock = 0;
-    public $low_stock_threshold = 10;
+    public $low_stock_threshold = 5;
     public $is_active = true;
     public $image;
     public $existingImage = null;
@@ -85,10 +85,10 @@ class ProductManager extends Component
     {
         $this->reset(['type', 'name', 'category_id', 'sku', 'description', 'price', 'cost_price', 'stock', 'low_stock_threshold', 'is_active', 'image', 'existingImage', 'editingId']);
         $this->sku = strtoupper(Str::random(8));
-        $this->type = 'product';
+        $this->type = 'service';
         $this->is_active = true;
         $this->stock = 0;
-        $this->low_stock_threshold = 10;
+        $this->low_stock_threshold = 5;
         $this->showModal = true;
     }
 
