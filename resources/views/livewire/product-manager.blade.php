@@ -1,12 +1,12 @@
-<div class="px-6 py-8 md:px-8 space-y-8 max-w-7xl mx-auto flex-1 w-full">
+<div class="px-1 md:px-6 py-8 space-y-8 max-w-7xl mx-auto flex-1 w-full">
     {{-- Header --}}
     <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Manajemen Produk</h1>
-        <div class="flex items-center gap-3">
+        <h1 class="text-xl md:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Manajemen Produk</h1>
+        <div class="flex flex-col md:flex-row items-end md:items-center gap-3">
             @if(count($selected) > 0)
-                <flux:button variant="danger" icon="trash" class="h-10 px-4" wire:click="confirmDeleteSelected">Hapus Terpilih ({{ count($selected) }})</flux:button>
+                <flux:button variant="danger" icon="trash" class="h-10 px-4" wire:click="confirmDeleteSelected">Terpilih ({{ count($selected) }})</flux:button>
             @endif
-            <flux:button variant="primary" icon="plus" class="h-10 px-4" wire:click="create">Tambah Produk</flux:button>
+            <flux:button variant="primary" icon="plus" class="h-10 px-4" wire:click="create">Produk</flux:button>
         </div>
     </div>
 
@@ -32,10 +32,10 @@
     {{-- Filters --}}
     <div class="flex flex-col gap-4 sm:flex-row">
         <div class="flex-1">
-            <flux:input icon="magnifying-glass" class="h-10" wire:model.live.debounce.300ms="search" placeholder="Cari produk atau SKU..." />
+            <flux:input icon="magnifying-glass" class="h-10 text-sm" wire:model.live.debounce.300ms="search" placeholder="Cari produk atau SKU..." />
         </div>
         <div class="w-full sm:w-56">
-            <flux:select wire:model.live="categoryFilter" class="h-10" placeholder="Semua Kategori">
+            <flux:select wire:model.live="categoryFilter" class="h-10 text-sm" placeholder="Semua Kategori">
                 <flux:select.option value="">Semua Kategori</flux:select.option>
                 @foreach($categories as $cat)
                     <flux:select.option value="{{ $cat->id }}">{{ $cat->name }}</flux:select.option>
@@ -56,7 +56,7 @@
                         <th class="px-6 py-4 text-left font-semibold text-zinc-600 dark:text-zinc-400">Produk</th>
                         <th class="px-6 py-4 text-left font-semibold text-zinc-600 dark:text-zinc-400">SKU</th>
                         <th class="px-6 py-4 text-left font-semibold text-zinc-600 dark:text-zinc-400">Kategori</th>
-                        <th class="px-6 py-4 text-right font-semibold text-zinc-600 dark:text-zinc-400">Harga</th>
+                        <th class="px-6 py-4 text-right font-semibold text-zinc-600 dark:text-zinc-400">Harga (Rp)</th>
                         <th class="px-6 py-4 text-center font-semibold text-zinc-600 dark:text-zinc-400">Tipe</th>
                         <th class="px-6 py-4 text-center font-semibold text-zinc-600 dark:text-zinc-400">Stok</th>
                         <th class="px-6 py-4 text-center font-semibold text-zinc-600 dark:text-zinc-400">Status</th>
@@ -83,7 +83,7 @@
                             </td>
                             <td class="px-6 py-4 font-mono text-sm text-zinc-600 dark:text-zinc-400">{{ $product->sku }}</td>
                             <td class="px-6 py-4 text-zinc-600 dark:text-zinc-400">{{ $product->category->name }}</td>
-                            <td class="px-6 py-4 text-right font-medium text-zinc-900 dark:text-white">Rp {{ number_format($product->price, 0, ',', '.') }}</td>
+                            <td class="px-6 py-4 text-right font-medium text-zinc-900 dark:text-white">{{ number_format($product->price, 0, ',', '.') }}</td>
                             <td class="px-6 py-4 text-center">
                                 @if($product->type === 'service')
                                     <span class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold ring-1 ring-inset bg-blue-50 text-blue-700 ring-blue-600/20 dark:bg-blue-900/30 dark:text-blue-400 dark:ring-blue-900/50">
@@ -115,7 +115,7 @@
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
                                     <flux:button size="sm" variant="ghost" class="h-8 w-8 px-0" icon="pencil" wire:click="edit({{ $product->id }})" />
-                                    <flux:button size="sm" variant="ghost" class="h-8 w-8 px-0 text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20 dark:hover:text-red-400" icon="trash" wire:click="confirmDelete({{ $product->id }}, '{{ addslashes($product->name) }}')" />
+                                    <flux:button size="sm" variant="ghost" class="h-8 w-8 px-0 [&_svg]:text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20 dark:hover:text-red-400" icon="trash" wire:click="confirmDelete({{ $product->id }}, '{{ addslashes($product->name) }}')" />
                                 </div>
                             </td>
                         </tr>
@@ -135,103 +135,111 @@
     <div>{{ $products->links() }}</div>
 
     {{-- Modal --}}
-    <flux:modal wire:model="showModal" class="max-w-lg md:max-w-xl p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl">
-        <div class="p-6">
+    <flux:modal wire:model="showModal" class="max-w-sm md:max-w-lg p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl">
+        <div>
             <header class="border-b border-zinc-100 dark:border-zinc-800 pb-4 mb-4">
                 <h2 class="text-lg font-semibold tracking-tight text-zinc-900 dark:text-white">{{ $editingId ? 'Edit Produk' : 'Tambah Produk' }}</h2>
                 <p class="text-sm text-zinc-500 mt-1">Lengkapi informasi produk di bawah ini.</p>
             </header>
 
             <div class="max-h-[60vh] overflow-y-auto pr-2 customized-scrollbar">
-                <form wire:submit="save" id="productForm" class="space-y-4">
+                <form wire:submit="save" id="productForm" class="space-y-4 p-3">
                     <flux:field>
                         <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Nama Produk <span class="text-red-500">*</span></flux:label>
-                        <flux:input class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" wire:model="name" />
-                        <flux:error name="name" class="mt-1 text-sm text-red-500" />
+                        <flux:input class="h-10 mt-1 rounded-lg border-zinc-300" wire:model="name" />
+                        <flux:error name="name" class="text-sm text-red-500" />
                     </flux:field>
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <flux:field>
                             <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Tipe Item <span class="text-red-500">*</span></flux:label>
-                            <flux:select class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" wire:model.live="type">
-                                <flux:select.option value="product">Produk Fisik</flux:select.option>
-                                <flux:select.option value="service">Jasa / Layanan</flux:select.option>
+                            <flux:select class="h-10 mt-1 rounded-lg border-zinc-300" wire:model.live="type">
+                                <flux:select.option value="product">Produk</flux:select.option>
+                                <flux:select.option value="service">Jasa</flux:select.option>
                             </flux:select>
-                            <flux:error name="type" class="mt-1 text-sm text-red-500" />
+                            <flux:error name="type" class="text-sm text-red-500" />
                         </flux:field>
 
                         <flux:field>
                             <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Kategori <span class="text-red-500">*</span></flux:label>
-                            <flux:select class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" wire:model="category_id">
+                            <flux:select class="h-10 mt-1 rounded-lg border-zinc-300" wire:model="category_id">
                                 <flux:select.option value="">Pilih Kategori</flux:select.option>
                                 @foreach($categories as $cat)
                                     <flux:select.option value="{{ $cat->id }}">{{ $cat->name }}</flux:select.option>
                                 @endforeach
                             </flux:select>
-                            <flux:error name="category_id" class="mt-1 text-sm text-red-500" />
+                            <flux:error name="category_id" class="text-sm text-red-500" />
                         </flux:field>
                     </div>
 
                     <div class="grid grid-cols-1 gap-4">
                         <flux:field>
                             <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">SKU <span class="text-red-500">*</span></flux:label>
-                            <flux:input class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" wire:model="sku" />
-                            <flux:error name="sku" class="mt-1 text-sm text-red-500" />
+                            <flux:input class="h-10 mt-1 rounded-lg border-zinc-300" wire:model="sku" />
+                            <flux:error name="sku" class="text-sm text-red-500" />
                         </flux:field>
                     </div>
 
                     <flux:field>
                         <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Deskripsi</flux:label>
-                        <flux:textarea wire:model="description" rows="3" class="mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" />
-                        <flux:error name="description" class="mt-1 text-sm text-red-500" />
+                        <flux:textarea wire:model="description" rows="3" class="mt-1 rounded-lg border-zinc-300" />
+                        <flux:error name="description" class="text-sm text-red-500" />
                     </flux:field>
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <flux:field>
                             <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Harga Jual <span class="text-red-500">*</span></flux:label>
-                            <flux:input class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" type="number" wire:model="price" />
-                            <flux:error name="price" class="mt-1 text-sm text-red-500" />
+                            <flux:input class="h-10 mt-1 rounded-lg border-zinc-300" type="number" wire:model="price" />
+                            <flux:error name="price" class="text-sm text-red-500" />
                         </flux:field>
 
                         <flux:field>
                             <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Harga Modal</flux:label>
-                            <flux:input class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" type="number" wire:model="cost_price" />
-                            <flux:error name="cost_price" class="mt-1 text-sm text-red-500" />
+                            <flux:input class="h-10 mt-1 rounded-lg border-zinc-300" type="number" wire:model="cost_price" />
+                            <flux:error name="cost_price" class="text-sm text-red-500" />
                         </flux:field>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4" x-data="{ type: @entangle('type') }" x-show="type === 'product'">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" x-data="{ type: @entangle('type') }" x-show="type === 'product'">
                         <flux:field>
                             <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Stok <span class="text-red-500">*</span></flux:label>
-                            <flux:input class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" type="number" wire:model="stock" />
-                            <flux:error name="stock" class="mt-1 text-sm text-red-500" />
+                            <flux:input class="h-10 mt-1 rounded-lg border-zinc-300" type="number" wire:model="stock" />
+                            <flux:error name="stock" class="text-sm text-red-500" />
                         </flux:field>
 
                         <flux:field>
                             <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Batas Stok Rendah <span class="text-red-500">*</span></flux:label>
-                            <flux:input class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" type="number" wire:model="low_stock_threshold" />
-                            <flux:error name="low_stock_threshold" class="mt-1 text-sm text-red-500" />
+                            <flux:input class="h-10 mt-1 rounded-lg border-zinc-300" type="number" wire:model="low_stock_threshold" />
+                            <flux:error name="low_stock_threshold" class="text-sm text-red-500" />
                         </flux:field>
                     </div>
 
                     <flux:field>
                         <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Gambar Produk</flux:label>
                         <div class="mt-2 flex items-center gap-4">
-                            <div class="relative h-24 w-24 overflow-hidden rounded-xl border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800/50 shrink-0">
-                                @if ($image)
-                                    <img src="{{ $image->temporaryUrl() }}" class="h-full w-full object-cover">
-                                @elseif ($existingImage)
-                                    <img src="{{ Storage::url($existingImage) }}" class="h-full w-full object-cover">
-                                @else
-                                    <flux:icon name="photo" class="h-6 w-6 m-auto top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 absolute text-zinc-400" />
+                            <div class="relative h-46 w-46 shrink-0 group">
+                                <div class="h-full w-full overflow-hidden rounded-xl border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800/50">
+                                    @if ($image)
+                                        <img src="{{ $image->temporaryUrl() }}" class="h-full w-full object-cover">
+                                    @elseif ($existingImage)
+                                        <img src="{{ Storage::url($existingImage) }}" class="h-full w-full object-cover">
+                                    @else
+                                        <flux:icon name="photo" class="h-6 w-6 m-auto top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 absolute text-zinc-400" />
+                                    @endif
+                                </div>
+                                
+                                @if ($image || $existingImage)
+                                    <button type="button" wire:click="removeImagePreview" class="cursor-pointer absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white shadow-sm transition-colors hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-zinc-900" title="Hapus Gambar">
+                                        <flux:icon name="x-mark" class="h-4 w-4" />
+                                    </button>
                                 @endif
                             </div>
                             <div class="flex-1">
-                                <input type="file" wire:model="image" id="image-upload-{{ $editingId ?? 'new' }}" accept="image/*" class="block w-full text-sm text-zinc-500 file:mr-3 file:rounded-md file:border-0 file:bg-zinc-100 file:px-4 file:py-2 file:text-sm file:font-medium file:text-zinc-600 hover:file:bg-zinc-200 dark:text-zinc-400 dark:file:bg-zinc-800 dark:file:text-white dark:hover:file:bg-zinc-700 transition-colors" />
+                                <input type="file" wire:key="upload-{{ $uploadIteration }}" wire:model="image" id="image-upload-{{ $editingId ?? 'new' }}-{{ $uploadIteration }}" accept="image/*" class="block w-full text-sm text-zinc-500 file:mr-3 file:rounded-md file:border-0 file:bg-zinc-100 file:px-4 file:py-2 file:text-sm file:font-medium file:text-zinc-600 hover:file:bg-zinc-200 dark:text-zinc-400 dark:file:bg-zinc-800 dark:file:text-white dark:hover:file:bg-zinc-700 transition-colors" />
                                 <div class="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Max ukuran 2MB. Format: JPG, PNG.</div>
                             </div>
                         </div>
-                        <flux:error name="image" class="mt-1 text-sm text-red-500" />
+                        <flux:error name="image" class="text-sm text-red-500" />
                     </flux:field>
 
                     <div class="pt-2">
@@ -241,8 +249,8 @@
             </div>
 
             <footer class="mt-6 flex justify-end gap-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">
-                <button type="button" class="h-10 px-4 rounded-lg bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 font-medium text-sm transition-colors" wire:click="$set('showModal', false)">Batal</button>
-                <button type="submit" form="productForm" class="h-10 px-6 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold text-sm transition-colors">{{ $editingId ? 'Perbarui' : 'Simpan' }}</button>
+                <button type="button" class="cursor-pointer h-10 px-4 rounded-lg bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 font-medium text-sm transition-colors" wire:click="$set('showModal', false)">Batal</button>
+                <button type="submit" form="productForm" class="cursor-pointer h-10 px-6 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold text-sm transition-colors">{{ $editingId ? 'Perbarui' : 'Simpan' }}</button>
             </footer>
         </div>
     </flux:modal>

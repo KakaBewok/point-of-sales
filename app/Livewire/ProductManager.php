@@ -45,6 +45,8 @@ class ProductManager extends Component
     public $is_active = true;
     public $image;
     public $existingImage = null;
+    public $removeExistingImage = false;
+    public $uploadIteration = 0;
 
     protected function rules()
     {
@@ -83,7 +85,8 @@ class ProductManager extends Component
 
     public function create()
     {
-        $this->reset(['type', 'name', 'category_id', 'sku', 'description', 'price', 'cost_price', 'stock', 'low_stock_threshold', 'is_active', 'image', 'existingImage', 'editingId']);
+        $this->reset(['type', 'name', 'category_id', 'sku', 'description', 'price', 'cost_price', 'stock', 'low_stock_threshold', 'is_active', 'image', 'existingImage', 'removeExistingImage', 'editingId']);
+        $this->uploadIteration++;
         $this->sku = strtoupper(Str::random(8));
         $this->type = 'service';
         $this->is_active = true;
@@ -106,6 +109,9 @@ class ProductManager extends Component
         $this->low_stock_threshold = $product->low_stock_threshold;
         $this->is_active = $product->is_active;
         $this->existingImage = $product->image;
+        $this->removeExistingImage = false;
+        $this->image = null;
+        $this->uploadIteration++;
         $this->showModal = true;
     }
 
@@ -130,10 +136,18 @@ class ProductManager extends Component
             $validated['cost_price'] = null;
         }
 
+        if ($this->removeExistingImage) {
+            $this->deleteOldImage();
+            $validated['image'] = null;
+            $validated['thumbnail'] = null;
+        }
+
         if ($this->image) {
             // Delete old image file only when a new image is uploaded 
             // and old file exists to prevent orphans.
-            $this->deleteOldImage();
+            if (!$this->removeExistingImage) {
+                $this->deleteOldImage();
+            }
             
             $validated['image'] = $this->image->store('products', 'public');
             $validated['thumbnail'] = $validated['image'];
@@ -153,7 +167,20 @@ class ProductManager extends Component
         }
 
         $this->showModal = false;
-        $this->reset(['type', 'name', 'category_id', 'sku', 'description', 'price', 'cost_price', 'stock', 'low_stock_threshold', 'is_active', 'image', 'existingImage', 'editingId']);
+        $this->reset(['type', 'name', 'category_id', 'sku', 'description', 'price', 'cost_price', 'stock', 'low_stock_threshold', 'is_active', 'image', 'existingImage', 'removeExistingImage', 'editingId']);
+    }
+
+    public function removeImagePreview()
+    {
+        if ($this->image) {
+            $this->image = null;
+            $this->uploadIteration++;
+        }
+        
+        if ($this->existingImage) {
+            $this->removeExistingImage = true;
+            $this->existingImage = null;
+        }
     }
 
     private function deleteOldImage()
@@ -230,7 +257,7 @@ class ProductManager extends Component
 
     public function render()
     {
-        $products = $this->getProductsQuery()->orderBy('name')->paginate(12);
+        $products = $this->getProductsQuery()->orderBy('created_at', 'desc')->paginate(12);
 
         $categories = Category::active()->ordered()->get();
 
