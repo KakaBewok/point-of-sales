@@ -98,7 +98,7 @@ class StockManager extends Component
             ->whereHas('product') // This automatically excludes soft-deleted products
             ->with(['product', 'user'])
             ->orderByDesc('created_at')
-            ->limit(5)
+            ->limit(10)
             ->get();
 
         return view('livewire.stock-manager', [
