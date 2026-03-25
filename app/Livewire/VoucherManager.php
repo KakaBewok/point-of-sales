@@ -46,8 +46,8 @@ class VoucherManager extends Component
             'max_discount' => 'nullable|numeric|min:0',
             'min_transaction' => 'required|numeric|min:0',
             'usage_limit' => 'nullable|integer|min:1',
-            'valid_from' => 'nullable|date',
-            'valid_until' => 'nullable|date|after_or_equal:valid_from',
+            'valid_from' => 'required|date',
+            'valid_until' => 'required|date|after_or_equal:valid_from',
             'is_active' => 'boolean',
         ];
     }

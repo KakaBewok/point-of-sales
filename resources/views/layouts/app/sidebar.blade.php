@@ -24,7 +24,8 @@
                 <flux:navlist variant="outline">
                     {{-- Main Navigation --}}
                     @if(auth()->user()->hasPermission('dashboard') || auth()->user()->hasPermission('pos'))
-                    <flux:navlist.group expandable :heading="__('Utama')" :expanded="request()->routeIs('dashboard') || request()->routeIs('pos.*')">
+                    {{-- <flux:navlist.group expandable :heading="__('Utama')" :expanded="request()->routeIs('dashboard') || request()->routeIs('pos.*')"> --}}
+                    <flux:navlist.group expandable :heading="__('Utama')" :expanded="true">
                         @if(auth()->user()->hasPermission('dashboard'))
                             <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
                                 {{ __('Dashboard') }}
@@ -41,7 +42,8 @@
 
                     {{-- Management --}}
                     @if(auth()->user()->hasPermission('products') || auth()->user()->hasPermission('categories') || auth()->user()->hasPermission('stock') || auth()->user()->hasPermission('vouchers') || auth()->user()->hasPermission('expense_categories') || auth()->user()->hasPermission('expenses'))
-                    <flux:navlist.group expandable :heading="__('Manajemen')" :expanded="request()->routeIs('products.*') || request()->routeIs('categories.*') || request()->routeIs('stock.*') || request()->routeIs('vouchers.*') || request()->routeIs('expense-categories.*') || request()->routeIs('expenses.*')">
+                    {{-- <flux:navlist.group expandable :heading="__('Manajemen')" :expanded="request()->routeIs('products.*') || request()->routeIs('categories.*') || request()->routeIs('stock.*') || request()->routeIs('vouchers.*') || request()->routeIs('expense-categories.*') || request()->routeIs('expenses.*')"> --}}
+                    <flux:navlist.group expandable :heading="__('Manajemen')" :expanded="true">
                         @if(auth()->user()->hasPermission('products'))
                             <flux:navlist.item icon="cube" :href="route('products.index')" :current="request()->routeIs('products.*')" wire:navigate>
                                 {{ __('Produk') }}
@@ -82,7 +84,8 @@
 
                     {{-- Reports --}}
                     @if(auth()->user()->hasPermission('reports') || auth()->user()->hasPermission('expense_reports'))
-                    <flux:navlist.group expandable :heading="__('Laporan')" :expanded="request()->routeIs('reports.*')">
+                    {{-- <flux:navlist.group expandable :heading="__('Laporan')" :expanded="request()->routeIs('reports.*')"> --}}
+                    <flux:navlist.group expandable :heading="__('Laporan')" :expanded="true">   
                         @if(auth()->user()->hasPermission('reports'))
                         <flux:navlist.item icon="chart-bar" :href="route('reports.index')" :current="request()->routeIs('reports.index')" wire:navigate>
                             {{ __('Laporan Penjualan') }}
@@ -99,7 +102,8 @@
 
                     {{-- Admin and OwnerOnly --}}
                     @if(auth()->user()->canAccessAdminMenu())
-                    <flux:navlist.group expandable :heading="__('Sistem')" :expanded="request()->routeIs('admin.*')">
+                    {{-- <flux:navlist.group expandable :heading="__('Sistem')" :expanded="request()->routeIs('admin.*')"> --}}
+                    <flux:navlist.group expandable :heading="__('Sistem')" :expanded="true">   
                         <flux:navlist.item icon="users" :href="route('admin.users.index')" :current="request()->routeIs('admin.users.*')" wire:navigate>
                             {{ __('Pengguna') }}
                         </flux:navlist.item>

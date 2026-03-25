@@ -1,11 +1,11 @@
-<div class="px-6 py-8 md:px-8 space-y-8 max-w-7xl mx-auto flex-1 w-full">
+<div class="px-1 py-8 md:px-6 space-y-8 max-w-7xl mx-auto flex-1 w-full">
     <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Manajemen Voucher</h1>
-        <div class="flex items-center gap-3">
+        <h1 class="text-lg md:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Manajemen Voucher</h1>
+        <div class="flex flex-col md:flex-row items-end md:items-center gap-3">
             @if(!empty($selected) && is_array($selected))
-                <flux:button variant="danger" icon="trash" class="h-10 px-4" wire:click="confirmDeleteSelected">Hapus Terpilih ({{ count($selected) }})</flux:button>
+                <flux:button variant="danger" icon="trash" class="cursor-pointer text-sm h-8 px-4" wire:click="confirmDeleteSelected">Terpilih ({{ count($selected) }})</flux:button>
             @endif
-            <flux:button variant="primary" icon="plus" class="h-10 px-4" wire:click="create">Tambah Voucher</flux:button>
+            <flux:button variant="primary" icon="plus" class="cursor-pointer text-sm h-8 px-4" wire:click="create">Voucher</flux:button>
         </div>
     </div>
 
@@ -28,16 +28,11 @@
         </div>
     @endif
 
-    <div class="flex items-center gap-4">
-        <div class="flex items-center gap-2 max-w-sm w-full">
-            <flux:checkbox wire:model.live="selectAll" label="Pilih Semua" class="mr-2 whitespace-nowrap" />
-            <flux:input icon="magnifying-glass" class="h-10 w-full" wire:model.live.debounce.300ms="search" placeholder="Cari kode voucher..." />
-        </div>
-    </div>
+    <flux:input icon="magnifying-glass" class="h-10 max-w-md" wire:model.live.debounce.300ms="search" placeholder="Cari kode voucher..." />
 
     <div class="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div class="overflow-x-auto">
-            <table class="w-full text-sm">
+            <table class="w-full text-xs md:text-sm">
                 <thead class="bg-zinc-50 border-b border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800">
                     <tr>
                         <th class="px-4 py-4 text-center w-12">
@@ -97,8 +92,8 @@
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
-                                    <flux:button size="sm" variant="ghost" class="h-8 w-8 px-0" icon="pencil" wire:click="edit({{ $voucher->id }})" />
-                                    <flux:button size="sm" variant="ghost" class="h-8 w-8 px-0 text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20 dark:hover:text-red-400" icon="trash" wire:click="confirmDelete({{ $voucher->id }}, '{{ addslashes($voucher->code) }}')" />
+                                    <flux:button size="sm" variant="ghost" class="cursor-pointer h-8 w-8 px-0" icon="pencil" wire:click="edit({{ $voucher->id }})" />
+                                    <flux:button size="sm" variant="ghost" class="cursor-pointer h-8 w-8 px-0 [&_svg]:text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20 dark:hover:text-red-400" icon="trash" wire:click="confirmDelete({{ $voucher->id }}, '{{ addslashes($voucher->code) }}')" />
                                 </div>
                             </td>
                         </tr>
@@ -115,24 +110,24 @@
     </div>
 
     <flux:modal wire:model="showModal" class="max-w-lg md:max-w-xl p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl">
-        <div class="p-6">
+        <div>
             <header class="border-b border-zinc-100 dark:border-zinc-800 pb-4 mb-4">
                 <h2 class="text-lg font-semibold tracking-tight text-zinc-900 dark:text-white">{{ $editingId ? 'Edit Voucher' : 'Tambah Voucher' }}</h2>
                 <p class="text-sm text-zinc-500 mt-1">Lengkapi informasi voucher di bawah ini.</p>
             </header>
 
             <div class="max-h-[60vh] overflow-y-auto pr-2 customized-scrollbar">
-                <form wire:submit="save" id="voucherForm" class="space-y-4">
+                <form wire:submit="save" id="voucherForm" class="space-y-4 p-3">
                     <flux:field>
                         <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Kode Voucher <span class="text-red-500">*</span></flux:label>
-                        <flux:input class="h-10 mt-1 uppercase font-mono rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" wire:model="code" />
+                        <flux:input class="h-10 mt-1 uppercase font-mono rounded-lg border-zinc-300" wire:model="code" />
                         <flux:error name="code" class="mt-1 text-sm text-red-500" />
                     </flux:field>
                     
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <flux:field>
                             <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Tipe Diskon <span class="text-red-500">*</span></flux:label>
-                            <flux:select class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" wire:model.live="discount_type">
+                            <flux:select class="h-10 mt-1 rounded-lg border-zinc-300" wire:model.live="discount_type">
                                 <flux:select.option value="percentage">Persentase (%)</flux:select.option>
                                 <flux:select.option value="fixed">Nominal (Rp)</flux:select.option>
                             </flux:select>
@@ -141,7 +136,7 @@
                         
                         <flux:field>
                             <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Nilai Diskon <span class="text-red-500">*</span></flux:label>
-                            <flux:input class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" type="number" wire:model="discount_value" />
+                            <flux:input class="h-10 mt-1 rounded-lg border-zinc-300" type="number" wire:model="discount_value" />
                             <flux:error name="discount_value" class="mt-1 text-sm text-red-500" />
                         </flux:field>
                     </div>
@@ -149,33 +144,33 @@
                     @if($discount_type === 'percentage')
                         <flux:field>
                             <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Maksimal Diskon (Rp)</flux:label>
-                            <flux:input class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" type="number" wire:model="max_discount" />
+                            <flux:input class="h-10 mt-1 rounded-lg border-zinc-300" type="number" wire:model="max_discount" />
                             <flux:error name="max_discount" class="mt-1 text-sm text-red-500" />
                         </flux:field>
                     @endif
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <flux:field>
                             <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Minimal Transaksi (Rp) <span class="text-red-500">*</span></flux:label>
-                            <flux:input class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" type="number" wire:model="min_transaction" />
+                            <flux:input class="h-10 mt-1 rounded-lg border-zinc-300" type="number" wire:model="min_transaction" />
                             <flux:error name="min_transaction" class="mt-1 text-sm text-red-500" />
                         </flux:field>
                         <flux:field>
                             <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Batas Pemakaian</flux:label>
-                            <flux:input class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" type="number" wire:model="usage_limit" />
+                            <flux:input class="h-10 mt-1 rounded-lg border-zinc-300" type="number" wire:model="usage_limit" />
                             <flux:error name="usage_limit" class="mt-1 text-sm text-red-500" />
                         </flux:field>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <flux:field>
-                            <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Berlaku Dari</flux:label>
-                            <flux:input class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" type="datetime-local" wire:model="valid_from" />
+                            <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Berlaku Dari <span class="text-red-500">*</span></flux:label>
+                            <flux:input class="h-10 mt-1 rounded-lg border-zinc-300" type="datetime-local" wire:model="valid_from" />
                             <flux:error name="valid_from" class="mt-1 text-sm text-red-500" />
                         </flux:field>
                         <flux:field>
-                            <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Berlaku Sampai</flux:label>
-                            <flux:input class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" type="datetime-local" wire:model="valid_until" />
+                            <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Berlaku Sampai <span class="text-red-500">*</span></flux:label>
+                            <flux:input class="h-10 mt-1 rounded-lg border-zinc-300" type="datetime-local" wire:model="valid_until" />
                             <flux:error name="valid_until" class="mt-1 text-sm text-red-500" />
                         </flux:field>
                     </div>
@@ -195,7 +190,7 @@
 
     <!-- Delete Confirmation Modal -->
     <flux:modal wire:model="showDeleteModal" class="max-w-md p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl transition-all">
-        <div class="p-6">
+        <div>
             <div class="flex flex-col items-center text-center">
                 <div class="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30 mb-4 mx-auto">
                     <flux:icon name="exclamation-triangle" class="h-6 w-6 text-red-600 dark:text-red-400" />
@@ -205,7 +200,6 @@
                 </h3>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
                     Apakah Anda yakin ingin menghapus <span class="font-medium text-gray-700 dark:text-gray-300">{{ $itemToDeleteName ?: 'item ini' }}</span>?
-                    <br>Data riwayat transaksi tetap aman.
                 </p>
             </div>
             
