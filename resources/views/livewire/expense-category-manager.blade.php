@@ -1,11 +1,11 @@
 <div class="px-1 py-8 md:px-3 space-y-8 max-w-7xl mx-auto flex-1 w-full">
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div class="flex flex-row items-center justify-between gap-4">
         <h1 class="text-lg md:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Kategori Pengeluaran</h1>
-        <div class="flex items-center gap-3">
+        <div class="flex flex-col md:flex-row items-end md:items-center gap-3">
             @if(!empty($selected) && is_array($selected))
-                <flux:button variant="danger" icon="trash" class="h-10 px-4" wire:click="confirmDeleteSelected">Hapus Terpilih ({{ count($selected) }})</flux:button>
+                <flux:button variant="danger" icon="trash" class="cursor-pointer h-10 px-4" wire:click="confirmDeleteSelected">Terpilih ({{ count($selected) }})</flux:button>
             @endif
-            <flux:button variant="primary" icon="plus" class="h-10 px-4 cursor-pointer" wire:click="create">Tambah Kategori</flux:button>
+            <flux:button variant="primary" icon="plus" class="cursor-pointer text-sm md:text-md h-10 px-4" wire:click="create">Kategori</flux:button>
         </div>
     </div>
 
@@ -37,35 +37,28 @@
         </div>
     @endif
 
-    <div class="flex items-center gap-4">
-        <div class="flex items-center gap-2 max-w-sm w-full">
-            <flux:checkbox wire:model.live="selectAll" label="Pilih Semua" class="mr-2 whitespace-nowrap" />
-            <flux:input icon="magnifying-glass" class="h-10 w-full" wire:model.live.debounce.500ms="search" placeholder="Cari kategori pengeluaran..." />
-        </div>
+    <div class="flex flex-col md:flex-row justify-center md:justify-start md:items-center gap-5 w-full">
+        <flux:checkbox wire:model.live="selectAll" label="Pilih Semua" class="whitespace-normal md:shrink-0" />
+        <flux:input icon="magnifying-glass" class="h-10 max-w-md" wire:model.live.debounce.300ms="search" placeholder="Cari kategori..." />
     </div>
 
     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         @forelse($categories as $category)
-            <div class="relative rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 transition-shadow hover:shadow-md">
-                <div class="absolute top-6 left-5 z-10">
-                    <flux:checkbox wire:model.live="selected" value="{{ $category->id }}" />
+            <div class="relative rounded-lg border border-zinc-200 bg-white p-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 transition-shadow hover:shadow-md">
+                <div class="absolute top-4 left-4 z-10">
+                    <flux:checkbox wire:model.live="selected" value="{{ $category->id }}" class="cursor-pointer"/>
                 </div>
-                <div class="flex items-start justify-between pl-8">
-                    <div class="flex items-center gap-3">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
-                            <flux:icon name="folder" class="h-5 w-5 text-zinc-500" />
-                        </div>
-                        <div>
-                            <h3 class="text-base font-semibold text-zinc-900 dark:text-white">{{ $category->name }}</h3>
-                            <p class="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">Kategori Pengeluaran</p>
-                        </div>
+                <div class="flex items-start justify-between pl-9">
+                    <div>
+                        <h3 class="text-lg font-semibold text-zinc-900 dark:text-white">{{ $category->name }}</h3>
+                        <p class="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">Kategori Pengeluaran</p>
                     </div>
                 </div>
                 <div class="mt-6 flex items-center justify-between border-t border-zinc-100 pt-4 dark:border-zinc-800">
                     <span class="text-sm font-medium text-zinc-500 dark:text-zinc-400">{{ $category->expenses_count }} data pengeluaran</span>
                     <div class="flex gap-2">
-                        <flux:button size="sm" variant="ghost" class="h-8 w-8 px-0" icon="pencil" wire:click="edit({{ $category->id }})" />
-                        <flux:button size="sm" variant="ghost" class="h-8 w-8 px-0 [&_svg]:text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20 dark:hover:text-red-400" icon="trash" wire:click="confirmDelete({{ $category->id }}, '{{ addslashes($category->name) }}')" />
+                        <flux:button size="sm" variant="ghost" class="cursor-pointer h-8 w-8 px-0" icon="pencil" wire:click="edit({{ $category->id }})" />
+                        <flux:button size="sm" variant="ghost" class="cursor-pointer h-8 w-8 px-0 [&_svg]:text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20 dark:hover:text-red-400" icon="trash" wire:click="confirmDelete({{ $category->id }}, '{{ addslashes($category->name) }}')" />
                     </div>
                 </div>
             </div>
@@ -77,9 +70,9 @@
         @endforelse
     </div>
 
-    {{-- CRUD Modal --}}
+    {{-- CRUD Modal --}} 
     <flux:modal wire:model="showModal" class="max-w-md p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-xl shadow-xl">
-        <div class="p-3">
+        <div>
             <header class="border-b border-zinc-100 dark:border-zinc-800 pb-4 mb-4">
                 <h2 class="text-lg font-semibold tracking-tight text-zinc-900 dark:text-white">{{ $editingId ? 'Edit Kategori' : 'Tambah Kategori' }}</h2>
                 <p class="text-sm text-zinc-500 mt-1">Masukkan nama kategori pengeluaran.</p>
@@ -88,7 +81,7 @@
             <form wire:submit="save" id="expenseCategoryForm" class="space-y-4 px-3">
                 <flux:field>
                     <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Nama Kategori <span class="text-red-500">*</span></flux:label>
-                    <flux:input class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" wire:model="name" placeholder="Contoh: Listrik, Sewa, Gaji..." />
+                    <flux:input class="h-10 mt-1 rounded-lg border-zinc-300 focus:border-green-500 focus:ring-green-500" wire:model="name" placeholder="Listrik, Sewa, Gaji..." />
                     <flux:error name="name" class="mt-1 text-sm text-red-500" />
                 </flux:field>
             </form>
@@ -101,8 +94,8 @@
     </flux:modal>
 
     {{-- Delete Confirmation Modal --}}
-    <flux:modal wire:model="showDeleteModal" class="max-w-md p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl transition-all">
-        <div class="p-6">
+    <flux:modal wire:model="showDeleteModal" class="max-w-sm p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl transition-all">
+        <div>
             <div class="flex flex-col items-center text-center">
                 <div class="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30 mb-4 mx-auto">
                     <flux:icon name="exclamation-triangle" class="h-6 w-6 text-red-600 dark:text-red-400" />
@@ -112,7 +105,6 @@
                 </h3>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
                     Apakah Anda yakin ingin menghapus <span class="font-medium text-gray-700 dark:text-gray-300">{{ $itemToDeleteName ?: 'item ini' }}</span>?
-                    <br>Data akan dihapus secara soft delete.
                 </p>
                 @if($hasExpensesWarning)
                     <div class="mt-3 rounded-lg bg-amber-50 border border-amber-200 p-3 text-xs text-amber-700 dark:bg-amber-900/20 dark:border-amber-900/50 dark:text-amber-400">

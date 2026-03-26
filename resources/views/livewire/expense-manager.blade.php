@@ -1,11 +1,11 @@
-<div class="px-6 py-8 md:px-8 space-y-8 max-w-7xl mx-auto flex-1 w-full">
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+<div class="px-1 py-8 md:px-6 space-y-8 max-w-7xl mx-auto flex-1 w-full">
+    <div class="flex flex-row items-center justify-between gap-4">
         <h1 class="text-lg md:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Pengeluaran</h1>
-        <div class="flex items-center gap-3">
+        <div class="flex flex-col items-end md:flex-row md:items-center gap-3">
             @if(!empty($selected) && is_array($selected))
-                <flux:button variant="danger" icon="trash" class="h-10 px-4" wire:click="confirmDeleteSelected">Hapus Terpilih ({{ count($selected) }})</flux:button>
+                <flux:button variant="danger" icon="trash" class="cursor-pointer h-10 px-4" wire:click="confirmDeleteSelected">Terpilih ({{ count($selected) }})</flux:button>
             @endif
-            <flux:button variant="primary" icon="plus" class="h-10 px-4 cursor-pointer" wire:click="create">Tambah Pengeluaran</flux:button>
+            <flux:button variant="primary" icon="plus" class="cursor-pointer text-sm md:text-md h-10 px-4" wire:click="create">Pengeluaran</flux:button>
         </div>
     </div>
 
@@ -70,10 +70,10 @@
                         </th>
                         <th class="px-6 py-4 text-left font-semibold text-zinc-600 dark:text-zinc-400">Tanggal</th>
                         <th class="px-6 py-4 text-left font-semibold text-zinc-600 dark:text-zinc-400">Kategori</th>
-                        <th class="px-6 py-4 text-right font-semibold text-zinc-600 dark:text-zinc-400">Jumlah</th>
-                        <th class="px-6 py-4 text-left font-semibold text-zinc-600 dark:text-zinc-400 hidden md:table-cell">Deskripsi</th>
-                        <th class="px-6 py-4 text-center font-semibold text-zinc-600 dark:text-zinc-400 hidden lg:table-cell">Bukti</th>
-                        <th class="px-6 py-4 text-left font-semibold text-zinc-600 dark:text-zinc-400 hidden md:table-cell">Dibuat oleh</th>
+                        <th class="px-6 py-4 text-right font-semibold text-zinc-600 dark:text-zinc-400">Jumlah (Rp)</th>
+                        <th class="px-6 py-4 text-left font-semibold text-zinc-600 dark:text-zinc-400">Deskripsi</th>
+                        <th class="px-6 py-4 text-center font-semibold text-zinc-600 dark:text-zinc-400">Bukti</th>
+                        <th class="px-6 py-4 text-left font-semibold text-zinc-600 dark:text-zinc-400">Dibuat oleh</th>
                         <th class="px-6 py-4 text-center font-semibold text-zinc-600 dark:text-zinc-400">Aksi</th>
                     </tr>
                 </thead>
@@ -92,12 +92,12 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <span class="text-base font-bold text-red-600 dark:text-red-400">Rp {{ number_format($expense->amount, 0, ',', '.') }}</span>
+                                <span class="text-base font-bold text-red-600 dark:text-red-400">{{ number_format($expense->amount, 0, ',', '.') }}</span>
                             </td>
-                            <td class="px-6 py-4 hidden md:table-cell">
+                            <td class="px-6 py-4">
                                 <div class="text-zinc-600 dark:text-zinc-400 truncate max-w-[200px]" title="{{ $expense->description }}">{{ $expense->description ?: '-' }}</div>
                             </td>
-                            <td class="px-6 py-4 text-center hidden lg:table-cell">
+                            <td class="px-6 py-4 text-center">
                                 @if($expense->image_path)
                                     <button wire:click="openImagePreview('{{ Storage::url($expense->image_path) }}')" class="cursor-pointer inline-block">
                                         <img src="{{ Storage::url($expense->image_path) }}" alt="Bukti" class="h-10 w-10 rounded-lg object-cover ring-1 ring-zinc-200 dark:ring-zinc-700 hover:ring-2 hover:ring-indigo-400 transition-all" />
@@ -106,12 +106,12 @@
                                     <span class="text-zinc-400 text-xs">—</span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 hidden md:table-cell">
+                            <td class="px-6 py-4">
                                 <div class="text-sm text-zinc-600 dark:text-zinc-400">{{ $expense->creator->name ?? '-' }}</div>
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <div class="flex items-center justify-center gap-1">
-                                    <flux:button size="sm" variant="ghost" class="cursor-pointer h-8 w-8 px-0" icon="eye" wire:click="showDetail({{ $expense->id }})" />
+                                    <!-- <flux:button size="sm" variant="ghost" class="cursor-pointer h-8 w-8 px-0" icon="eye" wire:click="showDetail({{ $expense->id }})" /> -->
                                     <flux:button size="sm" variant="ghost" class="cursor-pointer h-8 w-8 px-0" icon="pencil" wire:click="edit({{ $expense->id }})" />
                                     <flux:button size="sm" variant="ghost" class="cursor-pointer h-8 w-8 px-0 [&_svg]:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20" icon="trash" wire:click="confirmDelete({{ $expense->id }}, 'Rp {{ number_format($expense->amount, 0, ',', '.') }}')" />
                                 </div>
@@ -131,7 +131,7 @@
 
     {{-- CRUD Modal --}}
     <flux:modal wire:model="showModal" class="max-w-md md:max-w-lg p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-xl shadow-xl">
-        <div class="p-3">
+        <div>
             <header class="border-b border-zinc-100 dark:border-zinc-800 pb-4 mb-4">
                 <h2 class="text-lg font-semibold tracking-tight text-zinc-900 dark:text-white">{{ $editingId ? 'Edit Pengeluaran' : 'Tambah Pengeluaran' }}</h2>
                 <p class="text-sm text-zinc-500 mt-1">Lengkapi informasi pengeluaran di bawah ini.</p>
@@ -158,7 +158,7 @@
 
                     <flux:field>
                         <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Deskripsi</flux:label>
-                        <flux:textarea class="mt-1 rounded-lg border-zinc-300" wire:model="description" rows="3" placeholder="Deskripsi pengeluaran (opsional)..." />
+                        <flux:textarea class="mt-1 rounded-lg border-zinc-300" wire:model="description" rows="3" placeholder="Deskripsi pengeluaran..." />
                         <flux:error name="description" class="mt-1 text-sm text-red-500" />
                     </flux:field>
 
@@ -171,8 +171,8 @@
                     <flux:field>
                         <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Bukti Pembayaran (JPG/PNG, Maks 2MB)</flux:label>
                         <div class="mt-1">
-                            <input type="file" wire:model="image" accept="image/jpeg,image/png" class="block w-full text-sm text-zinc-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900/30 dark:file:text-indigo-400 dark:text-zinc-400 cursor-pointer" />
-                            <div wire:loading wire:target="image" class="mt-2 text-sm text-indigo-600 dark:text-indigo-400">Mengupload gambar...</div>
+                            <input type="file" wire:model="image" accept="image/jpeg,image/png" class="block w-full text-sm text-zinc-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100 dark:file:bg-slate-900/30 dark:file:text-slate-400 dark:text-zinc-400 cursor-pointer" />
+                            <div wire:loading wire:target="image" class="mt-2 text-sm text-slate-600 dark:text-slate-400">Mengupload gambar...</div>
                         </div>
                         <flux:error name="image" class="mt-1 text-sm text-red-500" />
 
@@ -202,56 +202,13 @@
     </flux:modal>
 
     {{-- Detail Modal --}}
-    <flux:modal wire:model="showDetailModal" class="max-w-md md:max-w-lg p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-xl shadow-xl">
-        @if($detailExpense)
-        <div class="p-6">
-            <header class="border-b border-zinc-100 dark:border-zinc-800 pb-4 mb-5">
-                <h2 class="text-lg font-semibold tracking-tight text-zinc-900 dark:text-white">Detail Pengeluaran</h2>
-            </header>
-
-            <div class="space-y-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <p class="text-xs text-zinc-500 dark:text-zinc-400">Tanggal</p>
-                        <p class="font-medium text-zinc-900 dark:text-white mt-0.5">{{ $detailExpense->expense_date->format('d/m/Y') }}</p>
-                    </div>
-                    <div>
-                        <p class="text-xs text-zinc-500 dark:text-zinc-400">Kategori</p>
-                        <p class="font-medium text-zinc-900 dark:text-white mt-0.5">{{ $detailExpense->category->name ?? '-' }}</p>
-                    </div>
-                </div>
-                <div>
-                    <p class="text-xs text-zinc-500 dark:text-zinc-400">Jumlah</p>
-                    <p class="text-xl font-bold text-red-600 dark:text-red-400 mt-0.5">Rp {{ number_format($detailExpense->amount, 0, ',', '.') }}</p>
-                </div>
-                <div>
-                    <p class="text-xs text-zinc-500 dark:text-zinc-400">Deskripsi</p>
-                    <p class="font-medium text-zinc-900 dark:text-white mt-0.5">{{ $detailExpense->description ?: '-' }}</p>
-                </div>
-                <div>
-                    <p class="text-xs text-zinc-500 dark:text-zinc-400">Dibuat oleh</p>
-                    <p class="font-medium text-zinc-900 dark:text-white mt-0.5">{{ $detailExpense->creator->name ?? '-' }}</p>
-                </div>
-                @if($detailExpense->image_path)
-                    <div>
-                        <p class="text-xs text-zinc-500 dark:text-zinc-400 mb-2">Bukti Pembayaran</p>
-                        <img src="{{ Storage::url($detailExpense->image_path) }}" alt="Bukti" class="max-h-64 w-auto rounded-lg object-contain ring-1 ring-zinc-200 dark:ring-zinc-700" />
-                    </div>
-                @endif
-            </div>
-
-            <footer class="mt-6 flex justify-end pt-4 border-t border-zinc-100 dark:border-zinc-800">
-                <button type="button" class="cursor-pointer h-10 px-4 rounded-lg bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 font-medium text-sm transition-colors" wire:click="$set('showDetailModal', false)">Tutup</button>
-            </footer>
-        </div>
-        @endif
-    </flux:modal>
+    
 
     {{-- Image Preview Modal --}}
-    <flux:modal wire:model="showImageModal" class="max-w-2xl p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-xl shadow-xl">
-        <div class="p-4">
+    <flux:modal wire:model="showImageModal" class="max-w-sm md:max-w-2xl p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-lg shadow-xl">
+        <div>
             @if($previewImageUrl)
-                <img src="{{ $previewImageUrl }}" alt="Preview Bukti" class="w-full max-h-[70vh] object-contain rounded-lg" />
+                <img src="{{ $previewImageUrl }}" alt="Preview Bukti" class="w-full max-h-[70vh] object-contain rounded-sm" />
             @endif
             <div class="mt-4 flex justify-end">
                 <button type="button" class="cursor-pointer h-10 px-4 rounded-lg bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 font-medium text-sm transition-colors" wire:click="$set('showImageModal', false)">Tutup</button>
@@ -260,8 +217,8 @@
     </flux:modal>
 
     {{-- Delete Confirmation Modal --}}
-    <flux:modal wire:model="showDeleteModal" class="max-w-md p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl transition-all">
-        <div class="p-6">
+    <flux:modal wire:model="showDeleteModal" class="max-w-sm md:max-w-md p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-lg shadow-lg transition-all">
+        <div>
             <div class="flex flex-col items-center text-center">
                 <div class="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30 mb-4 mx-auto">
                     <flux:icon name="exclamation-triangle" class="h-6 w-6 text-red-600 dark:text-red-400" />
@@ -270,8 +227,7 @@
                     Konfirmasi Hapus
                 </h3>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    Apakah Anda yakin ingin menghapus <span class="font-medium text-gray-700 dark:text-gray-300">{{ $itemToDeleteName ?: 'pengeluaran ini' }}</span>?
-                    <br>Data akan dihapus secara soft delete.
+                    Apakah Anda yakin ingin menghapus <span class="font-medium text-gray-700 dark:text-gray-300">{{ $itemToDeleteName ?: 'pengeluaran ini' }}</span>
                 </p>
             </div>
 

@@ -144,12 +144,12 @@ class ExpenseManager extends Component
 
     // ─── Detail ────────────────────────────────────────────────
 
-    public function showDetail(Expense $expense)
-    {
-        $expense->load(['category', 'creator']);
-        $this->detailExpense = $expense;
-        $this->showDetailModal = true;
-    }
+    // public function showDetail(Expense $expense)
+    // {
+    //     $expense->load(['category', 'creator']);
+    //     $this->detailExpense = $expense;
+    //     $this->showDetailModal = true;
+    // }
 
     public function openImagePreview($url)
     {
