@@ -130,7 +130,7 @@
     </div>
 
     {{-- CRUD Modal --}}
-    <flux:modal wire:model="showModal" class="max-w-md md:max-w-lg p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-xl shadow-xl">
+    <flux:modal wire:model="showModal" class="max-w-sm md:max-w-lg p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-xl shadow-xl">
         <div>
             <header class="border-b border-zinc-100 dark:border-zinc-800 pb-4 mb-4">
                 <h2 class="text-lg font-semibold tracking-tight text-zinc-900 dark:text-white">{{ $editingId ? 'Edit Pengeluaran' : 'Tambah Pengeluaran' }}</h2>
@@ -179,12 +179,12 @@
                         @if ($image)
                             <div class="mt-3">
                                 <p class="text-xs text-zinc-500 mb-1">Preview:</p>
-                                <img src="{{ $image->temporaryUrl() }}" class="h-32 w-auto rounded-lg object-cover ring-1 ring-zinc-200 dark:ring-zinc-700" />
+                                <img src="{{ $image->temporaryUrl() }}" class="h-32 w-full rounded-lg object-cover ring-1 ring-zinc-200 dark:ring-zinc-700" />
                             </div>
                         @elseif ($existingImagePath)
                             <div class="mt-3">
                                 <p class="text-xs text-zinc-500 mb-1">Gambar saat ini:</p>
-                                <img src="{{ Storage::url($existingImagePath) }}" class="h-32 w-auto rounded-lg object-cover ring-1 ring-zinc-200 dark:ring-zinc-700" />
+                                <img src="{{ Storage::url($existingImagePath) }}" class="h-32 w-full rounded-lg object-cover ring-1 ring-zinc-200 dark:ring-zinc-700" />
                             </div>
                         @endif
                     </flux:field>
