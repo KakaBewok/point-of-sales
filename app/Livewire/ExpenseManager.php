@@ -31,7 +31,9 @@ class ExpenseManager extends Component
     public $description = '';
     public $expense_date = '';
     public $image;
+    public $imageIteration = 0;
     public $existingImagePath = null;
+    public $removeImage = false;
 
     // Detail Modal
     public $showDetailModal = false;
@@ -87,7 +89,7 @@ class ExpenseManager extends Component
 
     public function create()
     {
-        $this->reset(['category_id', 'amount', 'description', 'image', 'editingId', 'existingImagePath']);
+        $this->reset(['category_id', 'amount', 'description', 'image', 'editingId', 'existingImagePath', 'removeImage']);
         $this->expense_date = now()->format('Y-m-d');
         $this->showModal = true;
     }
@@ -101,7 +103,15 @@ class ExpenseManager extends Component
         $this->expense_date = $expense->expense_date->format('Y-m-d');
         $this->existingImagePath = $expense->image_path;
         $this->image = null;
+        $this->removeImage = false;
         $this->showModal = true;
+    }
+
+    public function removeUploadedImage()
+    {
+        $this->image = null;
+        $this->removeImage = true;
+        $this->imageIteration++;
     }
 
     public function save()
@@ -114,6 +124,11 @@ class ExpenseManager extends Component
             'description' => $this->description,
             'expense_date' => $this->expense_date,
         ];
+
+        if ($this->removeImage && $this->editingId && $this->existingImagePath && !$this->image) {
+            Storage::disk('public')->delete($this->existingImagePath);
+            $data['image_path'] = null;
+        }
 
         // Handle image upload
         if ($this->image) {

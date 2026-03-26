@@ -171,20 +171,26 @@
                     <flux:field>
                         <flux:label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Bukti Pembayaran (JPG/PNG, Maks 2MB)</flux:label>
                         <div class="mt-1">
-                            <input type="file" wire:model="image" accept="image/jpeg,image/png" class="block w-full text-sm text-zinc-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100 dark:file:bg-slate-900/30 dark:file:text-slate-400 dark:text-zinc-400 cursor-pointer" />
+                            <input type="file" wire:key="expense-image-{{ $imageIteration }}" id="expense-image-{{ $imageIteration }}" wire:model="image" accept="image/jpeg,image/png" class="block w-full text-sm text-zinc-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100 dark:file:bg-slate-900/30 dark:file:text-slate-400 dark:text-zinc-400 cursor-pointer" />
                             <div wire:loading wire:target="image" class="mt-2 text-sm text-slate-600 dark:text-slate-400">Mengupload gambar...</div>
                         </div>
                         <flux:error name="image" class="mt-1 text-sm text-red-500" />
 
                         @if ($image)
-                            <div class="mt-3">
+                            <div class="mt-3 relative inline-block group">
                                 <p class="text-xs text-zinc-500 mb-1">Preview:</p>
-                                <img src="{{ $image->temporaryUrl() }}" class="h-32 w-full rounded-lg object-cover ring-1 ring-zinc-200 dark:ring-zinc-700" />
+                                <img src="{{ $image->temporaryUrl() }}" class="h-full w-full rounded-lg object-cover ring-1 ring-zinc-200 dark:ring-zinc-700" />
+                                <button type="button" wire:click="removeUploadedImage" class="absolute top-2 -right-2 p-1 bg-red-500 text-white shadow-md cursor-pointer rounded-full" title="Hapus Gambar">
+                                    <flux:icon name="x-mark" class="w-4 h-4 cursor-pointer" />
+                                </button>
                             </div>
-                        @elseif ($existingImagePath)
-                            <div class="mt-3">
+                        @elseif ($existingImagePath && !$removeImage)
+                            <div class="mt-3 relative inline-block group">
                                 <p class="text-xs text-zinc-500 mb-1">Gambar saat ini:</p>
-                                <img src="{{ Storage::url($existingImagePath) }}" class="h-32 w-full rounded-lg object-cover ring-1 ring-zinc-200 dark:ring-zinc-700" />
+                                <img src="{{ Storage::url($existingImagePath) }}" class="h-full w-full rounded-lg object-cover ring-1 ring-zinc-200 dark:ring-zinc-700" />
+                                <button type="button" wire:click="removeUploadedImage" class="absolute top-2 -right-2 p-1 bg-red-500 text-white shadow-md cursor-pointer rounded-full" title="Hapus Gambar">
+                                    <flux:icon name="x-mark" class="w-4 h-4 cursor-pointer" />
+                                </button>
                             </div>
                         @endif
                     </flux:field>
