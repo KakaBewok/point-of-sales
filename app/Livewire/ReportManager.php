@@ -15,11 +15,12 @@ use App\Services\ActivityLogger;
 use Illuminate\Support\Facades\DB;
 
 #[Layout('layouts.app')]
-#[Title('Laporan')]
+#[Title('Laporan Penjualan')]
 class ReportManager extends Component
 {
     use WithPagination;
 
+    // filters
     public $startDate;
     public $endDate;
     public $paymentMethod = '';
@@ -33,7 +34,7 @@ class ReportManager extends Component
     public $selected = [];
     public $selectAll = false;
 
-    // ─── Edit Transaction Properties ────────────────────────────
+    // Edit Transaction Properties
     public $showEditModal = false;
     public $editingTransactionId = null;
     public $editItems = [];
@@ -79,7 +80,7 @@ class ReportManager extends Component
         );
     }
 
-    // ─── Edit Methods ───────────────────────────────────────────
+    // Edit Methods
 
     public function editTransaction($id)
     {
@@ -153,11 +154,12 @@ class ReportManager extends Component
             $this->editItems[$key]['subtotal'] = $itemSubtotal;
             $subtotal += $itemSubtotal;
         }
-
+        
         $this->editSubtotal = $subtotal;
 
         // Calculate discount
         $discountAmount = 0;
+
         if ($this->editDiscountType === 'percentage' && $this->editDiscountValue > 0) {
             $discountAmount = $subtotal * (min(100, $this->editDiscountValue) / 100);
         } elseif ($this->editDiscountType === 'fixed' && $this->editDiscountValue > 0) {

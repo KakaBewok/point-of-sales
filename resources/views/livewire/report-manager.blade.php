@@ -1,11 +1,11 @@
-<div class="px-6 py-8 md:px-8 space-y-8 max-w-7xl mx-auto flex-1 w-full">
+<div class="px-0 py-8 md:px-5 space-y-8 max-w-7xl mx-auto flex-1 w-full">
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <h1 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Laporan Transaksi</h1>
+        <h1 class="text-lg md:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Laporan Transaksi</h1>
         <div class="flex items-center gap-3">
             @if(!empty($selected) && is_array($selected))
-                <flux:button variant="danger" icon="trash" class="h-10 px-4" wire:click="confirmDeleteSelected">Hapus Terpilih ({{ count($selected) }})</flux:button>
+                <flux:button variant="danger" icon="trash" class="h-10 px-4" wire:click="confirmDeleteSelected">Terpilih ({{ count($selected) }})</flux:button>
             @endif
-            <flux:button variant="primary" icon="arrow-down-tray" class="h-10 px-4" wire:click="exportExcel" wire:loading.attr="disabled">Export Excel</flux:button>
+            <flux:button variant="primary" icon="arrow-down-tray" class="cursor-pointer h-10 px-4" wire:click="exportExcel" wire:loading.attr="disabled">Export Excel</flux:button>
         </div>
     </div>
 
@@ -30,15 +30,14 @@
 
     {{-- Filters --}}
     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-        <flux:input type="date" label="Dari Tanggal" class="h-10" wire:model.live="startDate" />
-        <flux:input type="date" label="Sampai Tanggal" class="h-10" wire:model.live="endDate" />
-        <flux:select label="Metode Pembayaran" class="h-10" wire:model.live="paymentMethod">
+        <flux:input type="date" label="Dari Tanggal" class="h-10 cursor-pointer" wire:model.live="startDate" />
+        <flux:input type="date" label="Sampai Tanggal" class="h-10 cursor-pointer" wire:model.live="endDate" />
+        <flux:select label="Metode Pembayaran" class="h-10 cursor-pointer" wire:model.live="paymentMethod">
             <flux:select.option value="">Semua Metode</flux:select.option>
             <flux:select.option value="cash">Tunai</flux:select.option>
             <flux:select.option value="qris">QRIS</flux:select.option>
-            <flux:select.option value="va">Virtual Account</flux:select.option>
         </flux:select>
-        <flux:select label="Kategori" class="h-10" wire:model.live="categoryId">
+        <flux:select label="Kategori" class="h-10 cursor-pointer" wire:model.live="categoryId">
             <flux:select.option value="">Semua Kategori</flux:select.option>
             @foreach($categories as $category)
                 <flux:select.option value="{{ $category->id }}">{{ $category->name }}</flux:select.option>
@@ -63,18 +62,18 @@
             <p class="text-2xl font-bold tracking-tight text-emerald-700 dark:text-emerald-300 relative z-10">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</p>
         </div>
         <div class="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-            <div class="flex items-center gap-3 text-indigo-500 dark:text-indigo-400 mb-2">
+            <div class="flex items-center gap-3 text-emerald-700 dark:text-emerald-400 mb-2">
                 <flux:icon name="receipt-percent" class="h-5 w-5" />
                 <h3 class="font-medium text-sm">Total Diskon Diberikan</h3>
             </div>
-            <p class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Rp {{ number_format($totalDiscounts, 0, ',', '.') }}</p>
+            <p class="text-2xl font-bold tracking-tight text-emerald-700 dark:text-emerald-300">Rp {{ number_format($totalDiscounts, 0, ',', '.') }}</p>
         </div>
         <div class="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-            <div class="flex items-center gap-3 text-amber-500 dark:text-amber-400 mb-2">
+            <div class="flex items-center gap-3 text-amber-700 dark:text-amber-500 mb-2">
                 <flux:icon name="document-text" class="h-5 w-5" />
-                <h3 class="font-medium text-sm">Total Pajak (PPN)</h3>
+                <h3 class="font-medium text-sm">Total Pajak</h3>
             </div>
-            <p class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">Rp {{ number_format($totalTax, 0, ',', '.') }}</p>
+            <p class="text-2xl font-bold tracking-tight text-amber-700 dark:text-amber-500">Rp {{ number_format($totalTax, 0, ',', '.') }}</p>
         </div>
     </div>
 
@@ -87,12 +86,12 @@
                         <th class="px-4 py-4 text-center w-12">
                             <flux:checkbox wire:model.live="selectAll" />
                         </th>
-                        <th class="px-6 py-4 text-left font-semibold text-zinc-600 dark:text-zinc-400">Invoice / Waktu</th>
+                        <th class="px-6 py-4 text-left font-semibold text-zinc-600 dark:text-zinc-400">Invoice/Waktu</th>
                         <th class="px-6 py-4 text-center font-semibold text-zinc-600 dark:text-zinc-400">Item</th>
-                        <th class="px-6 py-4 text-right font-semibold text-zinc-600 dark:text-zinc-400">Subtotal</th>
-                        <th class="px-6 py-4 text-right font-semibold text-emerald-600 dark:text-emerald-500">Diskon</th>
-                        <th class="px-6 py-4 text-right font-semibold text-red-600 dark:text-red-400">Pajak</th>
-                        <th class="px-6 py-4 text-right font-semibold text-zinc-900 dark:text-white">Total</th>
+                        <th class="px-6 py-4 text-right font-semibold text-zinc-600 dark:text-zinc-400">Subtotal (Rp)</th>
+                        <th class="px-6 py-4 text-right font-semibold text-emerald-600 dark:text-emerald-500">Diskon (Rp)</th>
+                        <th class="px-6 py-4 text-right font-semibold text-amber-700 dark:text-amber-500">Pajak (Rp)</th>
+                        <th class="px-6 py-4 text-right font-semibold text-zinc-900 dark:text-white">Total (Rp)</th>
                         <th class="px-6 py-4 text-center font-semibold text-zinc-600 dark:text-zinc-400">Metode</th>
                         <th class="px-6 py-4 text-center font-semibold text-zinc-600 dark:text-zinc-400">Aksi</th>
                     </tr>
@@ -108,10 +107,10 @@
                                 <div class="text-xs text-zinc-500 mt-1">{{ $trx->created_at->format('d/m/Y H:i') }} • {{ $trx->user->name ?? '-' }}</div>
                             </td>
                             <td class="px-6 py-4 text-center font-bold text-zinc-700 dark:text-zinc-300">{{ $trx->items->sum('quantity') }}</td>
-                            <td class="px-6 py-4 text-right font-medium text-zinc-600 dark:text-zinc-400">Rp {{ number_format($trx->subtotal, 0, ',', '.') }}</td>
-                            <td class="px-6 py-4 text-right font-medium text-emerald-600 dark:text-emerald-400">-Rp {{ number_format($trx->discount_amount, 0, ',', '.') }}</td>
-                            <td class="px-6 py-4 text-right font-medium text-red-500 dark:text-red-400">+Rp {{ number_format($trx->tax_amount, 0, ',', '.') }}</td>
-                            <td class="px-6 py-4 text-right text-base font-bold text-zinc-900 dark:text-white">Rp {{ number_format($trx->grand_total, 0, ',', '.') }}</td>
+                            <td class="px-6 py-4 text-right font-medium text-zinc-600 dark:text-zinc-400">{{ number_format($trx->subtotal, 0, ',', '.') }}</td>
+                            <td class="px-6 py-4 text-right font-medium text-emerald-600 dark:text-emerald-400">-{{ number_format($trx->discount_amount, 0, ',', '.') }}</td>
+                            <td class="px-6 py-4 text-right font-medium text-amber-700 dark:text-amber-500">+{{ number_format($trx->tax_amount, 0, ',', '.') }}</td>
+                            <td class="px-6 py-4 text-right text-base font-bold text-zinc-900 dark:text-white">{{ number_format($trx->grand_total, 0, ',', '.') }}</td>
                             <td class="px-6 py-4 text-center">
                                 <span class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold ring-1 ring-inset {{ match($trx->payment?->method) { 
                                     'cash' => 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-900/30 dark:text-emerald-400 dark:ring-emerald-900/50', 
@@ -124,10 +123,10 @@
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <div class="flex items-center justify-center gap-2">
-                                    <flux:button size="sm" variant="primary" class="h-9 px-3 bg-blue-600 hover:bg-blue-700 text-white border-blue-600 shadow-sm" as="a" href="{{ route('reports.detail', $trx->id) }}" wire:navigate>Lihat</flux:button>
-                                    <flux:button size="sm" variant="ghost" class="h-9 w-9 px-0 text-amber-600 hover:bg-amber-50 hover:text-amber-700 dark:text-amber-400 dark:hover:bg-amber-900/20 dark:hover:text-amber-300" icon="pencil-square" wire:click="editTransaction({{ $trx->id }})" />
-                                    <flux:button size="sm" variant="ghost" class="h-9 w-9 px-0 text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800" icon="printer" as="a" href="{{ route('receipt.print', $trx->id) }}" target="_blank" />
-                                    <flux:button size="sm" variant="ghost" class="h-9 w-9 px-0 text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20 dark:hover:text-red-400" icon="trash" wire:click="confirmDelete({{ $trx->id }}, '{{ $trx->invoice_number }}')" />
+                                    <flux:button size="sm" variant="ghost" class="cursor-pointer h-9 w-9 px-0 text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:bg-amber-900/20 dark:hover:text-amber-300" icon="pencil-square" wire:click="editTransaction({{ $trx->id }})" />
+                                    <flux:button size="sm" variant="ghost" class="cursor-pointer h-9 w-9 px-0 text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800" icon="printer" as="a" href="{{ route('receipt.print', $trx->id) }}" target="_blank" />
+                                    <flux:button size="sm" variant="ghost" class="cursor-pointer h-9 w-9 px-0 [&_svg]:text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20 dark:hover:text-red-400" icon="trash" wire:click="confirmDelete({{ $trx->id }}, '{{ $trx->invoice_number }}')" />
+                                    <flux:button size="sm" variant="primary" class="cursor-pointer h-9 px-3 bg-blue-500 hover:bg-blue-600 text-white border-blue-600 shadow-sm" as="a" href="{{ route('reports.detail', $trx->id) }}" wire:navigate>Lihat</flux:button>
                                 </div>
                             </td>
                         </tr>
@@ -143,6 +142,7 @@
         <div class="border-t border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">{{ $transactions->links() }}</div>
     </div>
 
+    <!-- sampe sini -->
     <!-- Delete Confirmation Modal -->
     <flux:modal wire:model="showDeleteModal" class="max-w-md p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl transition-all">
         <div class="p-6">
@@ -171,9 +171,7 @@
         </div>
     </flux:modal>
 
-    {{-- ═══════════════════════════════════════════════════════════
-         EDIT TRANSACTION MODAL
-    ═══════════════════════════════════════════════════════════ --}}
+    {{-- EDIT TRANSACTION MODAL --}}
     <flux:modal wire:model="showEditModal" class="max-w-3xl p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl">
         <div class="max-h-[85vh] overflow-y-auto">
             {{-- Header --}}
