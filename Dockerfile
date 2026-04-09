@@ -5,7 +5,7 @@ RUN apk add --no-cache \
     git curl zip unzip bash \
     nodejs npm \
     libpng-dev libjpeg-turbo-dev freetype-dev \
-    oniguruma-dev libxml2-dev
+    oniguruma-dev libxml2-dev libzip-dev
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install \
