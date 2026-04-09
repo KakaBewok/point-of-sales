@@ -1,5 +1,5 @@
 # Get PHP image with Alpine Linux
-FROM php:8.2-fpm-alpine
+FROM php:8.3-fpm-alpine
 # Install system dependencies
 RUN apk add --no-cache \
     git curl zip unzip bash \
