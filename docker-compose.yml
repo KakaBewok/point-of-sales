@@ -73,8 +73,10 @@ services:
     networks:
       - app_network
     depends_on:
-      - mysql
-      - redis
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   scheduler:
     build:
