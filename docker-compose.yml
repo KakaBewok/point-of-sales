@@ -52,46 +52,46 @@ services:
       timeout: 5s
       retries: 5
 
-  redis:
-    image: redis:7-alpine
-    container_name: ${APP_NAME}_redis
-    restart: unless-stopped
-    volumes:
-      - redis_data:/data
-    networks:
-      - app_network
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: ${APP_NAME}_redis
+  #   restart: unless-stopped
+  #   volumes:
+  #     - redis_data:/data
+  #   networks:
+  #     - app_network
 
-  queue:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: ${APP_NAME}_queue
-    restart: unless-stopped
-    command: php artisan queue:work --sleep=3 --tries=3 --max-time=3600
-    volumes:
-      - .:/var/www
-    networks:
-      - app_network
-    depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_started
+  # queue:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: ${APP_NAME}_queue
+  #   restart: unless-stopped
+  #   command: php artisan queue:work --sleep=3 --tries=3 --max-time=3600
+  #   volumes:
+  #     - .:/var/www
+  #   networks:
+  #     - app_network
+  #   depends_on:
+  #     mysql:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_started
 
-  scheduler:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: ${APP_NAME}_scheduler
-    restart: unless-stopped
-    command: sh -c "while true; do php artisan schedule:run; sleep 60; done"
-    volumes:
-      - .:/var/www
-    networks:
-      - app_network
-    depends_on:
-      mysql:
-        condition: service_healthy
+  # scheduler:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: ${APP_NAME}_scheduler
+  #   restart: unless-stopped
+  #   command: sh -c "while true; do php artisan schedule:run; sleep 60; done"
+  #   volumes:
+  #     - .:/var/www
+  #   networks:
+  #     - app_network
+  #   depends_on:
+  #     mysql:
+  #       condition: service_healthy
 
   certbot:
     image: certbot/certbot
@@ -105,7 +105,7 @@ services:
 
 volumes:
   mysql_data:
-  redis_data:
+    #redis_data:
 
 
 networks:
