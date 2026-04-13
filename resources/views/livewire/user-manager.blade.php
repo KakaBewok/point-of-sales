@@ -134,6 +134,7 @@
                                 <flux:checkbox label="Kategori Pengeluaran" wire:model="permissions" value="expense_categories" />
                                 <flux:checkbox label="Pengeluaran" wire:model="permissions" value="expenses" />
                                 <flux:checkbox label="Laporan Pengeluaran" wire:model="permissions" value="expense_reports" />
+                                <flux:checkbox label="Performa Kasir" wire:model="permissions" value="view_cashier_performance" />
                             </div>
                         </div>
                     @endif

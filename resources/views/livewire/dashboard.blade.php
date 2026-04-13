@@ -139,6 +139,52 @@
             </div>
         </div>
 
+        {{-- Top Cashier Today Widget --}}
+        @if(auth()->user()->canAccessAdminMenu())
+        <div class="mt-5">
+            <div class="rounded-xl border border-violet-200/70 bg-gradient-to-br from-violet-50 via-indigo-50 to-white p-5 shadow-sm dark:border-violet-800/40 dark:from-violet-900/20 dark:via-indigo-900/15 dark:to-zinc-900 relative overflow-hidden">
+                {{-- Decorative bg element --}}
+                <div class="absolute top-0 right-0 w-32 h-32 bg-violet-200/30 dark:bg-violet-800/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
+                <div class="relative z-10">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/40">
+                            <flux:icon name="trophy" class="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                        </div>
+                        <h3 class="text-sm font-semibold text-violet-700 dark:text-violet-300">Top Kasir Hari Ini</h3>
+                    </div>
+                    @if($topCashierToday)
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6">
+                            <div class="flex items-center gap-3">
+                                <div class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-white font-bold text-sm shadow-md">
+                                    {{ strtoupper(substr($topCashierToday->cashier_name, 0, 2)) }}
+                                </div>
+                                <div>
+                                    <p class="font-bold text-zinc-900 dark:text-white text-base">{{ $topCashierToday->cashier_name }}</p>
+                                    <p class="text-xs text-zinc-500 dark:text-zinc-400">Kasir terbaik hari ini</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4 sm:ml-auto">
+                                <div class="text-center px-3 py-1.5 rounded-lg bg-white/70 dark:bg-zinc-800/50 border border-violet-100 dark:border-violet-800/30">
+                                    <p class="text-[10px] uppercase tracking-wider font-medium text-zinc-500 dark:text-zinc-400">Pendapatan</p>
+                                    <p class="text-sm font-bold text-emerald-600 dark:text-emerald-400">Rp {{ number_format($topCashierToday->total_sales, 0, ',', '.') }}</p>
+                                </div>
+                                <div class="text-center px-3 py-1.5 rounded-lg bg-white/70 dark:bg-zinc-800/50 border border-violet-100 dark:border-violet-800/30">
+                                    <p class="text-[10px] uppercase tracking-wider font-medium text-zinc-500 dark:text-zinc-400">Transaksi</p>
+                                    <p class="text-sm font-bold text-blue-600 dark:text-blue-400">{{ $topCashierToday->total_transactions }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <div class="flex items-center gap-3 py-2">
+                            <flux:icon name="clock" class="h-5 w-5 text-zinc-400 dark:text-zinc-500" />
+                            <p class="text-sm text-zinc-500 dark:text-zinc-400">Belum ada transaksi hari ini.</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+        @endif
+
         {{-- Sales Charts --}}
         <div class="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-3 mt-5">
             {{-- Revenue Chart (7 days) --}}

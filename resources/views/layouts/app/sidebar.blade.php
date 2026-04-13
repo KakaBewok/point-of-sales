@@ -83,7 +83,7 @@
                     @endif
 
                     {{-- Reports --}}
-                    @if(auth()->user()->hasPermission('reports') || auth()->user()->hasPermission('expense_reports'))
+                    @if(auth()->user()->hasPermission('reports') || auth()->user()->hasPermission('expense_reports') || auth()->user()->hasPermission('view_cashier_performance'))
                     {{-- <flux:navlist.group expandable :heading="__('Laporan')" :expanded="request()->routeIs('reports.*')"> --}}
                     <flux:navlist.group expandable :heading="__('Laporan')" :expanded="true">   
                         @if(auth()->user()->hasPermission('reports'))
@@ -95,6 +95,12 @@
                         @if(auth()->user()->hasPermission('expense_reports'))
                         <flux:navlist.item icon="document-chart-bar" :href="route('reports.expenses')" :current="request()->routeIs('reports.expenses')" wire:navigate>
                             {{ __('Laporan Pengeluaran') }}
+                        </flux:navlist.item>
+                        @endif
+
+                        @if(auth()->user()->hasPermission('view_cashier_performance'))
+                        <flux:navlist.item icon="user-group" :href="route('reports.cashier-performance')" :current="request()->routeIs('reports.cashier-performance')" wire:navigate>
+                            {{ __('Performa Kasir') }}
                         </flux:navlist.item>
                         @endif
                     </flux:navlist.group>

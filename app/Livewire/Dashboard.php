@@ -10,6 +10,7 @@ use App\Models\Transaction;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Illuminate\Support\Facades\DB;
 
 #[Layout('layouts.app')]
 #[Title('Dashboard')]
@@ -128,6 +129,21 @@ class Dashboard extends Component
             ]);
         }
 
+        // ─── Top Cashier Today ────────────────────────────────────────
+        $topCashierToday = Transaction::completed()->today()
+            ->select(
+                'user_id',
+                DB::raw('COUNT(*) as total_transactions'),
+                DB::raw('SUM(grand_total) as total_sales')
+            )
+            ->groupBy('user_id')
+            ->orderByDesc('total_sales')
+            ->first();
+
+        if ($topCashierToday) {
+            $topCashierToday->cashier_name = \App\Models\User::find($topCashierToday->user_id)?->name ?? 'Unknown';
+        }
+
         return view('livewire.dashboard', [
             'todayRevenue' => $todayRevenue,
             'todayTransactions' => $todayTransactions,
@@ -143,6 +159,8 @@ class Dashboard extends Component
             'monthlyExpenses' => $monthlyExpenses,
             'expenseByCategory' => $expenseByCategory,
             'expenseChartData' => $expenseChartData,
+            'topCashierToday' => $topCashierToday,
         ]);
     }
 }
+

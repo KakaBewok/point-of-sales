@@ -12,6 +12,7 @@ use App\Livewire\ReportManager;
 use App\Livewire\ExpenseCategoryManager;
 use App\Livewire\ExpenseManager;
 use App\Livewire\ExpenseReport;
+use App\Livewire\CashierPerformance;
 use App\Livewire\UserManager;
 use App\Livewire\SettingsManager;
 use App\Livewire\StoreRegistration;
@@ -44,6 +45,7 @@ Route::middleware(['auth', 'verified', 'store.active', 'role:owner,admin,cashier
     Route::get('/vouchers', VoucherManager::class)->name('vouchers.index')->middleware('permission:vouchers');
     Route::get('/reports', ReportManager::class)->name('reports.index')->middleware('permission:reports');
     Route::get('/reports/expenses', ExpenseReport::class)->name('reports.expenses')->middleware('permission:expense_reports');
+    Route::get('/reports/cashier-performance', CashierPerformance::class)->name('reports.cashier-performance')->middleware('permission:view_cashier_performance');
     Route::get('/reports/{id}', \App\Livewire\ReportDetail::class)->name('reports.detail')->middleware('permission:reports');
 
     // Expense Management
