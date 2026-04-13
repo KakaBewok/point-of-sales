@@ -82,6 +82,11 @@ class User extends Authenticatable
         return $this->is_superadmin;
     }
 
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
     public function canAccessAdminMenu(): bool
     {
         return $this->isAdmin() || $this->isOwner();

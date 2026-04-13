@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Exports\TransactionReportExport;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\User;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
 use Livewire\Attributes\Layout;
@@ -25,6 +26,7 @@ class ReportManager extends Component
     public $endDate;
     public $paymentMethod = '';
     public $categoryId = '';
+    public $userId = '';
 
     public $showDeleteModal = false;
     public $itemToDeleteId = null;
@@ -348,6 +350,10 @@ class ReportManager extends Component
             $query->whereHas('items.product', fn($q) => $q->where('category_id', $this->categoryId));
         }
 
+        if ($this->userId) {
+            $query->where('user_id', $this->userId);
+        }
+
         return $query;
     }
 
@@ -365,6 +371,7 @@ class ReportManager extends Component
         $transactions = $query->paginate(20);
 
         $categories = Category::active()->ordered()->get();
+        $users = User::active()->get();
 
         return view('livewire.report-manager', [
             'transactions' => $transactions,
@@ -373,6 +380,7 @@ class ReportManager extends Component
             'totalTax' => $totalTax,
             'totalDiscounts' => $totalDiscounts,
             'categories' => $categories,
+            'users' => $users,
         ]);
     }
 }

@@ -43,6 +43,12 @@
                 <flux:select.option value="{{ $category->id }}">{{ $category->name }}</flux:select.option>
             @endforeach
         </flux:select>
+        <flux:select label="Pengguna" class="h-10 cursor-pointer" wire:model.live="userId">
+             <flux:select.option value="">Semua Pengguna</flux:select.option>
+            @foreach($users as $user)
+                <flux:select.option value="{{ $user->id }}">{{ $user->name }}</flux:select.option>
+            @endforeach
+        </flux:select>
     </div>
 
     {{-- Summary Cards --}}
