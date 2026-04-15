@@ -36,7 +36,7 @@
         <div class="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
             <div class="flex items-center gap-3 text-zinc-500 dark:text-zinc-400 mb-2">
                 <flux:icon name="document-text" class="h-5 w-5" />
-                <h3 class="font-medium text-sm">Total Data Pengeluaran</h3>
+                <h3 class="font-medium text-sm">Total Pengeluaran</h3>
             </div>
             <p class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">{{ number_format($totalCount) }} <span class="text-sm font-semibold text-zinc-500">data</span></p>
         </div>
