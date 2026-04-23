@@ -8,28 +8,28 @@
                     wire:click="addToCart({{ $product->id }})" 
                     class="w-full cursor-pointer group relative flex flex-col bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden transition-all hover:border-green-500 hover:shadow-md active:scale-95 text-left"
                 >
-                    <div class="aspect-square w-full bg-zinc-50 dark:bg-zinc-800/50 flex items-center justify-center p-4 relative border-b border-zinc-100 dark:border-zinc-800">
+                    <div class="aspect-square w-full bg-zinc-50 dark:bg-zinc-800/50 flex items-center justify-center p-0 relative border-b border-zinc-100 dark:border-zinc-800">
                         @if($product->image)
-                            <img src="{{ Storage::url($product->image) }}" class="h-full w-full object-contain" alt="{{ $product->name }}">
+                            <img src="{{ Storage::url($product->image) }}" class="h-full w-full object-cover" alt="{{ $product->name }}">
                         @else
-                            <flux:icon name="cube" class="h-8 w-8 text-zinc-300 dark:text-zinc-700 opacity-20" />
+                            <flux:icon name="cube" class="h-18 w-18 text-zinc-300 dark:text-zinc-700 opacity-50" />
                         @endif
                         
                         <div class="absolute top-2 right-2">
                             @if($product->type === 'service')
-                                <span class="bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400 px-1.5 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-wider border border-blue-200 dark:border-blue-800">Jasa</span>
+                                <span class="bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400 px-2 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider border border-blue-200 dark:border-blue-800">Jasa</span>
                             @elseif($product->stock <= $product->low_stock_threshold)
-                                <span class="bg-red-500 text-white px-1.5 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-wider shadow-sm animate-pulse">Low: {{ $product->stock }}</span>
+                                <span class="bg-red-500 text-white px-2 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider shadow-sm animate-pulse">Low: {{ $product->stock }}</span>
                             @else
-                                <span class="bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400 px-1.5 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-wider">Stok: {{ $product->stock }}</span>
+                                <span class="bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400 px-2 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider">Stok: {{ $product->stock }}</span>
                             @endif
                         </div>
                     </div>
                     <div class="p-3 flex flex-col flex-1">
-                        <h3 class="text-[11px] md:text-xs font-bold text-zinc-800 dark:text-zinc-200 line-clamp-2 leading-snug mb-2 min-h-[32px]">{{ $product->name }}</h3>
+                        <h3 class="text-xs md:text-md font-medium text-zinc-800 dark:text-zinc-200 line-clamp-2 leading-snug mb-2 min-h-[32px]">{{ $product->name }}</h3>
                         
                         <div class="mt-auto flex items-center justify-between gap-1">
-                            <span class="text-sm md:text-base font-black text-zinc-950 dark:text-white truncate">Rp{{ number_format($product->price, 0, ',', '.') }}</span>
+                            <span class="text-sm md:text-lg font-black text-zinc-950 dark:text-white truncate">Rp{{ number_format($product->price, 0, ',', '.') }}</span>
                             
                             <div class="flex items-center gap-1 shrink-0">
                                 <button @click.stop="detailModal = true" class="md:hidden flex h-7 w-7 items-center justify-center bg-zinc-100 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 rounded-lg transition-all">

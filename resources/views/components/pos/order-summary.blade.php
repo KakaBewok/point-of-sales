@@ -18,39 +18,39 @@
     {{-- Cart Header --}}
     <header class="p-4 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 shrink-0 flex items-center justify-between">
         <div>
-            <h2 class="text-[11px] font-black uppercase tracking-widest text-zinc-950 dark:text-white">Daftar Belanja</h2>
-            <p class="text-[9px] font-bold text-zinc-400 uppercase mt-0.5">{{ count($cart) }} Items</p>
+            <h2 class="text-[13px] font-black uppercase tracking-widest text-zinc-950 dark:text-white">Daftar Belanja</h2>
+            <p class="text-[11px] font-bold text-zinc-400 mt-1">{{ count($cart) }} Items</p>
         </div>
         @if(count($cart) > 0)
-            <button wire:click="clearCart" class="text-[9px] font-black text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 px-2 py-1 rounded-lg transition-all uppercase tracking-tighter">Batal</button>
+            <button wire:click="clearCart" class="cursor-pointer tracking-wider text-[13px] font-black text-red-500 bg-red-50 dark:hover:bg-red-950/30 px-2 py-1 rounded-lg transition-all">Batal</button>
         @endif
     </header>
 
     {{-- Cart Content: Priority Area --}}
-    <div class="flex-none md:flex-1 overflow-visible md:overflow-y-auto customized-scrollbar p-3 space-y-2">
+    <div class="flex-none md:flex-1 overflow-visible md:overflow-y-auto customized-scrollbar p-3 space-y-3">
         @forelse($cart as $key => $item)
-            <div class="bg-zinc-50 dark:bg-zinc-900/50 p-3 rounded-2xl border border-zinc-100 dark:border-zinc-800 flex flex-col gap-3 group transition-all hover:border-green-300">
+            <div class="bg-zinc-50 dark:bg-zinc-900/50 p-3 rounded-sm border border-zinc-100 dark:border-zinc-800 flex flex-col gap-5 group transition-all hover:border-green-300 shadow-sm">
                 <div class="flex justify-between items-start gap-3">
                     <div class="flex-1">
-                        <h4 class="text-[11px] font-black text-zinc-800 dark:text-zinc-100 uppercase truncate leading-tight flex items-center gap-1">
-                            {{ $item['name'] }}
+                        <h4 class="text-[13px] font-black text-zinc-800 dark:text-zinc-100 truncate leading-tight flex items-center gap-1">
+                            <span class="uppercase mr-2">{{ $item['name'] }}</span>
                             @if(($item['type'] ?? 'product') === 'service')
-                                <span class="text-[7px] bg-blue-100 text-blue-700 px-1 py-0.5 rounded-sm dark:bg-blue-900 dark:text-blue-300">JASA</span>
+                                <span class="text-[13px] bg-blue-100 text-blue-700 px-1 py-0.5 rounded-sm dark:bg-blue-900 dark:text-blue-300">Jasa</span>
                             @endif
                         </h4>
-                        <p class="text-[9px] font-bold text-zinc-400 mt-0.5">@ Rp{{ number_format($item['price'], 0, ',', '.') }}</p>
+                        <p class="text-[11px] font-bold text-zinc-400 mt-1">@ Rp{{ number_format($item['price'], 0, ',', '.') }}</p>
                     </div>
-                    <button wire:click="removeFromCart('{{ $key }}')" class="h-6 w-6 text-zinc-300 hover:text-red-500 transition-colors flex items-center justify-center">
-                        <flux:icon name="trash" class="h-3 w-3" />
+                    <button wire:click="removeFromCart('{{ $key }}')" class="h-9 w-9 text-red-500 hover:text-red-600 transition-colors flex items-center justify-center">
+                        <flux:icon name="trash" class="h-5 w-5 cursor-pointer" />
                     </button>
                 </div>
                 <div class="flex items-center justify-between">
                     <div class="flex items-center bg-white dark:bg-zinc-800 rounded-lg p-0.5 border border-zinc-100 dark:border-zinc-700 shadow-sm">
-                        <button wire:click="decrementQuantity('{{ $key }}')" class="h-7 w-7 flex items-center justify-center text-zinc-400 hover:text-red-500"><flux:icon name="minus" class="h-3 w-3" /></button>
+                        <button wire:click="decrementQuantity('{{ $key }}')" class="cursor-pointer h-7 w-7 flex items-center justify-center text-zinc-400 hover:text-red-500"><flux:icon name="minus" class="h-3 w-3" /></button>
                         <span class="w-8 text-center text-[11px] font-black dark:text-white">{{ $item['quantity'] }}</span>
-                        <button wire:click="incrementQuantity('{{ $key }}')" class="h-7 w-7 flex items-center justify-center text-zinc-400 hover:text-green-500"><flux:icon name="plus" class="h-3 w-3" /></button>
+                        <button wire:click="incrementQuantity('{{ $key }}')" class="cursor-pointer h-7 w-7 flex items-center justify-center text-zinc-400 hover:text-green-500"><flux:icon name="plus" class="h-3 w-3" /></button>
                     </div>
-                    <span class="text-xs font-black text-zinc-950 dark:text-white">
+                    <span class="text-sm md:text-md font-black text-zinc-950 dark:text-white">
                         Rp{{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}
                     </span>
                 </div>
@@ -63,20 +63,21 @@
         @endforelse
     </div>
 
+    <!--  sampe sini -->
     {{-- DISCOUNT & VOUCHER BUTTONS --}}
     <div class="px-3 py-3 bg-zinc-50 dark:bg-zinc-900/50 border-t border-zinc-100 dark:border-zinc-800 shrink-0 flex gap-2">
         @if($manualDiscountType && $manualDiscountValue > 0)
             <div class="flex-1 flex flex-col bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl overflow-hidden relative group">
-                <button wire:click="openDiscountModal" class="flex-1 px-3 py-1.5 text-left hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors">
+                <button wire:click="openDiscountModal" class="cursor=pointer flex-1 px-3 py-1.5 text-left hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors">
                     <span class="text-[9px] font-black text-amber-600 dark:text-amber-500 uppercase block mb-0.5">Diskon ({{ $manualDiscountType === 'percentage' ? $manualDiscountValue.'%' : 'Rp' }})</span>
                     <span class="text-xs font-bold text-amber-700 dark:text-amber-400">Rp{{ number_format($manualDiscountAmount, 0, ',', '.') }}</span>
                 </button>
-                <button wire:click="resetDiscount" class="absolute right-0 top-0 bottom-0 w-8 flex items-center justify-center text-amber-400 hover:text-amber-600 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors border-l border-amber-200 dark:border-amber-800/50">
+                <button wire:click="resetDiscount" class="cursor-pointer absolute right-0 top-0 bottom-0 w-8 flex items-center justify-center text-amber-400 hover:text-amber-600 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors border-l border-amber-200 dark:border-amber-800/50">
                     <flux:icon name="x-mark" class="h-3 w-3" />
                 </button>
             </div>
         @else
-            <button wire:click="openDiscountModal" class="flex-1 py-3 px-2 bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 border-2 border-zinc-200 dark:border-zinc-700 rounded-xl text-[10px] font-black uppercase text-zinc-600 dark:text-zinc-300 shadow-sm transition-colors flex items-center justify-center gap-1.5">
+            <button wire:click="openDiscountModal" class="cursor-pointer flex-1 py-3 px-2 bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 border-2 border-zinc-200 dark:border-zinc-700 rounded-xl text-[10px] font-black uppercase text-zinc-600 dark:text-zinc-300 shadow-sm transition-colors flex items-center justify-center gap-1.5">
                 <flux:icon name="receipt-percent" class="h-4 w-4" />
                 Diskon
             </button>
@@ -88,12 +89,12 @@
                     <span class="text-[9px] font-black text-emerald-600 dark:text-emerald-500 uppercase block mb-0.5">Vcr ({{ $voucherCode }})</span>
                     <span class="text-xs font-bold text-emerald-700 dark:text-emerald-400">Rp{{ number_format($voucherDiscount, 0, ',', '.') }}</span>
                 </div>
-                <button wire:click="resetVoucher" class="absolute right-0 top-0 bottom-0 w-8 flex items-center justify-center text-emerald-400 hover:text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors border-l border-emerald-200 dark:border-emerald-800/50">
+                <button wire:click="resetVoucher" class="cursor-pointer absolute right-0 top-0 bottom-0 w-8 flex items-center justify-center text-emerald-400 hover:text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors border-l border-emerald-200 dark:border-emerald-800/50">
                     <flux:icon name="x-mark" class="h-3 w-3" />
                 </button>
             </div>
         @else
-            <button wire:click="openVoucherModal" class="flex-1 py-3 px-2 bg-zinc-900 dark:bg-zinc-700 hover:bg-zinc-800 dark:hover:bg-zinc-600 border-2 border-zinc-900 dark:border-zinc-700 rounded-xl text-[10px] font-black uppercase text-white shadow-sm transition-colors flex items-center justify-center gap-1.5">
+            <button wire:click="openVoucherModal" class="cursor-pointer flex-1 py-3 px-2 bg-zinc-900 dark:bg-zinc-700 hover:bg-zinc-800 dark:hover:bg-zinc-600 border-2 border-zinc-900 dark:border-zinc-700 rounded-xl text-[10px] font-black uppercase text-white shadow-sm transition-colors flex items-center justify-center gap-1.5">
                 <flux:icon name="ticket" class="h-4 w-4" />
                 Voucher
             </button>
