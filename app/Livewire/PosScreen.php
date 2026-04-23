@@ -12,7 +12,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Layout('layouts.app')]
-#[Title('Kasir (POS)')]
+#[Title('Kasir')]
 class PosScreen extends Component
 {
     // Cart
@@ -389,6 +389,7 @@ class PosScreen extends Component
                 'quantity' => $item['quantity'],
             ])->values()->toArray();
 
+            // determine if external qr or dynamic qr
             $qrisType = null;
             if ($this->paymentMethod === 'qris') {
                 $store = auth()->user()->store ?? null;
@@ -405,6 +406,7 @@ class PosScreen extends Component
                 qrisType: $qrisType,
             );
 
+            // sampe sini
             // Process payment based on method
             if ($this->paymentMethod === 'cash') {
                 $payment = $transactionService->processCashPayment($transaction, (float) $this->cashReceived);

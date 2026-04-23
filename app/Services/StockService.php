@@ -35,7 +35,7 @@ class StockService
                 'stock_before' => $stockBefore,
                 'stock_after' => $stockAfter,
                 'reference' => $reference,
-                'notes' => "Penjualan: {$quantity} unit",
+                'notes' => "Penjualan: {$quantity} unit/pcs",
             ]);
         });
     }
