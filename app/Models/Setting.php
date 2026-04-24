@@ -110,6 +110,7 @@ class Setting extends Model
         $defaults = [
             ['key' => 'store_name', 'value' => $storeName, 'group' => 'general'],
             ['key' => 'store_logo', 'value' => '', 'group' => 'general'],
+            ['key' => 'enable_virtual_keypad', 'value' => '0', 'group' => 'general'],
             ['key' => 'tax_enabled', 'value' => '0', 'group' => 'tax'],
             ['key' => 'tax_rate', 'value' => '11', 'group' => 'tax'],
             ['key' => 'receipt_header', 'value' => '', 'group' => 'receipt'],

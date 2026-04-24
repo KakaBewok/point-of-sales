@@ -49,6 +49,7 @@
         :cashReceived="$cashReceived"
         :changeAmount="$this->changeAmount"
         :qrisNotConfigured="$qrisNotConfigured"
+        :enableVirtualKeypad="$enable_virtual_keypad"
     />
 
     <x-pos.result-modal 
@@ -59,11 +60,13 @@
     <x-pos.discount-modal 
         :tempDiscountType="$tempDiscountType"
         :tempDiscountValue="$tempDiscountValue"
+        :enableVirtualKeypad="$enable_virtual_keypad"
     />
 
     <x-pos.voucher-modal 
         :tempVoucherCode="$tempVoucherCode"
         :voucherError="$voucherError"
+        :enableVirtualKeypad="$enable_virtual_keypad"
     />
 
     <style>

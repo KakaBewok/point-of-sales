@@ -3,7 +3,8 @@
     'paymentMethod',
     'cashReceived',
     'changeAmount',
-    'qrisNotConfigured'
+    'qrisNotConfigured',
+    'enableVirtualKeypad'
 ])
 
 <flux:modal wire:model="showPaymentModal" {{ $attributes->merge(['class' => 'max-w-2xl p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-3xl w-full']) }}>
@@ -115,7 +116,7 @@
             </div>
 
             {{-- Right side: Numeric Keypad (Cash only) --}}
-            @if($paymentMethod === 'cash')
+            @if($enableVirtualKeypad && $paymentMethod === 'cash')
                 <div class="md:w-64 shrink-0 flex flex-col justify-end">
                     <div class="grid grid-cols-3 gap-3">
                         @foreach(['1', '2', '3', '4', '5', '6', '7', '8', '9', '000', '00', '0'] as $key)

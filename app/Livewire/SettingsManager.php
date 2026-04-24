@@ -30,6 +30,9 @@ class SettingsManager extends Component
     public $social_facebook = '';
     public $social_youtube = '';
 
+    // Advanced Settings
+    public $enable_virtual_keypad = false;
+
     // Logo
     public $logo = null;       // File upload temporary
     public $currentLogo = '';   // Existing logo path
@@ -53,6 +56,9 @@ class SettingsManager extends Component
         $this->social_tiktok = Setting::get('social_tiktok', '');
         $this->social_facebook = Setting::get('social_facebook', '');
         $this->social_youtube = Setting::get('social_youtube', '');
+
+        // Advanced Settings
+        $this->enable_virtual_keypad = (bool) Setting::get('enable_virtual_keypad', '0');
 
         // Logo
         $this->currentLogo = Setting::get('store_logo', '');
@@ -79,6 +85,7 @@ class SettingsManager extends Component
             'social_facebook' => 'nullable|url|max:500',
             'social_youtube' => 'nullable|url|max:500',
             'logo' => 'nullable|image|mimes:png,jpg,jpeg,svg|max:1024',
+            'enable_virtual_keypad' => 'boolean',
         ]);
 
         Setting::set('store_name', $this->store_name, 'general');
@@ -87,6 +94,7 @@ class SettingsManager extends Component
         Setting::set('tax_enabled', $this->tax_enabled ? '1' : '0', 'tax');
         Setting::set('tax_rate', (string) $this->tax_rate, 'tax');
         Setting::set('receipt_footer', $this->receipt_footer, 'receipt');
+        Setting::set('enable_virtual_keypad', $this->enable_virtual_keypad ? '1' : '0', 'general');
 
         // Social Media
         Setting::set('social_instagram', $this->social_instagram ?? '', 'social');

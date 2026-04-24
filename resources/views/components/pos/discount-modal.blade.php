@@ -1,6 +1,7 @@
 @props([
     'tempDiscountType',
-    'tempDiscountValue'
+    'tempDiscountValue',
+    'enableVirtualKeypad'
 ])
 
 <flux:modal wire:model="showDiscountModal" {{ $attributes->merge(['class' => 'max-w-sm p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-3xl w-full']) }}>
@@ -20,17 +21,19 @@
                 <div class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 font-bold text-lg select-none pointer-events-none">{{ $tempDiscountType === 'fixed' ? 'Rp' : '%' }}</div>
             </div>
 
-            <div class="grid grid-cols-3 gap-2">
-                @foreach(['1', '2', '3', '4', '5', '6', '7', '8', '9', '000', '00', '0'] as $key)
-                    <button type="button" wire:click="appendDiscountKeypad('{{ $key }}')" class="h-14 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white rounded-xl font-bold text-xl transition-colors active:scale-95 shadow-sm">
-                        {{ $key }}
+            @if($enableVirtualKeypad)
+                <div class="grid grid-cols-3 gap-2">
+                    @foreach(['1', '2', '3', '4', '5', '6', '7', '8', '9', '000', '00', '0'] as $key)
+                        <button type="button" wire:click="appendDiscountKeypad('{{ $key }}')" class="h-14 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white rounded-xl font-bold text-xl transition-colors active:scale-95 shadow-sm">
+                            {{ $key }}
+                        </button>
+                    @endforeach
+                    <button type="button" wire:click="clearDiscountKeypad" class="col-span-1 h-12 bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400 rounded-xl font-black text-xs uppercase active:scale-95 shadow-sm">Clear</button>
+                    <button type="button" wire:click="removeDiscountKeypad" class="col-span-2 h-12 bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/40 rounded-xl flex items-center justify-center transition-colors active:scale-95 shadow-sm">
+                        <flux:icon name="backspace" class="h-6 w-6" />
                     </button>
-                @endforeach
-                <button type="button" wire:click="clearDiscountKeypad" class="col-span-1 h-12 bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400 rounded-xl font-black text-xs uppercase active:scale-95 shadow-sm">Clear</button>
-                <button type="button" wire:click="removeDiscountKeypad" class="col-span-2 h-12 bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/40 rounded-xl flex items-center justify-center transition-colors active:scale-95 shadow-sm">
-                    <flux:icon name="backspace" class="h-6 w-6" />
-                </button>
-            </div>
+                </div>
+            @endif
         </div>
 
         <div class="flex gap-2 pt-2">

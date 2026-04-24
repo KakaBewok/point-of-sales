@@ -50,6 +50,14 @@ class PosScreen extends Component
     // QRIS availability
     public $qrisNotConfigured = false;
 
+    // Advanced Settings
+    public $enable_virtual_keypad = false;
+
+    public function mount()
+    {
+        $this->enable_virtual_keypad = (bool) Setting::get('enable_virtual_keypad', false);
+    }
+
     // Computed totals
     public function getSubtotalProperty(): float
     {
