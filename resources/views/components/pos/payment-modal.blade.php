@@ -7,8 +7,8 @@
     'enableVirtualKeypad'
 ])
 
-<flux:modal wire:model="showPaymentModal" {{ $attributes->merge(['class' => 'max-w-2xl p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-3xl w-full']) }}>
-    <div class="p-6 space-y-6">
+<flux:modal wire:model="showPaymentModal" {{ $attributes->merge(['class' => 'max-w-sm md:max-w-2xl p-2 overflow-hidden bg-white dark:bg-zinc-900 rounded-md w-full']) }}>
+    <div class="p-4 md:p-6 space-y-6 overflow-y-auto md:overflow-y-hidden max-h-[85vh] md:max-h-[93vh]">
         <header class="flex justify-between items-end border-b border-zinc-100 dark:border-zinc-800 pb-5">
             <div>
                 <h2 class="text-xl font-black uppercase tracking-tighter text-zinc-900 dark:text-white leading-none">Checkout</h2>
@@ -16,7 +16,7 @@
             </div>
             <div class="text-right">
                 <p class="text-[10px] font-black tracking-[0.2em] text-zinc-400 uppercase mb-1">Total Bayar</p>
-                <p class="text-3xl font-black text-green-600 tracking-tighter leading-none">Rp{{ number_format($grandTotal, 0, ',', '.') }}</p>
+                <p class="text-3xl font-black text-green-600 tracking-wide leading-none">Rp{{ number_format($grandTotal, 0, ',', '.') }}</p>
             </div>
         </header>
 
@@ -36,6 +36,8 @@
                     @endforeach
                 </div>
 
+                <!-- sampe sini -->
+
                 {{-- Context Action Area --}}
                 <div class="bg-zinc-50 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800 min-h-[160px] flex flex-col justify-center flex-1">
                     @if($paymentMethod === 'cash')
@@ -51,6 +53,7 @@
                                     wire:model.live="cashReceived"
                                     class="w-full h-20 text-4xl font-black text-right pr-4 tracking-tighter bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-700 rounded-2xl focus:border-green-500 outline-none text-zinc-900 dark:text-white transition-all caret-green-600"
                                     placeholder="0"
+                                    {{ $enableVirtualKeypad ? 'readonly' : '' }}
                                     autofocus
                                 />
                                 <div class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 font-bold text-lg select-none pointer-events-none">Rp</div>
@@ -120,7 +123,7 @@
                 <div class="md:w-64 shrink-0 flex flex-col justify-end">
                     <div class="grid grid-cols-3 gap-3">
                         @foreach(['1', '2', '3', '4', '5', '6', '7', '8', '9', '000', '00', '0'] as $key)
-                            <button type="button" wire:click="appendKeypad('{{ $key }}')" class="h-14 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white rounded-xl font-bold text-xl transition-colors select-none active:scale-95 shadow-sm">
+                            <button type="button" wire:click="appendKeypad('{{ $key }}')" class="h-11 md:h-14 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white rounded-xl font-bold text-md md:text-xl transition-colors select-none active:scale-95 shadow-sm">
                                 {{ $key }}
                             </button>
                         @endforeach
@@ -141,7 +144,7 @@
                 class="flex-[2] h-14 rounded-xl bg-green-600 hover:bg-green-700 text-white font-black uppercase text-[12px] tracking-[0.2em] shadow-lg shadow-green-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group transition-all"
             >
                 Konfirmasi Bayar
-                <flux:icon name="arrow-right" class="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                <!-- <flux:icon name="arrow-right" class="h-4 w-4 transition-transform group-hover:translate-x-1" /> -->
             </button>
         </div>
     </div>

@@ -11,7 +11,11 @@
         </header>
 
         <div class="space-y-4 relative">
-            <input type="text" readonly value="{{ $tempVoucherCode }}" class="w-full h-16 text-center text-3xl font-black uppercase bg-white dark:bg-zinc-950 border-2 border-zinc-200 dark:border-zinc-800 rounded-2xl text-zinc-900 dark:text-white" placeholder="KODE VOUCHER">
+            @if($enableVirtualKeypad)
+                <input type="text" readonly value="{{ $tempVoucherCode }}" class="w-full h-16 text-center text-3xl font-black uppercase bg-white dark:bg-zinc-950 border-2 border-zinc-200 dark:border-zinc-800 rounded-2xl text-zinc-900 dark:text-white" placeholder="KODE VOUCHER">
+            @else
+                <input type="text" wire:model="tempVoucherCode" class="w-full h-16 text-center text-3xl font-black uppercase bg-white dark:bg-zinc-950 border-2 border-zinc-200 dark:border-zinc-800 rounded-2xl text-zinc-900 dark:text-white" placeholder="KODE VOUCHER" autofocus>
+            @endif
 
             @if($enableVirtualKeypad)
                 <div class="space-y-2">

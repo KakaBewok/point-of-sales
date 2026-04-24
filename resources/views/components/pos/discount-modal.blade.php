@@ -17,7 +17,11 @@
             </div>
 
             <div class="relative">
-                <input type="text" readonly value="{{ $tempDiscountValue ? number_format((float)$tempDiscountValue, 0, ',', '.') : '' }}" class="w-full h-16 text-center text-3xl font-black bg-white dark:bg-zinc-950 border-2 border-zinc-200 dark:border-zinc-800 rounded-2xl text-zinc-900 dark:text-white" placeholder="0">
+                @if($enableVirtualKeypad)
+                    <input type="text" readonly value="{{ $tempDiscountValue ? number_format((float)$tempDiscountValue, 0, ',', '.') : '' }}" class="w-full h-16 text-center text-3xl font-black bg-white dark:bg-zinc-950 border-2 border-zinc-200 dark:border-zinc-800 rounded-2xl text-zinc-900 dark:text-white" placeholder="0">
+                @else
+                    <input type="number" wire:model="tempDiscountValue" class="w-full h-16 text-center text-3xl font-black bg-white dark:bg-zinc-950 border-2 border-zinc-200 dark:border-zinc-800 rounded-2xl text-zinc-900 dark:text-white" placeholder="0" autofocus>
+                @endif
                 <div class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 font-bold text-lg select-none pointer-events-none">{{ $tempDiscountType === 'fixed' ? 'Rp' : '%' }}</div>
             </div>
 

@@ -36,7 +36,7 @@
                 <flux:input label="Nomor Telepon" type="number" class="text-sm h-10" wire:model="store_phone" />
                 
                 <div class="pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                    <flux:switch class="text-xs" label="Enable Virtual Keypad" wire:model.live="enable_virtual_keypad" description="Show on-screen keypad for easier input (recommended for tablet devices)" />
+                    <flux:switch class="text-xs" label="Gunakan Tombol Layar" wire:model.live="enable_virtual_keypad" description="Tampilkan tombol keyboard di layar untuk mempermudah input (direkomendasikan untuk tablet)" />
                 </div>
             </div>
         </div>
