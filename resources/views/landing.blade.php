@@ -110,7 +110,7 @@
                 <!-- Screenshot 1 -->
                 <div class="min-w-[85%] sm:min-w-[70%] md:min-w-[45%] lg:min-w-[35%] snap-center shrink-0 cursor-pointer group/modal" onclick="openModal('{{ asset('images/screenshots/pos_dashboard.png') }}', 'Dashboard Analytics')">
                     <div class="rounded-xl overflow-hidden shadow-2xl bg-gray-800 aspect-16/10 relative ring-1 ring-white/10">
-                        <img src="{{ asset('images/screenshots/pos_dashboard.png') }}" alt="Dashboard" class="w-full h-full object-cover transition duration-500 group-hover/modal:scale-105" loading="lazy">
+                        <img src="{{ asset('images/screenshots/1.png') }}" alt="Dashboard" class="w-full h-full object-cover transition duration-500 group-hover/modal:scale-105" loading="lazy">
                         <div class="absolute inset-0 bg-gray-900/0 group-hover/modal:bg-gray-900/40 transition duration-300 flex items-center justify-center">
                             <div class="bg-white/90 backdrop-blur text-gray-900 px-4 py-2 rounded-lg font-semibold text-sm shadow-sm opacity-0 group-hover/modal:opacity-100 transition duration-300 transform translate-y-2 group-hover/modal:translate-y-0 flex items-center gap-2">
                                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
@@ -118,16 +118,16 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mt-5 text-center">
+                    <!-- <div class="mt-5 text-center">
                         <h3 class="text-xl font-bold text-white">Dashboard Analytics</h3>
                         <p class="text-sm text-gray-400 mt-1">Pantau performa harian</p>
-                    </div>
+                    </div> -->
                 </div>
 
                 <!-- Screenshot 2 -->
                 <div class="min-w-[85%] sm:min-w-[70%] md:min-w-[45%] lg:min-w-[35%] snap-center shrink-0 cursor-pointer group/modal" onclick="openModal('{{ asset('images/screenshots/pos_transaction.png') }}', 'Kasir (POS)')">
                     <div class="rounded-xl overflow-hidden shadow-2xl bg-gray-800 aspect-16/10 relative ring-1 ring-white/10">
-                        <img src="{{ asset('images/screenshots/pos_transaction.png') }}" alt="POS" class="w-full h-full object-cover transition duration-500 group-hover/modal:scale-105" loading="lazy">
+                        <img src="{{ asset('images/screenshots/2.png') }}" alt="POS" class="w-full h-full object-cover transition duration-500 group-hover/modal:scale-105" loading="lazy">
                         <div class="absolute inset-0 bg-gray-900/0 group-hover/modal:bg-gray-900/40 transition duration-300 flex items-center justify-center">
                             <div class="bg-white/90 backdrop-blur text-gray-900 px-4 py-2 rounded-lg font-semibold text-sm shadow-sm opacity-0 group-hover/modal:opacity-100 transition duration-300 transform translate-y-2 group-hover/modal:translate-y-0 flex items-center gap-2">
                                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
@@ -135,16 +135,16 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mt-5 text-center">
+                    <!-- <div class="mt-5 text-center">
                         <h3 class="text-xl font-bold text-white">Kasir (POS)</h3>
                         <p class="text-sm text-gray-400 mt-1">Transaksi cepat & mudah</p>
-                    </div>
+                    </div> -->
                 </div>
 
                 <!-- Screenshot 3 -->
                 <div class="min-w-[85%] sm:min-w-[70%] md:min-w-[45%] lg:min-w-[35%] snap-center shrink-0 cursor-pointer group/modal" onclick="openModal('{{ asset('images/screenshots/pos_sales_report.png') }}', 'Laporan Penjualan')">
                     <div class="rounded-xl overflow-hidden shadow-2xl bg-gray-800 aspect-16/10 relative ring-1 ring-white/10">
-                        <img src="{{ asset('images/screenshots/pos_sales_report.png') }}" alt="Laporan" class="w-full h-full object-cover transition duration-500 group-hover/modal:scale-105" loading="lazy">
+                        <img src="{{ asset('images/screenshots/3.png') }}" alt="Laporan" class="w-full h-full object-cover transition duration-500 group-hover/modal:scale-105" loading="lazy">
                         <div class="absolute inset-0 bg-gray-900/0 group-hover/modal:bg-gray-900/40 transition duration-300 flex items-center justify-center">
                             <div class="bg-white/90 backdrop-blur text-gray-900 px-4 py-2 rounded-lg font-semibold text-sm shadow-sm opacity-0 group-hover/modal:opacity-100 transition duration-300 transform translate-y-2 group-hover/modal:translate-y-0 flex items-center gap-2">
                                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
@@ -152,16 +152,16 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mt-5 text-center">
+                    <!-- <div class="mt-5 text-center">
                         <h3 class="text-xl font-bold text-white">Laporan Penjualan</h3>
                         <p class="text-sm text-gray-400 mt-1">Evaluasi bisnis real-time</p>
-                    </div>
+                    </div> -->
                 </div>
 
                 <!-- Screenshot 4 -->
                 <div class="min-w-[85%] sm:min-w-[70%] md:min-w-[45%] lg:min-w-[35%] snap-center shrink-0 cursor-pointer group/modal" onclick="openModal('{{ asset('images/screenshots/pos_expense.png') }}', 'Manajemen Pengeluaran')">
                     <div class="rounded-xl overflow-hidden shadow-2xl bg-gray-800 aspect-16/10 relative ring-1 ring-white/10">
-                        <img src="{{ asset('images/screenshots/pos_expense.png') }}" alt="Pengeluaran" class="w-full h-full object-cover transition duration-500 group-hover/modal:scale-105" loading="lazy">
+                        <img src="{{ asset('images/screenshots/4.png') }}" alt="Pengeluaran" class="w-full h-full object-cover transition duration-500 group-hover/modal:scale-105" loading="lazy">
                         <div class="absolute inset-0 bg-gray-900/0 group-hover/modal:bg-gray-900/40 transition duration-300 flex items-center justify-center">
                             <div class="bg-white/90 backdrop-blur text-gray-900 px-4 py-2 rounded-lg font-semibold text-sm shadow-sm opacity-0 group-hover/modal:opacity-100 transition duration-300 transform translate-y-2 group-hover/modal:translate-y-0 flex items-center gap-2">
                                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
@@ -169,16 +169,16 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mt-5 text-center">
+                    <!-- <div class="mt-5 text-center">
                         <h3 class="text-xl font-bold text-white">Manajemen Pengeluaran</h3>
                         <p class="text-sm text-gray-400 mt-1">Catat biaya operasional</p>
-                    </div>
+                    </div> -->
                 </div>
 
                 <!-- Screenshot 5 -->
                 <div class="min-w-[85%] sm:min-w-[70%] md:min-w-[45%] lg:min-w-[35%] snap-center shrink-0 cursor-pointer group/modal" onclick="openModal('{{ asset('images/screenshots/pos_product_mgmt.png') }}', 'Manajemen Produk')">
                     <div class="rounded-xl overflow-hidden shadow-2xl bg-gray-800 aspect-16/10 relative ring-1 ring-white/10">
-                        <img src="{{ asset('images/screenshots/pos_product_mgmt.png') }}" alt="Manajemen Produk" class="w-full h-full object-cover transition duration-500 group-hover/modal:scale-105" loading="lazy">
+                        <img src="{{ asset('images/screenshots/5.png') }}" alt="Manajemen Produk" class="w-full h-full object-cover transition duration-500 group-hover/modal:scale-105" loading="lazy">
                         <div class="absolute inset-0 bg-gray-900/0 group-hover/modal:bg-gray-900/40 transition duration-300 flex items-center justify-center">
                             <div class="bg-white/90 backdrop-blur text-gray-900 px-4 py-2 rounded-lg font-semibold text-sm shadow-sm opacity-0 group-hover/modal:opacity-100 transition duration-300 transform translate-y-2 group-hover/modal:translate-y-0 flex items-center gap-2">
                                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
@@ -186,10 +186,26 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mt-5 text-center">
+                    <!-- <div class="mt-5 text-center">
                         <h3 class="text-xl font-bold text-white">Manajemen Produk</h3>
                         <p class="text-sm text-gray-400 mt-1">Stok & inventaris rapi</p>
+                    </div> -->
+                </div>
+                <!-- Screenshot 6 -->
+                <div class="min-w-[85%] sm:min-w-[70%] md:min-w-[45%] lg:min-w-[35%] snap-center shrink-0 cursor-pointer group/modal" onclick="openModal('{{ asset('images/screenshots/pos_product_mgmt.png') }}', 'Manajemen Produk')">
+                    <div class="rounded-xl overflow-hidden shadow-2xl bg-gray-800 aspect-16/10 relative ring-1 ring-white/10">
+                        <img src="{{ asset('images/screenshots/6.png') }}" alt="Manajemen Produk" class="w-full h-full object-cover transition duration-500 group-hover/modal:scale-105" loading="lazy">
+                        <div class="absolute inset-0 bg-gray-900/0 group-hover/modal:bg-gray-900/40 transition duration-300 flex items-center justify-center">
+                            <div class="bg-white/90 backdrop-blur text-gray-900 px-4 py-2 rounded-lg font-semibold text-sm shadow-sm opacity-0 group-hover/modal:opacity-100 transition duration-300 transform translate-y-2 group-hover/modal:translate-y-0 flex items-center gap-2">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                                Perbesar
+                            </div>
+                        </div>
                     </div>
+                    <!-- <div class="mt-5 text-center">
+                        <h3 class="text-xl font-bold text-white">Manajemen Produk</h3>
+                        <p class="text-sm text-gray-400 mt-1">Stok & inventaris rapi</p>
+                    </div> -->
                 </div>
             </div>
 
