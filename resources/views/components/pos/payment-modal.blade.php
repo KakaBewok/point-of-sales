@@ -16,7 +16,7 @@
             </div>
             <div class="text-right">
                 <p class="text-[10px] font-black tracking-[0.2em] text-zinc-400 uppercase mb-1">Total Bayar</p>
-                <p class="text-3xl font-black text-green-600 tracking-wide leading-none">Rp{{ number_format($grandTotal, 0, ',', '.') }}</p>
+                <p class="text-xl mdtext-3xl font-black text-green-600 tracking-wide leading-none">Rp{{ number_format($grandTotal, 0, ',', '.') }}</p>
             </div>
         </header>
 
@@ -26,7 +26,7 @@
                 {{-- Method Selection --}}
                 <div class="grid grid-cols-2 gap-4 shrink-0">
                     @foreach(['cash' => 'Tunai', 'qris' => 'QRIS'] as $val => $label)
-                        <label class="relative flex flex-col items-center justify-center p-4 border-2 rounded-2xl cursor-pointer transition-all {{ $paymentMethod === $val ? 'border-green-600 bg-green-50 dark:bg-green-950/20 shadow-sm' : 'border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 hover:bg-zinc-100' }}">
+                        <label class="relative flex flex-col items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition-all {{ $paymentMethod === $val ? 'border-green-600 bg-green-50 dark:bg-green-950/20 shadow-sm' : 'border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 hover:bg-zinc-100' }}">
                             <input type="radio" wire:model.live="paymentMethod" value="{{ $val }}" class="sr-only">
                             <div class="h-8 w-8 rounded-xl flex items-center justify-center mb-2 {{ $paymentMethod === $val ? 'bg-green-600 text-white' : 'bg-white dark:bg-zinc-800 text-zinc-400' }}">
                                 <flux:icon name="{{ $val === 'cash' ? 'banknotes' : 'qr-code' }}" class="h-5 w-5" />
@@ -36,22 +36,20 @@
                     @endforeach
                 </div>
 
-                <!-- sampe sini -->
-
                 {{-- Context Action Area --}}
-                <div class="bg-zinc-50 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800 min-h-[160px] flex flex-col justify-center flex-1">
+                <div class="bg-zinc-50 dark:bg-zinc-950 p-3 rounded-lg border border-zinc-100 dark:border-zinc-800 min-h-[160px] flex flex-col justify-center flex-1">
                     @if($paymentMethod === 'cash')
                         <div class="space-y-4">
                             <div class="flex items-center justify-between px-1">
                                 <label class="text-[10px] font-black uppercase tracking-widest text-zinc-500">Uang Diterima</label>
-                                <button type="button" wire:click="$set('cashReceived', {{ $grandTotal }})" class="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded-md font-black hover:bg-green-200 transition-colors">PAS</button>
+                                <button type="button" wire:click="$set('cashReceived', {{ $grandTotal }})" class="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded-md font-black hover:bg-green-200 transition-colors cursor-pointer">Uang Pas</button>
                             </div>
                             
                             <div class="relative">
                                 <input 
                                     type="number" 
                                     wire:model.live="cashReceived"
-                                    class="w-full h-20 text-4xl font-black text-right pr-4 tracking-tighter bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-700 rounded-2xl focus:border-green-500 outline-none text-zinc-900 dark:text-white transition-all caret-green-600"
+                                    class="w-full h-20 text-4xl font-black text-right pr-4 tracking-wide bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-700 rounded-lg focus:border-green-500 outline-none text-zinc-900 dark:text-white transition-all caret-green-600"
                                     placeholder="0"
                                     {{ $enableVirtualKeypad ? 'readonly' : '' }}
                                     autofocus
@@ -73,7 +71,7 @@
                                     </span>
                                 </div>
                                 @if($cashReceived < $grandTotal && $cashReceived > 0)
-                                    <p class="text-[9px] font-bold text-red-500 uppercase tracking-tight text-right px-1">Kurang: Rp{{ number_format($grandTotal - $cashReceived, 0, ',', '.') }}</p>
+                                    <p class="text-xs md:text-sm font-bold text-red-500 tracking-wide text-right px-1">Kurang Rp{{ number_format($grandTotal - $cashReceived, 0, ',', '.') }}</p>
                                 @endif
                             </div>
                         </div>
@@ -92,8 +90,8 @@
                                         Pelanggan scan QR dari EDC atau QR Cetak.
                                     </p>
                                 </div>
-                                <div class="px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                                    <p class="text-[9px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest">Total: Rp{{ number_format($grandTotal, 0, ',', '.') }}</p>
+                                <div class="px-3 py-2 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                                    <p class="text-[12px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest">Total Rp {{ number_format($grandTotal, 0, ',', '.') }}</p>
                                 </div>
                             </div>
                         @else
@@ -123,11 +121,11 @@
                 <div class="md:w-64 shrink-0 flex flex-col justify-end">
                     <div class="grid grid-cols-3 gap-3">
                         @foreach(['1', '2', '3', '4', '5', '6', '7', '8', '9', '000', '00', '0'] as $key)
-                            <button type="button" wire:click="appendKeypad('{{ $key }}')" class="h-11 md:h-14 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white rounded-xl font-bold text-md md:text-xl transition-colors select-none active:scale-95 shadow-sm">
+                            <button type="button" wire:click="appendKeypad('{{ $key }}')" class="cursor-pointer h-11 md:h-14 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white rounded-xl font-bold text-md md:text-xl transition-colors select-none active:scale-95 shadow-sm">
                                 {{ $key }}
                             </button>
                         @endforeach
-                        <button type="button" wire:click="removeKeypad" class="col-span-3 h-14 bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/40 dark:text-red-400 rounded-xl flex items-center justify-center transition-colors active:scale-95 shadow-sm">
+                        <button type="button" wire:click="removeKeypad" class="cursor-pointer col-span-3 h-14 bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/40 dark:text-red-400 rounded-xl flex items-center justify-center transition-colors active:scale-95 shadow-sm">
                             <flux:icon name="backspace" class="h-6 w-6" />
                         </button>
                     </div>
@@ -136,15 +134,14 @@
         </div>
 
         <div class="flex gap-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">
-            <button type="button" wire:click="$set('showPaymentModal', false)" class="flex-1 h-14 rounded-xl border border-zinc-200 dark:border-zinc-700 text-[11px] font-black uppercase text-zinc-500 hover:bg-zinc-50 transition-colors">Batal</button>
+            <button type="button" wire:click="$set('showPaymentModal', false)" class="cursor-pointer flex-1 h-14 rounded-xl border border-zinc-200 dark:border-zinc-700 text-[11px] font-black uppercase text-zinc-500 hover:bg-zinc-50 transition-colors">Batal</button>
             <button 
                 type="button" 
                 wire:click="processPayment" 
                 @if($paymentMethod === 'cash' && $cashReceived < $grandTotal) disabled @endif
-                class="flex-[2] h-14 rounded-xl bg-green-600 hover:bg-green-700 text-white font-black uppercase text-[12px] tracking-[0.2em] shadow-lg shadow-green-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group transition-all"
+                class="cursor-pointer flex-2 h-14 rounded-xl bg-green-600 hover:bg-green-700 text-white font-black uppercase text-[12px] tracking-[0.2em] shadow-lg shadow-green-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group transition-all"
             >
                 Konfirmasi Bayar
-                <!-- <flux:icon name="arrow-right" class="h-4 w-4 transition-transform group-hover:translate-x-1" /> -->
             </button>
         </div>
     </div>

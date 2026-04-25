@@ -3,14 +3,14 @@
     'qrisImageData'
 ])
 
-<flux:modal wire:model="showResultModal" {{ $attributes->merge(['class' => 'max-w-md p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-[2.5rem]']) }} :closable="false">
+<flux:modal wire:model="showResultModal" {{ $attributes->merge(['class' => 'max-w-sm md:max-w-md p-0 overflow-hidden bg-white dark:bg-zinc-900 rounded-md']) }} :closable="false">
     @if($paymentResult)
         <div class="p-8 flex flex-col items-center text-center">
             <div class="h-16 w-16 bg-green-500 text-white rounded-full flex items-center justify-center mb-6 shadow-xl shadow-green-100 border-4 border-white dark:border-zinc-800">
                 <flux:icon name="check" variant="solid" class="h-8 w-8" />
             </div>
             
-            <h2 class="text-xl font-black uppercase tracking-tighter text-zinc-900 dark:text-white leading-none">Berhasil!</h2>
+            <h2 class="text-xl font-black uppercase tracking-wide text-zinc-900 dark:text-white leading-none">Berhasil!</h2>
             <p class="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mt-2 mb-8">Invoice #{{ $paymentResult['invoice'] }}</p>
 
             @if($paymentResult['method'] === 'qris')
@@ -22,11 +22,11 @@
                         </div>
                     @endif
 
-                    <p class="text-2xl font-black text-green-600 tracking-tighter leading-none">
+                    <p class="text-2xl font-black text-green-600 tracking-wide leading-none">
                         Rp{{ number_format($paymentResult['grand_total'], 0, ',', '.') }}
                     </p>
 
-                    <p class="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] text-center">
+                    <p class="text-[10px] font-black text-zinc-400 tracking-[0.2em] uppercase text-center">
                         @if(isset($paymentResult['qris_type']) && $paymentResult['qris_type'] === 'external')
                             Pastikan pembayaran sudah diterima<br>lewat EDC atau mutasi rekening
                         @else
@@ -39,13 +39,13 @@
                         <button
                             wire:click="confirmQrisPayment"
                             type="button"
-                            class="w-full h-12 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg"
+                            class="w-full h-12 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-black tracking-wide flex items-center justify-center gap-2 transition-all active:scale-95 shadow-md"
                         >
                             <flux:icon name="check-circle" class="h-4 w-4" />
                             Konfirmasi Pembayaran Diterima
                         </button>
                     @else
-                        <div class="w-full h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-2">
+                        <div class="w-full h-12 rounded-md bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-sm font-black tracking-wide flex items-center justify-center gap-2">
                             <flux:icon name="check-circle" class="h-4 w-4" />
                             Pembayaran Dikonfirmasi
                         </div>
@@ -58,12 +58,12 @@
                 </div>
             @else
                 <div class="mb-8 w-full grid grid-cols-2 gap-3">
-                    <div class="bg-zinc-50 p-4 rounded-2xl">
-                        <p class="text-[8px] font-black text-zinc-400 uppercase mb-1">Diterima</p>
+                    <div class="bg-zinc-50 p-4 rounded-lg">
+                        <p class="text-xs font-black text-zinc-400 mb-1">Diterima</p>
                         <p class="text-sm font-black">Rp{{ number_format($paymentResult['cash_received'], 0, ',', '.') }}</p>
                     </div>
-                    <div class="bg-emerald-50 p-4 rounded-2xl">
-                        <p class="text-[8px] font-black text-emerald-400 uppercase mb-1">Kembali</p>
+                    <div class="bg-emerald-50 p-4 rounded-lg">
+                        <p class="text-xs font-black text-emerald-400 mb-1">Kembali</p>
                         <p class="text-sm font-black text-emerald-600">Rp{{ number_format($paymentResult['change'], 0, ',', '.') }}</p>
                     </div>
                 </div>
@@ -73,7 +73,7 @@
                 <a href="{{ route('receipt.print', $paymentResult['transaction_id']) }}" target="_blank" class="h-12 w-full flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 rounded-xl text-[10px] font-black uppercase tracking-widest border border-zinc-200">
                     <flux:icon name="printer" class="h-4 w-4" /> Cetak Struk
                 </a>
-                <button wire:click="newTransaction" type="button" class="h-12 w-full bg-green-600 hover:bg-green-700 text-white rounded-xl text-[10px] font-black uppercase shadow-lg">
+                <button wire:click="newTransaction" type="button" class="cursor-pointer h-12 w-full bg-green-600 hover:bg-green-700 text-white rounded-md text-[12px] font-black uppercase shadow-lg">
                     Selesai
                 </button>
             </div>
